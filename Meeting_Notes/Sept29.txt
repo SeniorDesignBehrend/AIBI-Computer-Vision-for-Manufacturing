@@ -1,0 +1,659 @@
+When: September 19th, 3:30pm
+Who: Daniel, Jacob, Nathan, Collin
+What:
+Meeting Purpose
+
+Introduce AIBI's computer vision project for manufacturing quality control and discuss technical requirements and implementation strategies.
+Key Takeaways
+
+    Project aims to streamline part tracking and quality control in manufacturing using computer vision and AI
+    Two main components: barcode/QR code scanning and human activity monitoring for process adherence
+    Implementation challenges include on-premise deployment, varying workstation setups, and integrating with existing systems
+    Weekly meetings scheduled for Thursdays 12-1 PM; team to provide agenda by Tuesday
+
+Topics
+AIBI Background and Project Overview
+
+    AIBI spun off from KMD Technology Solutions to develop on-premise AI solutions for manufacturers
+    Previous projects: quote generation assistance and automated test creation from work instructions
+    Current focus: computer vision for part tracking and quality control in manufacturing processes
+
+Part Tracking System Requirements
+
+    Detect and decode multiple barcodes/QR codes from a single image or video frame
+    Handle various scenarios: paper with multiple codes, individual part barcodes, etched identifiers on large parts
+    Ensure high accuracy and ease of use for factory workers in challenging environments (gloves, safety equipment)
+    Potential use of Raspberry Pi with cameras or centralized server-based processing
+
+Human Activity Monitoring
+
+    Track worker adherence to multi-step processes at each workstation
+    Use computer vision to detect completion of steps (e.g., applying cloth before resin)
+    Provide real-time feedback and alerts for out-of-order operations
+    Challenge: Accounting for variations in human behavior and camera angles
+
+Technical Considerations
+
+    On-premise deployment using Ubuntu server with Python
+    Evaluate need for GPUs vs. CPU-only processing
+    Consider network constraints for video streaming from multiple workstations
+    Aim for lower-quality video feeds to reduce bandwidth and cost
+    Leverage existing computer vision models and libraries where possible
+
+Documentation and Deployment
+
+    Emphasis on thorough documentation (200-300 pages expected)
+    Plan for easy deployment and maintenance in factory environments
+    Consider creating a configurable system to adapt to different workstation setups
+
+Next Steps
+
+    Nathan to schedule recurring Thursday meetings (12-1 PM) and reach out to Professor Liao
+    Team to compile and email questions daily to kevin@aibi.com
+    Investigate NDA requirements with Professor Ibrahim
+    Connect with Kevin on LinkedIn for project updates and networking
+    Research existing computer vision technologies applicable to the project
+    Prepare detailed questions for next meeting, focusing on technical feasibility and implementation strategies
+
+Transcript:
+Impromptu Microsoft Teams Meeting - September 19
+VIEW RECORDING - 62 mins (No highlights): https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_
+
+---
+
+1:27 - Daniel Pora (136dpora@gmail.com)
+  Yo. Yo. Do hear me?
+
+1:34 - Nathan DiGilio
+  Yeah.
+
+1:34 - Miller, Collin
+  No.
+
+1:35 - Daniel Pora (136dpora@gmail.com)
+  Yes. Good. Can I just paste it real quick? Thank you.
+
+1:59 - Nathan DiGilio
+  Here. There.
+
+2:07 - Daniel Pora (136dpora@gmail.com)
+  Yeah, we got to do a climbing trip together, all of this, you know, rebonding. I need a climbing version of a pull-up assist band.  I just want to get your dad on the big wall, because they have a 55-foot wall there. So you're climbing up 55 feet, which is, like, super intense.  It's terrifying. It's lot of endurance. Yeah, that's way too high. I get scared, like, walking up the stairs. All right.  It gets better the more you do it.
+
+3:08 - Miller, Collin
+  Yeah, definitely.
+
+3:13 - Daniel Pora (136dpora@gmail.com)
+  Gentlemen.
+
+3:15 - Kevin DiGilio
+  How's it going? Hi.
+
+3:16 - Miller, Collin
+  How are we doing? I'm pretty good.
+
+3:19 - Kevin DiGilio
+  Still missing one person. We got an agenda in here. I didn't even look. Did you just put those in there now?  No, I put that in there yesterday. Oh, heck. Maybe I have to read these. I got them.
+
+3:36 - Daniel Pora (136dpora@gmail.com)
+  I'll be one sec.
+
+3:48 - Kevin DiGilio
+  Okay. I've read the agenda.
+
+3:53 - Nathan DiGilio
+  Hello. Hi.
+
+3:58 - Kevin DiGilio
+  Hear me? Yeah, I can hear you.
+
+4:01 - Nathan DiGilio
+  Okay, perfect. All right.
+
+4:07 - Daniel Pora (136dpora@gmail.com)
+  All right, Dan's back. Excellent. Doing good.
+
+4:13 - Kevin DiGilio
+  Well, it looks like we got our note taker there, too. Excellent. Yeah.
+
+4:18 - Daniel Pora (136dpora@gmail.com)
+  Excellent.
+
+4:20 - Kevin DiGilio
+  Okay, so I know Nathan and Dan.
+
+4:22 - Nathan DiGilio
+  For we have Fathom in here, which is an AI note taker, it automatically records the video and does a pretty good job taking notes on action items and such.  Okay, cool.
+
+4:36 - Kevin DiGilio
+  And it's going to kick out an email to everybody here with the summary. And what's cool is it has a link at the bottom that you can actually get in there and use a tool called Ask Fathom that works a lot like chat, except it knows everything about the meeting, the transcript, who is there, who said what.  So, you can tell it to give you a summary of all the tasks for Colin or give you a summary of all the tasks.  one. Thanks. Thank Or, you know, try to clarify what Nathan was talking about. mean, you can ask it pretty much anything.  It's pretty neat. It's worth a look anyway. Yeah, I certainly will. That's a good two and a half.
+
+5:14 - Dzikowski, Jacob John
+  Yeah.
+
+5:17 - Kevin DiGilio
+  Yeah, a couple of our clients don't let us use it because it is cloud-based, and we work with some IP-restricted stuff and government stuff, so they gave me a hard no and told me not to bring it anymore.  It's good that if you bring it to a new audience to mention it, just like Nathan did, just to kind of keep yourself out of trouble.  It's best to ask permission to record people before you do it. But yeah, we're all good here. Hey, so Collin, good to meet you.  You look familiar to me, so you must have been at the hackathon. Yeah.
+
+5:59 - Miller, Collin
+  Yeah. when about. Yay! Bye. Bye. Bye.
+
+6:03 - Kevin DiGilio
+  Excellent. And Jacob, I'm just going to picture you as this tall, dark, and handsome fella since you're hiding back there.  No, I mean, you hit the nail right on the head, so.
+
+6:12 - Dzikowski, Jacob John
+  We'll go with that for now until you prove me otherwise.
+
+6:18 - Nathan DiGilio
+  My computer's, I mean, camera's kind of busted, otherwise I would.
+
+6:23 - Dzikowski, Jacob John
+  It's okay. We'll get that sorted out.
+
+6:25 - Kevin DiGilio
+  It's not super important to me, but we'll meet you sometime. Okay. But everybody's up here, right, at Barron, right?  Yes. All right, so we could probably do some in-person meetings. Sometimes we could, like, go to Radius, or we could find a spot and Barron somewhere.
+
+6:43 - Daniel Pora (136dpora@gmail.com)
+  So we'll make sure we do that at least a couple of times. Yeah, we can go climbing. I'm sure we'll get a ton of work done there.
+
+6:51 - Kevin DiGilio
+  So this is our AIBI logo here. The AIBI doesn't quite fit, but it's the idea. Yeah, a bunch of big brain action going on here.  So. So I'm you guys can do some more of that.
+
+7:06 - Dzikowski, Jacob John
+  You can certainly try. Excellent.
+
+7:09 - Daniel Pora (136dpora@gmail.com)
+  Excellent. All right. So, Nathan, this is your meeting. You in charge here? What's the story?
+
+7:15 - Kevin DiGilio
+  I can be.
+
+7:17 - Nathan DiGilio
+  I guess, do you want to give a kind of an introduction and history of what you and what AIBI is and kind of what you're after?
+
+7:25 - Daniel Pora (136dpora@gmail.com)
+  Sure. Okay.
+
+7:28 - Kevin DiGilio
+  So I have a company that Nathan has worked with for, I don't know, five plus years and Dan has played along.  It's called KMD Technology Solutions. And we provide project management, service request management, and kind of general workflow management software to manufacturers.  And our sweet spot is manufacturers that interact with the government because they have really, really heavy regulations. And so when you're trying to convince a new group of people.  For to use software and track their work and do a bunch of stuff, having the government force them to do it is a pretty helpful incentive.  Some companies can use it if they want to, but the government really requires a very specific level of tracking for a whole bunch of different things.  And so over the years, we've been very good at understanding those things that need tracked and then providing tools for folks to track them in a very simple fashion so that when the auditors show up, they're typically very successful.  Because if they do what we tell them to do, then all their stuff is tracked in a really nice, organized way.  Then the auditors look at it, everybody smiles, and the auditors go home. So we've been very successful in that regard.  And what we found is that these folks like to keep their data on-prem. They can't use the cloud. And I mean, can't is kind of in air quotes.  There are a number of cloud entities that support. They typically cost more, but there's still kind of a general mistrust of the cloud because once your data leaves your facility, you can't really get it back.  So at each one of these manufacturers, there's typically a compliance team led by a compliance manager, and their butt's kind of on the line if something goes wrong.  So it's very easy for them to say, no, let's not use the cloud, let's not use AI, let's not use any cool features because we need to stay safe.  And from their standpoint, it's more important to stay safe than it is to use cutting edge technology. And depending on what their budgets are and how much people in their company listen to them, this often is the winning voice.  So we found this to be quite common that the compliance teams are just afraid of the cloud. And rightfully so, you know, we've all seen enough hackings and random things.  And really, if you give all your data to Microsoft or Google, and then the government decides. And if they want it, there's not much you can do to stop it.  So there are some risks. It's probably trustworthy from a government standpoint, but if you're really trying to protect your IP, you know, your secret sauce or your inventions, it's hard to say whether it's actually safe to put it out there, because anybody can get hacked, anybody can be forced by the government to do whatever.  So that's kind of the general attitude of the people that we're working with. So, as we are kind of installing these systems and working with these companies, we found that there's a ton of work that we think AI can do for them.  They can't use AI like we all understand it, so we need an on-prem AI solution. And so, back in November, we started AIBI with that kind of goal in mind.  And we had kind of three primary things that we wanted to do. We wanted to be able to help them make quotes faster.  Sure. So, if you're a job shop. up. And you will build parts for customers. So let's just make up a scenario, right?  We have Boeing building a new helicopter for the US military. And that helicopter has an engine in it.
+
+11:12 - Daniel Pora (136dpora@gmail.com)
+  And that engine shakes a lot.
+
+11:13 - Kevin DiGilio
+  So you need an engine mount to hold that engine to the helicopter. So Boeing doesn't build engine mounts. They probably don't even build engines.  So Boeing hires some subcontractor to make an engine. Boeing hires some subcontractor to make an engine mount. And all of these different companies all have the same government rules they kind of suffer with.  So the smaller the companies get, the less they want to afford things like Meta or IBM or the kind of the big players in the space.  So that leaves a whole market of people that a company like ours can kind of serve. And kind of help them.  So, so when they, when they build these. So, So these companies are good at building engine mounts, so they build lots of them, but Secorsi is going to show up with a slightly, or Boeing is going to show up with a slightly different version of an engine mount.  So if we can take all of their quoting data and their engine mount data and put it into something that a large language model can get to, now any old engineer can ask questions, just like chat, and have access to their kind of proprietary information.  So our first task was to, you know, help them, just by typing or searching, find a quote that looks an awful lot like the new quote that came in.  So was kind of our first one. Nathan and Max worked on that over the summer. That went pretty well.  Another thing we found is that they write work instructions to build these things. So people that work in the actual factory, building the actual part, they have to follow very specific instructions.  And then to get certain certifications, they have to take a test, typically a Multiple choice tests to be able to prove that they actually know how to do the work.  And so that means, well, someone has to make these tests. So some poor dude's got to read these work instructions and then go build these multiple choice questions.  And, you know, if you can picture the professors, right, they have to build, you know, five options. Four of them have to be wrong, but kind of clever.  One of them's got to be right. So there's this whole test building process that nobody really wants to do.  So we thought, well, let's take a language model and tell it to look at the work instruction and go ahead and give us a multiple choice question.  So that's something that Nathan and Max built over the summer, and that's actually going pretty well. So those were kind of the first two things that we wanted to take care of because they were clear problems that a current customer had.  So now that we have kind of this on-prem AI available to us, you know, we buy a server, we install it at the manufacturer.  We write some Python code, we install some models. And then. And the magic starts to happen. So that's kind of how AIBI started.  The projects that we're bringing to you guys are a little more advanced. It's not just using language models, right?  We want to use cameras to do some pretty cool things. So one of the tasks that we have is, back to that example of Boeing building an engine mount, so we have this factory that builds engine mounts.  So the engineer comes up with a design, a drawing, all the stuff needed to know how to build it, but people actually have to build it, right?  So maybe they have to take rubber and metal and put it together. They have to cut it to a certain shape, mold it to a certain shape.  They have to test it. So there's a whole bunch of steps in the process of building this thing. And if you're interacting with the government, there's a certain level of quality it has to be built to because, well, we're going to put it on a helicopter and we can't have people just falling out of the sky.  So there's a ton of regulations on the high level of quality that Aerospace products have to have. So as they move this part through the factory, we have to keep track of how long it was at each station, was it in the oven long enough, did it get sanded properly, did it get cut and measured properly?  There's just a zillion things that have to go perfectly right for this thing to be a high-quality part. And so what they're doing now is they have these barcode scanners, much like you'd see at a Dollar General or any grocery store, right?  Little trigger, and you point at the barcode, and you click a button. And so for a single part that arrives at like the first workstation, there might be between 5 and 20 barcodes that they have to scan, depending on what material it is.  What rubber was it made of? What metal was it made of? What lot of the rubber did it come from?  What company made the rubber? You know, they're going to scan the barcode that's on the employee's badge to know who's working on it.
+
+15:57 - Daniel Pora (136dpora@gmail.com)
+  They're going to scan a barcode on the workstation to know what...
+
+16:01 - Kevin DiGilio
+  So we see this opportunity where one person has the room to make a lot of mistakes with this barcode scanner.  They scan things in the wrong order, or if the scanner kind of sucks and doesn't work, or if the barcode's kind of crappy.  There's just a lot of room for error. So we believe that if we have a piece of paper that has all the barcodes on it, let's just say there's 20 on there, we believe that we don't need barcode scanners anymore because computer vision with a single frame of those barcodes should be able to detect everything that's on there.  And we've done some baseline testing, right? We've taken images that have barcodes all over it and submitted them to chat, and chat can figure it all out.  It knows, you know, what each barcode means, what the number is, and it provides us a nice JSON file of all the numbers that were on the screen.  So at a baseline level, we know the technology is available. So our trick- We want to make sure that it's extremely usable and we can do it all on-prem without touching the cloud.  And so extremely usable. So picture yourself, you're this guy working in the factory, you maybe have gloves on, you have equipment on, you may have goggles, a hard hat, the kind of crap that you need to keep yourself safe.  And then you have to take this piece of paper and get the camera to see it, and you want it to work on the first try.  I'm not sure if you guys have used the scanners at, you know, self-checkout, but it doesn't always work, and you got to kind of shuffle it around and move it and kind of get it just right to get the damn thing to scan.  But we don't want our people suffering from that. So part of this is making it work, but the most important part is it doesn't work really, really easy.  Like, can we get it so that maybe even the piece of paper is just on a table, and that table is in the view of the camera, so that a person doesn't even have to think about holding the paper up?  up in front of the camera, they just do what they'd normally do, and because that paper ends up in front of the camera, our technology should be able to recognize that the paper's there, and then pick up all the barcodes pretty instantly, and feed that back to the system.  So I'm going to pause there for a second.
+
+18:21 - Daniel Pora (136dpora@gmail.com)
+  That was a lot of information.
+
+18:22 - Kevin DiGilio
+  So how are we feeling in general about, you know, the idea of a part moving through a factory, and the fact that this piece of paper with barcodes kind of goes with it?  Any questions, comments? I think that clarifies it a lot for me.
+
+18:39 - Dzikowski, Jacob John
+  So this is more so, rather than like object recognition, it's more so recognizing the barcodes that are moving along with the parts that are needed.  So like, don't, we don't have to recognize the part, we just have to recognize that there's a barcode there, and then get the information from the barcode?  I would say mostly yes.
+
+18:58 - Kevin DiGilio
+  But a challenge that I know they're going to introduce. This is that some things that need scanned can't have barcodes, so there may be a little bit of object detection, so I'm glad you brought that up, because one of the examples they have is one of the companies that we work for, they build tubes for missiles, and so to build a tube for a missile, what they have is this big, they call it a mandrel, but it's really just this long tube, and long, I want to say 10 or 20 feet long, it weighs hundreds of pounds, so nobody can pick it up, so it's being moved by some sort of large arm that's kind of, what's it called, Nathan, what's the word for it, it's a lift, maybe, or a crane?  Yeah, it's kind of like a crane, but it's not actually a crane, dang it, no, I can't remember what it's called, but anyway, a crane is a good enough thing to picture, some kind of overhead thing that moves this thing, because this, they'll wrap a bunch of stuff around this tube, and then they'll  Stick the whole thing in the oven to get cured. And so any barcodes, stickers, any of that kind of stuff would just get burnt off in the oven.  And so what I was kind of thinking is if on the end of this mandrill, say they have three of them, if they just carved something into it, you know, maybe used an etcher and etched a 1, 2, 3, or an ABC or something that we could train the image recognition on, and then that would give us something similar to scanning a barcode.  And so that's a fun little challenge that we're going to have when they don't have a barcode that they can produce.  So we may have some room to recommend what we think, you know, we can detect because we know this mandrill is going to move in front of the camera.  And so we could, you know, at a very specific angle, a very specific height or something, you know, teach it to kind of detect an object.  effect. And Nathan, I'm picturing your pen example that you gave. Yeah. If we give it enough frames of a shirt.  Yeah, it may not be the same thing, but that's what's kind of in my head. And then also keep in mind that these barcodes are likely going to be two-dimensional QR-style codes or barcodes or a combination of them.  Kind of as they mature through their process, they may swap things out. Because a barcode is kind of limited on what it can store, but a QR code can hold all sorts of stuff.
+
+21:37 - Nathan DiGilio
+  Yeah, that barcode example should be pretty trivial and pretty easy to do, I can imagine. Excellent. So the challenge would be definitely that the part recognition one where barcodes don't exist.  Okay.
+
+21:51 - Kevin DiGilio
+  I guess the level one. Yeah. Yeah, we may have to have a conversation too with Larry to see what we can actually do to a man.  But he seemed to be open to quite a few things because it's such a pain right now. You know, someone looks at it with their eyes, hopes that they see what they see, and then they type it into a text box.  And so that's just, you know, very ripe for errors to happen.
+
+22:19 - Nathan DiGilio
+  So I guess the two parts to this first problem is, one, due to the QR codes, they should be able to easily have a paper on a table or some location to where it scans every barcode and stores that.  And then the second part is to recognize a marked in some way part to figure out its information and store that.
+
+22:43 - Kevin DiGilio
+  Yeah, and I'm thinking the part recognition stuff, we'll be able to provide you as many, you know, snapshots of this thing to be able to train it.  Right, so if we're just going to put like a big A on metal, right, we'll be able to give you as many photos.  What's you're in of that A etched piece of metal as you need to be able to detect that on the screen.  And so at that point, it really seems like it's almost like facial recognition, but way, way easier. Yeah.
+
+23:18 - Daniel Pora (136dpora@gmail.com)
+  So will we get footage of this? Will we have footage just to see or visualize?
+
+23:28 - Kevin DiGilio
+  Yeah, I think that we are going to tell them what we need, but I would expect them to, yeah, for the first few runs at this before we have time to actually get in there just to keep things moving quickly, you know, we'll be able to ask Larry to say, hey, go, you know, go take a video of a piece of paper sitting on a table, right?  Then he'll give us like a 30 second video of what he thinks it'll look like.
+
+23:52 - Daniel Pora (136dpora@gmail.com)
+  Yeah. Will there be any security concerns with that? Like will we have to sign anything saying that we're not going to share this?  Oh, we'll probably have to do.
+
+24:00 - Kevin DiGilio
+  Some NDA type of stuff. But I also believe that they'll be smart enough to give us things that are not military at first.  Like they also do stuff for medical tables, things that are less scary. They've given me things that the medical stuff seems to be less concerned to them.  So I have a bunch of stuff that I'm allowed to see. I mean, I've signed it. So we're probably going to sign it anyway because we're going to want to go there.  That's one of the fun parts of this project is that we're talking about an actual manufacturing floor. So we want to go see what they're doing.  But they're not going to let us in there if we don't sign it.
+
+24:33 - Daniel Pora (136dpora@gmail.com)
+  So we'll probably just go through the basic paperwork. But Dan, you and Nathan already have signed something for me.  I think I signed something for accurate. Not sure.
+
+24:44 - Kevin DiGilio
+  Yeah, I'll make one for AIBI just so that it's very simple.
+
+24:48 - Daniel Pora (136dpora@gmail.com)
+  Yeah.
+
+24:49 - Kevin DiGilio
+  I don't know if I've signed anything ever. Yeah, probably not. I'll just cut off your fingers if it gets trouble.  Yeah. But it'll be too late then. So I should probably have you all sign something. Yeah. Yeah. Yeah, so I'll take care of that.  It'll all be under the AIBI umbrella. So if you guys do any breach of stuff, it'll come down heavily on the company as well as you.
+
+25:13 - Nathan DiGilio
+  Yeah, we should talk to Professor Ibrahim as well and see how that falls under or how it's handled on the project or senior design side.
+
+25:22 - Kevin DiGilio
+  Yeah, exactly, because he asked about both those questions on the intake form, and the intake form was pretty lame, but it didn't have a save button.  That's why I screwed up the whole Valkyrie submission, because once you start, you can't stop, and then there's a deadline, and what a mess.  I'm you have all those programmers, and you couldn't write a better intake form? Come on. Yeah. Come on, that's a senior project, a good intake form.  Anyway, anyway. Have you heard any of anyone from the Valkyrie side? Absolutely, absolutely not, and I'll go cry in the corner if it doesn't happen.
+
+26:00 - Daniel Pora (136dpora@gmail.com)
+  And then I'll blame Dan.
+
+26:02 - Dzikowski, Jacob John
+  Yeah, as you should. Yeah. That's right. No rallying of the troops happened over there.
+
+26:08 - Kevin DiGilio
+  But that's OK. All right, so let's stay on topic here. I don't want to start harassing Dan, because that might never end.
+
+26:14 - Dzikowski, Jacob John
+  But we'll save that for future meetings.
+
+26:17 - Kevin DiGilio
+  OK, yeah, so the first two of that is we're going to call it kind of the part-tracking piece of it, so that we know which part is coming in and what it's made of, all of its subcomponents.  And so that's mostly the barcodes. And then that mandrel scenario, that's really just one workstation. So let's say there's 15 different workstations in the factory that this thing's going to go to.  Only one of them has a mandrel. So I think in most cases, they found a way to give us a barcode.  But when I brought up the fact that we can probably figure out how to identify which of the three mandrels it is, that was a pretty exciting thing for them.  So if we can bring them something exciting, that's just good for all of us.
+
+26:59 - Daniel Pora (136dpora@gmail.com)
+  Right? We want to be...
+
+27:00 - Kevin DiGilio
+  As exciting as we can. OK, so that's kind of the first thing, the part tracking. The second piece is more human tracking, right?  So these folks that get hired, they come from temp agencies. They sometimes don't speak our language. And so in the very early stages of things, things can go wrong often.  They do their best to train them. And I'm sure these guys are trying to do their best. But you get a brand new job, and someone gives you a 14-step process.  It's possible that you make a mistake. And so when I watched Nathan's demo with Agrawal at that presentation, the camera was able to detect what step he was doing.  And so if we can, for each workstation, let's just talk about the mandrel, for instance. So the first step is they have to apply this cloth to the mandrel.  It kind of looks almost like a see-through netting. you're here's I But They kind of wrap around it, and then they use this resin, and they paint it all over the fabric.  So there's kind of two steps that need to happen. You have to put the fabric on first before you apply the resin.  So if someone starts applying resin to the mandrel, we should be able to detect that, hey, step two is happening, and we haven't seen step one happen yet.  So at each workstation, there's a guy who's in relatively clean clothes, no gloves, or safety equipment sitting at the computer, and then there's the guy who's actually doing the work.  And so they always work in pairs. And so what I'd like to see is on the computer screen that the computer operator is, is there's maybe a bunch of checkboxes down the right-hand side of the video feed that show the steps that are supposed to happen.
+
+28:51 - Daniel Pora (136dpora@gmail.com)
+  Right? So for that example, there's two checkboxes.
+
+28:54 - Kevin DiGilio
+  One says apply cloth, one says apply resin. And then when the camera sees him put the cloth on, a green.  Checkmark shows up, and now we know it's okay to apply the resin, and then when he applies the resin, the checkmark checks, right, and we kind of keep going with this nice, happy, smiley face, green checkmarks, but then if something goes out of, you know, goes out of order, then we would want some sort of flashy something, maybe an alarm to go off or, you know, something that lets everyone know, holy crap, if you stop now, we can probably save this thing, but we're doing stuff out of order.  So that's a very simple example, but it's just a, it's part of one of the, one of the operations that I, I've seen it on video, so I know how it works, and so, in a similar fashion to your question, Dan, is that we'll likely get a video of how it's supposed to go, and so this would be the ideal, the ideal way for it to go, then if we train the, or, you know, apply the machine learning or whatever that is, do the training of the, the algorithm, then when it's watching another video, it should be able to detect if it's doing the same.  Same thing or not. And so in my head, it seems perfect, but we know damn well that some people are going to apply the resin from left to right rather than right to left, left-handed versus right-handed.  They might drop the brush and have to pick it back up. You know, so there's a bunch of stuff that we have to assume is going to go wrong, but we have to determine if that's wrong enough to stop it.  Or, so I think this one's going to be a little trickier just because humans do funny things, and the example video we get, that's probably going to be a perfect human doing a perfect thing.  So some things that kind of pop into my head is, you know, what angle of camera do we need?  You know, do we even need to see the human, or do we just need to see the product and how it's coming together?  Because, you know, these kind of thoughts will help us decide, you know, what video do we need from them?  You know, where would they position the camera? camera? We won't be in charge of the hardware. They have people that will take care of that.  But if we tell them what camera angle and feed we need to do it best, they'll figure out a way to get a pole and a camera to face it just the right way.  I mean, the engineers that we're dealing with are kind of like mad scientists. They have to build things that never existed before.  They have to try out cool ideas of some really smart, smart dudes that we're interacting with. So they'll figure out how to mount the camera on this device that they probably built themselves.  So like some of these things like the mandrel, when they start wrapping fibers around that, that looks like a relatively homemade thing.  I mean, it couldn't be made in my home, but it's definitely was invented and it's pretty cool. So just some of those things that we have to kind of think about, you know, how perfect does this video feed need to be?  How many frames do we need to kind of train the model? So any of that kind of guide? Gotcha stuff would be great for you guys to kind of think about.  I'm going to try to get us a video of at least one of them. One that we're allowed to see, and that they want to tackle first is another challenge is that, well, they're, they're going to have to do a lot of this testing for us.  I mean, think that we can, we can probably do some stuff on our own just to get the proof of concept down.  You know, like I'm thinking, Nathan, back to your video, you know, you took apart a pen and put it back together and trained it.  So, obviously, you guys would have to be able to figure out that simple use case before you bother going into complex ones, right?
+
+32:46 - Nathan DiGilio
+  Yeah.
+
+32:47 - Kevin DiGilio
+  So I want you guys to kind of think through some of that in your planning, and then, you know, kind of tell me what you think you need to get the level of quality that we're after.  And then another thing just It in my head, even on the first example, that piece of paper full of barcodes, you know, if it's truly just barcodes, we need to figure out in which order the barcode should be fed back to the system, right?  Because if the first one is the raw material and the second one is the glue they used and the third one is the fibers that they used and the fourth one is the part number and the fifth one is the serial number, like we would need probably some configurable way to teach your system, you know, maybe top left or top down, left to right, you know, in which order I want to receive the information.  Because it's your job, your guys' job to produce a JSON string, but you're going to have to give that to me and my team and we're going to feed that into KMD somewhere to actually capture the data.  So, there's, there's got to be some kind of translation between those two things. Wouldn't these barcode numbers be a unique number for like if it was the raw material versus part?  I don't think we can make that assumption, because I believe the way Larry was describing is that some of the barcodes come right from the manufacturer, right, so the two examples I saw is that there's these buckets full of resin, which is really just super sticky glue that you paint on, and then there's spools of fibers.  And so they may get seven spools, and use all seven of those at the same time to kind of build this wound up product, and so there's going to be seven barcodes just to tell us which batch of fibers they used.  And those barcodes came from the manufacturer, and they were on the spool of fiber when it showed up at the factory.  And so I'm willing to believe that the spool makers could possibly have the same number sequences that the glue makers have.  So I don't think we can assume that we'll know based on.
+
+35:02 - Daniel Pora (136dpora@gmail.com)
+  Is there a chance that these barcodes can be damaged while in transit or while they're being shipped? Absolutely.
+
+35:12 - Kevin DiGilio
+  So what I think is going to happen, and this is kind of, I don't know, it's kind of a hope of mine, but like it looked like what he wanted to do was when they, there's a thing called a traveler, which is really just a piece of paper that's inside a, kind of like a clear plastic, something to kind of keep it clean.  And this thing gets passed around with the part from station to station to station. And it's in plastic because these dudes are wearing gloves and they're dirty and it's hot and right.  So they're trying to protect this piece of paper. And so I think they're going to want to put all the barcodes on that piece of paper, but I don't think they want to translate a bunch of stuff.  So I don't know exactly how they're going to do this. If they're going to like take a picture of the set.
+
+36:01 - Daniel Pora (136dpora@gmail.com)
+  too Thank
+
+36:02 - Kevin DiGilio
+  And then somehow get those barcodes onto the piece of paper because all seven spools get loaded into this big machine that does the winding.  So someone had to do that step of take those, you know, physically take the spool, you know, unwrap it from whatever plastic it's in, set it on some kind of spindle where it can kind of free spin, probably grab the first piece of it, stick it in something that can pull it out.  I mean, it's like a real factory doing real things, right? We kind of live in La La Land out here where we just deal with computers, but these factories, you know, they're actually building real things.  So someone had to take these seven spools and put them on there. So I believe as a part of that process, when you put a new spool on, it's your job as the spool guy to take the barcode from the spool and put it somewhere.  Let's use it as some of the fun technical details that as we as a group figure out what our capabilities are, we can then take those back to the manufacturer and see how much work they have to  Now, obviously, it's best for us if they're all in a very specific order on the piece of paper so that we know that top left is part number, next slot over is serial number, next slot over is, you know, spool, barcode one, then we have barcode two, barcode three, all the way out to seven to get to the seven spools, then maybe the next row down is the resins.  So the position on the paper would obviously make our job really, really easy. But the goal here is to make their job really, really easy.  So, again, figuring out our capabilities is an important step so that we can make it as easy on them as possible.  So I believe the reason they're putting it all on a piece of paper now is because they know that some poor human has to scan it with the barcode scanner, and they don't want them to work too hard.  year so that it won't to Then Thank you. But if we're going to have fixed cameras, and these things are going to naturally pass in front of the camera in a certain order, maybe we can pick up on that.  So there's a little bit of, you know, how cool can we be? You know, how awesome can we really make this for them?  Because, I mean, they have real challenges, right? Like, the poor guy with the spool, right? Like, we're assuming it goes well.  What if he drops the damn thing, right? What if it gets unspooled? And, you know, he's got all sorts of real problems to deal with.  So if we can remove the need for him to take pictures of barcodes, and glue them on, or print labels, or, you know, if we can make it easy in some way, it'd be pretty cool to do that.  You know, like maybe...
+
+38:43 - Nathan DiGilio
+  pictures and bluing is his break from the chaos? That's possible. Are we starving this guy of his break time?  Possibly. Possibly.
+
+38:57 - Kevin DiGilio
+  But if his break time leads to him making mistakes... Then maybe he should just skip the mistakes and take the break anyway, you know, kind of like the smokers problem, like everyone gets a smoke break.  Well, if you don't smoke, no one gives you a smoke break. Well, that's . You know, everybody should get a break, should have to smoke cigarettes just to get a break.  So we'll put his boss in charge of whether he gets breaks or not. But but if he could just like grab the spool and then show it to the camera, you know, that's probably easier than some other things.  And then if it doesn't have to be on the piece of paper anymore because we have this cool technology.  So I'm just kind of just kind of thinking out loud here, we'll probably get Larry on the on one of these calls to kind of really talk through how he thinks this can work.  And then another piece I'm interested in is, you know, how different is each workstation? So. So as you guys kind of think about this, I'm picturing a pretty infinitely configurable thing so that what.  If shows up on screen, if it's a piece of paper with barcodes, if it's a stack of spools with a bunch of barcodes, is it a video that shows five different barcodes in a row just by panning around?  You know, I'm thinking to the Sam's Club example that you drive your shopping cart under this camera and it is able to, while you're moving, read all the barcodes of all the products that are in your cart and detect if that's close enough to the receipt or not.  So I know the technology is there. The models are already built. People are already using them. So it's just our ability to kind of find the models and apply them specifically to this use case is, I think, where the magic comes in.  Okay, that was another good chat. That's some good stuff in here.
+
+40:59 - Dzikowski, Jacob John
+  Thank you.
+
+41:05 - Kevin DiGilio
+  So, Nathan, are we accomplishing the steps as you as you wrote them?
+
+41:15 - Nathan DiGilio
+  We're definitely getting good information and a lot more questions to ask later. Yeah.
+
+41:20 - Dzikowski, Jacob John
+  Yeah, I'm already thinking of a whole list of things to ask Professor Liao. Yeah, and definitely write them down.
+
+41:28 - Nathan DiGilio
+  Oh, yeah. Yeah, you'll forget. Some matter.
+
+41:31 - Kevin DiGilio
+  got a whole weekend ahead of you. Definitely write it down as you think of it.
+
+41:34 - Daniel Pora (136dpora@gmail.com)
+  Yeah, we're recording this so I can always send to you guys. That's right.
+
+41:42 - Nathan DiGilio
+  And then I guess there's bookkeeping afterwards that I'd like to talk about once we're done talking technical, I guess, in terms of future meetings and such.  Yep. Yeah. going to newbie. I I can for newbie, we've a newbie for you. Definitely. So does anyone have any technical questions at the moment that they would like to clarify?
+
+42:07 - Dzikowski, Jacob John
+  Yeah, so you didn't have like any specific technologies in mind, right? Just like, you know, the end goal, pretty much like nothing.
+
+42:15 - Miller, Collin
+  That is correct.
+
+42:16 - Dzikowski, Jacob John
+  Yeah, this is way outside of my scope of knowledge.
+
+42:19 - Kevin DiGilio
+  So I don't even have any idea what to tell you to start with, except that I know that it's possible because I've seen it applied places.
+
+42:26 - Daniel Pora (136dpora@gmail.com)
+  Yeah, and that's on us.
+
+42:29 - Dzikowski, Jacob John
+  So we'll do our best.
+
+42:32 - Kevin DiGilio
+  And now what we will have is, you know, we'll have an Ubuntu server sitting on prem. Nathan and Max's Python libraries will be running there.  We're either going to have the DeepSeq or 5.4 model running to be able to answer questions. Again, I have no idea if this stuff applies to what you guys are going to work on.  That's kind of a blurry line for me where, you know, computer vision and language models come together. I don't know if they're, they're actually.
+
+43:03 - Nathan DiGilio
+  We probably won't need it too much.
+
+43:06 - Kevin DiGilio
+  But I assume, like, where's the code going to be running, do think?
+
+43:12 - Daniel Pora (136dpora@gmail.com)
+  I guess it depends on what models.
+
+43:14 - Nathan DiGilio
+  A lot of computer vision models can run on edge cases, such as a laptop, phone, whatever. So it could run on that and be fine without competing with stuff for the most part.  Okay, so here's another fun thing.
+
+43:29 - Kevin DiGilio
+  So each workstation, while it has computer hardware, it's really kind of a dumb terminal. It's got a mouse, a scanner, a keyboard, a screen, and then this little box that's Velcroed to the back of the monitor that remotes into the main server.  And so the windows that it's running is just a single session on a server, and all machines share the same server.  So any of this... All smart technical stuff is likely going to be in an API on this Ubuntu server.  Yeah. So we'll probably run the video feeds with some sort of indicator.
+
+44:13 - Daniel Pora (136dpora@gmail.com)
+  This is the feed for Workstation 1.
+
+44:17 - Kevin DiGilio
+  So most of the computing stuff is going to have to be on that server just because the main server, we don't want to try to do any computing there.  It's already an overburdened Windows server. And if we're going to, as part of AIBI, the first thing we do is we install a new server and give it enough, you know, GPUs to do its job.  So, again, I don't know if we actually need GPUs or not, but you guys should kind of be thinking in that mode of it.  It's probably going to be some kind of Python running on Ubuntu. But if you tell me that's challenging, you have a better idea, I'm totally open to that because I just don't know.  So, yeah, I'm an old Windows guy. I, you know, I do mostly Windows. was in .NET programming. So if it's not that, then you guys are the experts.  Yeah.
+
+45:09 - Nathan DiGilio
+  Python and Ubuntu is kind of AI's favorite place for the most part.
+
+45:16 - Kevin DiGilio
+  Right. And the machine learning stuff, you know, you did with the pen, that's all Python, right?
+
+45:22 - Nathan DiGilio
+  That was, yeah, that was all Python and could be run on a bunch of those run on Windows. And that was all run without a graphics card.  That's right.
+
+45:33 - Kevin DiGilio
+  You were just on the laptop there. Okay. Yeah. Yeah. So, yeah, I'm picturing that video feed. We're going to have to get it to that machine somehow.  Yeah.
+
+45:41 - Nathan DiGilio
+  Unless you wanted to go down the route of having like a Raspberry Pi with a camera that sends just data.
+
+45:51 - Kevin DiGilio
+  Larry was setting up a Raspberry Pi with a heat, a heat camera to monitor the oven temperature. That's kind of why I mentioned it.  Yeah. Yeah. So if that's, I mean, if that's the way to go, that's far less expensive than some things, right?  I mean, it's pretty cheap to get a Raspberry Pi and a cheap camera.
+
+46:11 - Nathan DiGilio
+  Yeah, it would have to be a cost analysis of how many cameras, because it might be cheaper if you have 100 cameras that you exclude the 100 Raspberry Pis and just feed that to the server itself, potentially.  Yeah.
+
+46:27 - Kevin DiGilio
+  But that would be a network constraint as well.
+
+46:30 - Nathan DiGilio
+  Yeah, we'll have to bring VNet in on that.
+
+46:33 - Kevin DiGilio
+  But they do have VNet, so they do have some pretty high-powered network stuff going on these days. But I've also heard them complain about network speeds, but I don't think it's actually network.  I think it's the server's ability to serve it up. I'd be surprised if the network itself was actually the bottleneck.  But these are all kind of the real-world things that you often don't find out about until you get into the real world.  You know, I wrote some pretty awesome And then they installed it in China, and it was  software, because the internet speed there was just so bad.  Brazil, again, it was just so far away in Brazil that it wouldn't run. It took forever. And so they just didn't use it.  So we sometimes have to be smart about that. But our first use case is going to be inside one building on a very closed, controlled network.  But the second customer that I want to sell this to, potentially, they have two buildings. Now, they're both in Erie, probably connected by a VNet connection.  So it'll be decent, but not as good as all being in the same building. So the quality of the video stream, it'd be cool if it didn't need to be top of the line video, just because the iPhones capture, you know, a zillion bits or bytes or pixels or whatever it is, if we can use a pretty low level cheap camera.  You know, cost is very important to all these people. The less we cost, the more money we can save them.
+
+48:16 - Nathan DiGilio
+  Any other thoughts or ideas?
+
+48:24 - Dzikowski, Jacob John
+  Not for me, no. Yeah.
+
+48:28 - Daniel Pora (136dpora@gmail.com)
+  Just looking through our list of questions. Mostly covered a lot of it. Yeah. guess I kind of forgot about that list that I made.
+
+48:36 - Nathan DiGilio
+  Yeah. Well, you guys have a secret list?
+
+48:39 - Daniel Pora (136dpora@gmail.com)
+  Secret list. Yeah. I was supposed to share it with you and then forgot.
+
+48:44 - Nathan DiGilio
+  But a lot of them were kind of touched as you talked.
+
+48:47 - Kevin DiGilio
+  Yeah, definitely.
+
+48:49 - Nathan DiGilio
+  And then I guess for bookkeeping, we would like to meet weekly. Yep.
+
+48:54 - Daniel Pora (136dpora@gmail.com)
+  If possible.
+
+48:56 - Nathan DiGilio
+  That's optimal.
+
+48:58 - Miller, Collin
+  To keep gathering this information.
+
+49:00 - Nathan DiGilio
+  is between and And then there's lot other Thank Pretty sure you have time for that. I guess the timing would be the biggest part.  Right now, we have a free time on Thursdays at 12 to, I think, 1.30ish is our best time because the rest of the times that we're kind of free are my practice times, like right now, which are definitely free if Thursday doesn't work, but I'd prefer if we could try to do something with our free times.  Well, say the, say the Thursday time again. 12 to like 1.30, I believe. 12 to 1.30.
+
+49:44 - Kevin DiGilio
+  Okay. Yeah, I do have that one at 12.30. I could probably shuffle that somewhere else. So that would leave a 12 to 1 every Thursday.  And if we just lock it in, and if we don't need the whole time, we'll just quit early, but...  Yeah, and towards...
+
+50:01 - Nathan DiGilio
+  The, uh, Abraham talked about once we get past this, like a sprint zero, he's calling it, it'll, we could work towards going just bi-weekly.  Yeah.
+
+50:18 - Kevin DiGilio
+  Yeah, I'm, I'm okay with weekly as long as we need it. We want this to go well. You guys have a limited time.  Everybody wants this to go well, right? Your teachers want it to go well. Obviously you guys want it to go super awesome, right?  So do I, um, I'd really like our clients that people were sell it to, to be super impressed with your team, right?  So it's, it's neat and all that AIBI gets a cool product, but if you guys could be a part of something that's really cool that we install in Erie, that's, that's good stuff.  That's good for everybody. You know, the, the, the, the company will love it cause they got the support to school.  You know, you guys will get some really good stuff to put on your resumes. You know, this is not just some foo-foo stuff.  And this is real, you know, with this with this kind of experience, if we get it working the way I'm picturing this is, this is really cool stuff.
+
+51:08 - Daniel Pora (136dpora@gmail.com)
+  Yeah.
+
+51:14 - Kevin DiGilio
+  And I don't think we have to invent too much. I feel like the technology and the models, you know, the libraries, there should be stuff that we can tap into that.  It's really about the application of the cool technology rather than actually having to invent the machine learning algorithm. Yeah.  I would agree.
+
+51:33 - Nathan DiGilio
+  That's, that's way beyond anything I can do, but applying cool things.
+
+51:37 - Kevin DiGilio
+  That's, I've been doing that forever. .net did all the cool stuff. I just applied it to where there was problems and that's what the world needs is people who can solve real problems.  So I'm hoping this gets you guys close enough to real problems that you get an idea of what we're after.  Yeah. Anybody can write code. Anybody can cobble this stuff together, but to actually solve a problem for someone in a factory, that's, that's the magic.
+  ACTION ITEM: Set up recurring Thursday 12-1pm meetings with AIBI team
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3118.9999  So, okay, how are we doing?
+
+52:09 - Nathan DiGilio
+  I guess in terms of bookkeeping, I can put a meeting, a recurring meeting for Thursday from 12 to 1.  We can sort and cancel as needed. And then we will reach out to Professor Luau about meeting with him and kind of bouncing these ideas with him.
+
+52:30 - Daniel Pora (136dpora@gmail.com)
+  Yeah. Okay.
+  ACTION ITEM: Prepare & send meeting agenda to Kevin by Tuesday for Thursday meetings
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3152.9999
+
+52:32 - Nathan DiGilio
+  And then, yeah, we'll come back with more questions, maybe some ideas as this goes forward. Okay. Yep.
+
+52:43 - Kevin DiGilio
+  And a rule that kind of happens on meetings that people press upon me is that, you know, at least a couple of days before the meeting have an idea of what the agenda is.  I'm okay with a general agenda, but, you know, giving me, you know, by like Tuesday of that week an idea of what we're going to talk about.  Yeah. So when I show up, I.
+
+53:01 - Daniel Pora (136dpora@gmail.com)
+  Yeah.
+
+53:01 - Kevin DiGilio
+  I have some thoughts, and the more time you give me, the better, because I may have to reach out to our manufacturer to get insight from them.  So I'm okay if questions come kind of willy-nilly as you have them. You know, maybe, you know, once per day you guys gather a collection of emails or a collection of questions and hit me with one email.  Yeah, that's another question I did have.
+
+53:32 - Dzikowski, Jacob John
+  Would you, are you fine with team, or would you, like, prefer an email or something?
+
+53:38 - Kevin DiGilio
+  I would say an organized email per day with all the questions would probably help us keep track of it.  There's a lot of stuff that happens in teams, and teams can kind of get kind of hairy, and I have a million conversations in teams.  Um, and if we could keep those going through my Kevin at AIBI email, that'll keep it very- Be clean for me.  Even these meetings, Nathan, invite my AIBI account just so that everything's under that umbrella and I'll always know where to find it.  I got too many emails and companies to have them just show up anywhere. So let's keep it all running through there.
+
+54:23 - Daniel Pora (136dpora@gmail.com)
+  Okay.
+
+54:24 - Kevin DiGilio
+  I'm okay with an email per day if that's how many questions you have. Seven a day would get kind of hairy.  So, you know, think your questions through and the earlier you get them to me, especially the ones for the manufacturers, because these guys are busy.  Yeah. They're busy in a way that I haven't seen people be busy. So you'll get to see when we go in there with what's going on there.  It's pretty wild. Like we think we're busy with school. These guys got some serious  going on. So it's pretty eye opening when you see it live.  Yeah. It's okay. Emails, meetings. We're both going to look into NDAs and IP, so one of you guys should talk to the professor to see if there's any special documents we need to use for them.
+  ACTION ITEM: Email Prof. Liao to schedule meeting next week re project ideas
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3317.9999
+  ACTION ITEM: Email/meet Prof. Ibrahim re NDA requirements for senior design project
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3317.9999  If not, I'll just use my standard one for AIBI. So why don't we figure that out sooner than later?
+
+55:28 - Nathan DiGilio
+  Yeah, I can send an email tonight to Liao asking for time to meet next week and Professor Ibrahim about NDA questions, or maybe I could look at his office hours to meet next week.
+  ACTION ITEM: Send Kevin full name & address for NDA
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3334.9999  Okay.
+  ACTION ITEM: Send Kevin full name & address for NDA
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3334.9999
+  ACTION ITEM: Send Kevin full name & address for NDA
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3334.9999
+
+55:45 - Kevin DiGilio
+  Yeah, and if it's just mine, then it's no problem. I'll just, what I'll want, if I have to make it, I need a name and address, so whatever your legal name is and whatever address to make you different, you know, like if there's another
+  ACTION ITEM: Send Kevin full name & address for NDA
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3334.9999  The Collin Miller out there, it's good to know that we're talking about the Collin Miller from whatever, you know, and if you don't have your own place and use your parents' address, that's fine.  It's just something that makes you different than all the other Collin Millers that the world might find, so we know which one's signing it.  And, Jake, are you a Jacob or a Jake? Oh, you know, I don't have a preference, but most people call me Jacob.
+
+56:30 - Dzikowski, Jacob John
+  Jacob? All right, I'll go with Jacob.
+
+56:32 - Kevin DiGilio
+  I'm you have more of a preference than I do.
+
+56:36 - Daniel Pora (136dpora@gmail.com)
+  Yep, yep, forced into Dan, that's right, when you join a company that's owned by Daniel. You get to become a Dan.
+
+56:43 - Miller, Collin
+  Yeah.
+
+56:45 - Kevin DiGilio
+  Although we call you Pora most of the time because there's too many Dans.
+
+56:49 - Daniel Pora (136dpora@gmail.com)
+  There's even more than just you two.
+
+56:52 - Kevin DiGilio
+  But that's normal college talk, right? Everyone goes by last name, right? Yep, Penfield. Yep.
+
+56:58 - Daniel Pora (136dpora@gmail.com)
+  Okay.
+
+57:00 - Kevin DiGilio
+  I don't know. Jacob's last name's not a hard discount.
+
+57:01 - Nathan DiGilio
+  So, yeah, usually stick to Jacob.
+
+57:06 - Dzikowski, Jacob John
+  Well, I guess so.
+
+57:07 - Daniel Pora (136dpora@gmail.com)
+  I guess the Jilio seems easy.
+
+57:09 - Kevin DiGilio
+  Yeah, you got more than one consonant in a row. That usually trips people up. Yeah, we have an I every other letter, so.
+
+57:17 - Nathan DiGilio
+  Say it out loud for us, Jacob.
+
+57:21 - Kevin DiGilio
+  Joukowsky.
+
+57:22 - Dzikowski, Jacob John
+  Yeah, I never would have guessed that. So BZ is a J sound?
+
+57:26 - Daniel Pora (136dpora@gmail.com)
+  Joukowsky? BZI, yeah, it's a J-U-H.
+  ACTION ITEM: Connect with Kevin DiGilio on LinkedIn
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3451.9999
+
+57:30 - Dzikowski, Jacob John
+  Joukowsky. Joukowsky. Yeah. Well, it sounds easy when you say it out loud like that, but yeah, I would have butchered that.
+  ACTION ITEM: Connect with Kevin DiGilio on LinkedIn
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3451.9999
+  ACTION ITEM: Connect with Kevin DiGilio on LinkedIn
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3451.9999
+  ACTION ITEM: Connect with Kevin DiGilio on LinkedIn
+ - WATCH: https://fathom.video/share/JeN1gLfvzn9MjybLjwa2Dszn96c4vh1_?timestamp=3451.9999
+
+57:38 - Kevin DiGilio
+  So I'm glad we had you say it first. Okay, excellent. Okay, and you guys can all connect with me on LinkedIn.  Anytime anything cool happens, I'll probably brag about you. I like to be known to you on LinkedIn just because it's part of my sales process, so might as well drag you guys into it.
+
+57:55 - Daniel Pora (136dpora@gmail.com)
+  It can't hurt to have people talking about you when you're looking for jobs, so.
+
+57:59 - Kevin DiGilio
+  Don't feel free to do that. come on. Here we go. You We'll play along. And eventually, you're going to want to put a pretty detailed version of this in your LinkedIn resume on projects that you've worked on because you'll be touching on some cool technologies.  And once we figure out which technologies, they'll be good to have that in your skill set. Always got to be ready to sell yourself.  The world needs you to be selling yourselves to them because almost nobody cares. But if you can show them something cool, they'll start caring.  Okay, I got like three minutes left. Anything else, fellas?
+
+58:38 - Daniel Pora (136dpora@gmail.com)
+  I don't think so.
+
+58:39 - Dzikowski, Jacob John
+  Yeah. Yeah, I got nothing.
+
+58:43 - Miller, Collin
+  Okay, excellent.
+
+58:44 - Kevin DiGilio
+  Well, then, if nothing else, we'll talk on Thursday. And yeah, I'm pretty excited about this project. So I hope you guys are too.  There's definitely some cool stuff in here that I've never seen done before.
+
+58:56 - Daniel Pora (136dpora@gmail.com)
+  So when we do it, that's pretty cool.
+
+59:00 - Kevin DiGilio
+  A lot of...
+
+59:01 - Daniel Pora (136dpora@gmail.com)
+  Your territory for me, so I get to learn a lot. absolutely.
+
+59:04 - Miller, Collin
+  Yeah, that's right. Yeah, tear it up.
+
+59:06 - Kevin DiGilio
+  But, oh, yeah, I expect great things out of you. So, absolutely.
+
+59:11 - Dzikowski, Jacob John
+  Looking right at you there, Mr. Dan.
+
+59:13 - Kevin DiGilio
+  Thank goodness I don't have that expectation.
+
+59:16 - Daniel Pora (136dpora@gmail.com)
+  Well, I know. Well, no. We'll stay out of that territory for now.
+
+59:22 - Kevin DiGilio
+  But you definitely pulled together the meeting well and have been doing that stuff well. So that's, I think I taught you at least something.
+
+59:29 - Daniel Pora (136dpora@gmail.com)
+  Yeah, we got a good leader. We'll see when it's time to deploy this sucker live.
+
+59:34 - Kevin DiGilio
+  That's the test. That's what you see.
+
+59:37 - Daniel Pora (136dpora@gmail.com)
+  Yeah, that's usually where I come up a little short. Oh, hell. Yeah, this is a little.
+
+59:41 - Dzikowski, Jacob John
+  Turn it on in the real world.
+
+59:43 - Daniel Pora (136dpora@gmail.com)
+  That's some fun stuff.
+
+59:45 - Kevin DiGilio
+  But I'm thinking, I won't know how to do this stuff, so you guys are going to have to turn it on for me.  Oh, now I'm involved in those processes. That's what I've Make the dev guys do the ops. Then you all find out if you did a good job or not.  Yeah.
+
+59:59 - Daniel Pora (136dpora@gmail.com)
+  Yeah.
+
+1:00:01 - Kevin DiGilio
+  Yep. I learned that lesson last summer, so you guys are enjoying it. have Courtney to pretend to find my stuff either.
+
+1:00:08 - Nathan DiGilio
+  Yeah, see, that's an interesting thing, even with what Max is working on.
+
+1:00:12 - Kevin DiGilio
+  Courtney and I barely even know where to look.
+
+1:00:17 - Nathan DiGilio
+  We have to document this about a million times more than anything I've ever done for you. Yeah, it's insane.
+
+1:00:24 - Kevin DiGilio
+  I saw what Max produced for this one, and so if it's anything like that, then it's good. I mean, it's a potentially annoying step, but it's so important.  You know, I mean, six months after you finish it, you will forget everything. It's amazing how your brain just forgets all the important details.  So you've got to write them down as you're doing it. Yeah, I mean, he estimated a 200 to 300-page document.  Holy moly. And any company is going to want you to know how to do that, and they're not going to necessarily tell you how.  They're going to give you another one that's 500 pages and say, well, kind of make it look like this.  So, you know. So it's, it's a good skill set to have. And if you guys can produce what Max is producing and, you know, he didn't have any more education than you guys did, he went through the same process.  So, um, yeah, it should be good. Okay. I'm out of here.
+
+1:01:17 - Daniel Pora (136dpora@gmail.com)
+  We'll talk to you guys on a Thursday at noon.
+
+1:01:21 - Miller, Collin
+  Hey, great to meet everybody. Have a great weekend.
+
+1:01:23 - Dzikowski, Jacob John
+  You bet. See you guys. Yeah.
+
+1:01:25 - Miller, Collin
+  Catch you later.
+
+1:01:31 - Daniel Pora (136dpora@gmail.com)
+  Bye.
