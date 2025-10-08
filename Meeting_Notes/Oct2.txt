@@ -1,0 +1,567 @@
+When: October 2nd, 12:00pm
+Who: Daniel, Jacob, Nathan, Collin
+What:
+Impromptu Microsoft Teams Meeting - October 02
+VIEW RECORDING: https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay
+Meeting Purpose
+
+Discuss project requirements and implementation details for CompositeFlex's AI-assisted manufacturing process.
+
+Key Takeaways
+
+  - Project has two main parts: 1) Barcode scanning for part tracking, 2) Process monitoring for quality control
+  - Need to determine approach for training AI on workstation processes
+  - Hardware requirements include Ubuntu server with GPUs for video processing
+  - Integration with existing KMD software needs to be worked out, likely via API calls
+
+Topics
+
+Barcode Scanning Implementation
+
+  - No conveyor belts; parts manually moved between ~12 workstations
+  - Fixed camera at each station to scan paper with multiple barcodes
+  - Barcodes contain part number, serial number, material batch info
+  - Need to develop configurable system to map barcode positions to data fields
+  - Output likely JSON string with scanned data to integrate with KMD software
+
+Process Monitoring System
+
+  - Live video feed of worker performing tasks at each station
+  - AI to detect if steps are performed in correct order
+  - Focus on process/steps rather than final part quality
+  - Example: Resin application, cloth wrapping, fiber winding for missile tubes
+  - Need simple UI for training system on correct process steps
+
+Training Approach
+
+  - Capture video of correct process, mark start/end of each step
+  - Develop easy-to-use interface for non-technical workers to train system
+  - May need to schedule time with engineering staff for initial setup
+
+Hardware & Software
+
+  - Ubuntu server with multiple GPUs for video processing
+  - Considering Raspberry Pi cameras at each workstation
+  - Preference for open source software (MIT/Apache license) to avoid costs
+  - Custom web app likely needed for training interface
+
+Integration with Existing Systems
+
+  - KMD software currently uses barcode scanners as keyboard input
+  - Need to develop API or local network communication between new system and KMD
+  - Consider database table for intermediate data storage
+
+Testing Environment
+
+  - No dedicated test environment at CompositeFlex
+  - Team should create simulated workstation for initial testing
+  - Will need to schedule time on production floor for final testing
+
+Next Steps
+
+  - Compile comprehensive list of project requirements
+  - Determine if parts 1 and 2 will be developed in parallel or sequentially
+  - Research open source computer vision libraries compatible with project needs
+  - Design initial mockup of training interface for process monitoring
+  - Kevin to follow up on NDA process for potential site visit
+  - Team to present requirements list to Kevin at next meeting for review
+Action Items
+  - Compile comprehensive list of project requirements from meeting notes. Include both parts of project, user training process, hardware needs, software integration points.  - WATCH (5 secs): https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay?timestamp=6.297267000000001
+  - Prepare demo of embedding/centroid tech for task identification in next group meeting. Include explanation of real-time processing capabilities.  - WATCH (5 secs): https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay?timestamp=1477.269515
+  - Contact Dean Lewis re NDA for CompositeFlex project. Clarify process, get timeline for approval.  - WATCH (5 secs): https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay?timestamp=2650.269515
+  - Consolidate team's requirement lists into single doc. Prepare for review w/ Kevin in next meeting. Include both parts, prioritize key features.  - WATCH (5 secs): https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay?timestamp=2713.269515
+
+
+Transcript:
+Impromptu Microsoft Teams Meeting - October 02
+VIEW RECORDING - 56 mins (No highlights): https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay
+
+---
+
+0:06 - Kevin DiGilio
+  How's it going?
+
+0:07 - Daniel Pora (136dpora@gmail.com)
+  Hello.
+
+0:08 - Miller, Collin
+  moly.
+
+0:08 - Kevin DiGilio
+  This Dan Pora character gave me a really long list of questions. Yeah. Holy moly. We better, well, I guess your Fathom's here, so we can skip my Fathom.  We showed up to a meeting and someone sent their, it was Fixer AI, and they didn't show up.
+
+0:33 - Daniel Pora (136dpora@gmail.com)
+  Really? Nope.
+
+0:35 - Miller, Collin
+  We ain't doing that.
+
+0:36 - Kevin DiGilio
+  I ain't playing that game. You know, we need humans here. Oh. Yeah.
+
+0:41 - Daniel Pora (136dpora@gmail.com)
+  Is Fixer AI like a replacement? It's a Fathom. Yeah. That is horrible. I would not do that. Well, we did have one meeting where there was a webinar, an AI webinar.
+
+0:53 - Kevin DiGilio
+  Yeah. And many, many note takers showed up without their people. Yeah.
+
+0:58 - Daniel Pora (136dpora@gmail.com)
+  Okay.
+
+0:59 - Kevin DiGilio
+  Just so that they could capture the content and not have to attend, which I thought was clever and a little bit shiesty.  much. Alright. But this was not a webinar. This was clearly for discussing things. was the Auki lab guys. There's spatial computing guys that we met in California.  So we kind of needed to talk to him about serious stuff. I need more than your note taker. Yeah.
+  ACTION ITEM: Compile comprehensive list of project requirements from meeting notes. Include both parts of project, user training process, hardware needs, software integration points.
+ - WATCH: https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay?timestamp=6.297267000000001  Okay, so we can walk through these questions. I'm not guessing that I'm going to have answers to all of them.  Yeah, that's fine. But I think that... Our big thing right now is we just need to get a lot of requirements.
+
+1:37 - Daniel Pora (136dpora@gmail.com)
+  So we need to get a ton of user requirements. So just anything that we need to know about the project.  So you can write this down. Right. Yeah, because there's definitely...
+
+1:47 - Kevin DiGilio
+  Yeah, Nathan was describing the waterfall nature of these things. So... Yep. Ah, there he is now.
+
+1:53 - Daniel Pora (136dpora@gmail.com)
+  Okay.
+
+1:55 - Kevin DiGilio
+  He's hiding somewhere. That's okay. Okay. you hear me? Okay. Yes. Yeah, we can hear you. Okay. Okay, so we got everybody.  We wait... Are for John, Jacob? Yeah, he's joining right now. I'm sitting next to him. Excellent. Okay. Okay. Excellent.  Everybody's here? Yep. All right. So Mr. Pora sent me a long list of questions, and I'm going to do my best getting through them.  I'm not sure I have all of the answers, but I think I can at least move us forward in some regards.  Yeah.
+
+2:40 - Daniel Pora (136dpora@gmail.com)
+  Okay.
+
+2:41 - Kevin DiGilio
+  So number one, on the conveyors, will there be overlapping items? This one's easy. There are no conveyors. So let's be clear about the operating environment that I'm picturing, at least our test zone.  Yeah. So there's a big open factory, and there's a bunch of workstations all around the factory. And there's no automation to move.  The you're The thing from place to place. So it's not really like an assembly line. While they may operate in an assembly line fashion, it's more of like this station over here is in charge of the first layup.  So they'll take whatever shape of whatever thing they're building and then they'll do the first portion of the build there.  And then when they're done with that step, they'll put it on a cart or a carry it or something to move it to the next station.  And so there's an undetermined distance between these stations because there's a bunch of them. Let's say there's 12 stations.  And so this initial thing is going to be moved through these 12 stations, each having a different job. I know one of the stations is like a CNC machine.  One of them is an oven to cure the thing. Once it's been cured, they take it out and kind of cut the edges off and sand and scrape to make it kind of smooth.  There's probably another station to maybe drill holes in it to put screw-holding materials So no conveyor belts. And what we're trying to do is when it moves from station to station, what I'm projecting, I guess, is that each station has a fixed camera that this piece of paper or series of barcodes will pass in front of to let us know that it is now in this station.  Yeah.
+
+4:34 - Daniel Pora (136dpora@gmail.com)
+  So you talk about a piece of paper a lot with a bunch of barcodes on it. Is it going to be attached or is someone just going to wave this in front to show?
+
+4:44 - Kevin DiGilio
+  Well, that's up for a decision on how they're actually going to do it. But right now, this piece of paper travels with the part and they're using a scan gun.  Yeah. And they go into the software and they click on field one and then they scan barcode one. And they click on field two, the next text box, and then they scan the second barcode and they click on the thirds.  Tods. we don't So if they do any of that wrong, skip a tab, scan the same thing twice, right?  There's a lot of room for errors there. So we're trying to do that activity for them just as a byproduct of how it's moving through the factory.  So we can probably assume for now, since we don't know, is that some poor human has to take that piece of paper and wave it in front of the camera in a way that accomplishes the goal.  But we will try to work with them. To see what kind of movement they're doing naturally. So that they don't have to do like the self-checkout scanning, right, because they want it to be part of their behavior.
+
+5:47 - Daniel Pora (136dpora@gmail.com)
+  So you're talking about having a piece of paper that someone will hold in front of our camera just to show.  That this part has been moved. But remember, we also talked about. Maybe there won't be a barcode. Maybe there won't be a piece of paper and we need to be able to recognize that.
+
+6:08 - Kevin DiGilio
+  Okay, so I did say that. Now, in follow-up meetings, which humorously enough for me, happen at child birthday parties, the gentleman described that he was able to get a QR code on the machine.  And so the mandrill that we're talking about, so I want to be careful with edge cases here, because that object detection really only feels like one step of one of those workstations, right?  So that one of the workstations is the oven, and so it's really hard to move this tube into the oven.  And the mandrill is what they wrapped the material around, so that's really only at one workstation where this problem exists.  Yeah. And it seems like they may have gotten past that. But what I'm thinking is, is that it may introduce...  It was the concept of, we have a piece of paper and an object getting scanned. And so, yeah, because then, like at that point, do you even need the piece of paper?
+
+7:19 - Daniel Pora (136dpora@gmail.com)
+  It'd kind of cool if we just. absolutely.
+
+7:21 - Kevin DiGilio
+  We absolutely need the piece of paper because what the piece of paper has is the part number, right? So the part number is the overall design that the engineer built, right?  So let's say N dash one, two, three, four, five. Okay, so that's the part they're building. Well, that's the design of the part, but then it has a serial number, right?  Because if we build 10 of these parts, they all have the same part number, but they have 10 different serial numbers.  This is the instance of that part, right? So kind of like a class in programming, right?
+
+7:52 - Daniel Pora (136dpora@gmail.com)
+  You define the class.
+
+7:53 - Kevin DiGilio
+  That's the definition, but then you instantiate it and use it over and over and over again. Those are the serials because the engineer is going to design one part.  He's going to build a drawing, all the rules on making it and that. It's N-12345. Then the factory is going to build 1,000 of those suckers.  And so it's going to be part number N-12345 and then serial 1, serial 2, serial 3, all the way up to 1,000.  So if you're working on serial number 1350, you need to know which one you're working on at this moment, at this station, so that when that serial number fails on an airplane in the future, we can come back to this data and know what day it went through, how long it was at each station, all the kind of tracking stuff that we're supposed to be doing.  Does that make sense? Okay, yeah, just one sec.
+
+8:51 - Daniel Pora (136dpora@gmail.com)
+  So each part that they're going to build has a part number. So that would kind of be like multiple parts can have this same number, but they're all going to be the same.  You Is that right? customer will buy a certain number of a part. And then all the components of that part number will be the serial numbers.  So all those components. word components. I would say instance of.
+
+9:22 - Kevin DiGilio
+  Right. So let's use a very specific example. Let's say we're talking about this missile tube. Right. Yeah. All we know is that this long plastic tube that's super strong.  So it doesn't explode until it's supposed to. Right. So when he designed the tube, he said this tube is it's part numbers and dash one, two, three, four, five.  Right. So every time we build one of these tubes, we're going to use the design. That is and dash one, four, five.  Right. How long is it? How strong is it? What color is it? And all that stuff. But when I build the first one, it's going to be that same part number with serial number one.  Okay. The second tube of the exact same object, just another one because they need two missiles. Right. It's serial number two.  And I'm oversimplifying all of these numbers, right? The serial numbers are terrible.
+
+10:11 - Daniel Pora (136dpora@gmail.com)
+  They're long and sequential and mean nothing.
+
+10:15 - Kevin DiGilio
+  So that's why we don't trust humans to type them, because sometimes it's an eight-digit number. They've been doing this a while, right?  So their serial numbers have become quite large. And then in addition to that on this piece of paper is maybe that part was made out of a certain resin, right?  We need to use resin plus fiber to build the material that is the tube. Well, the resin came from a certain batch from a certain supplier and has a certain barcode on it.  So that's also on the piece of paper. Yeah. And if there are fibers in there, there's likely seven spools of fiber that went into it.  So we need to know maybe which seven fiber spools were used. That's why there's so many barcodes, because all the sub-components of this serial need to be tracked as well.  Well, again, if the missile fails, we need to go back through history and figure out, oh, well, the supplier gave us a crappy resin batch that's failing.  All the parts we made with resin batch one are failing. We need to track every detail about this. And so that's why the engineer found it most beneficial to put all these barcodes on a piece of paper that travels with it.  Yeah. So they can scan it when they need to.
+
+11:31 - Daniel Pora (136dpora@gmail.com)
+  Okay, so this paper has a part number and then the serial number. The serial number is the instance. We only need to know the numbers for, like, the resin or, like, what batch that resin was from.  And if we do, how did we get that?
+
+11:52 - Kevin DiGilio
+  So what I'm kind of picturing is we built – let me think here's something that you could recognize. Can you picture a properties form in KMD Project?  Just a form with a bunch of text boxes on it? Yeah. So there's going to be a form that kind of looks a lot like what the piece of paper looks like.  So if the piece of paper has 10 barcodes on it, well, there's probably a form in KMV Projects that's got 10 text boxes to capture those 10 things.  And right now, they're kind of clicking on the box, scan, click, scan, right? So we're trying to fill out this online form with one quick view of a camera.  Yeah. And so what I think we're going to find is that being able to scan barcodes is probably a technology that's done already, right?  So you're not going to have to invent that. Scanning multiples, probably not going to have to invent that. But what we are going to have to do is now that I've scanned this piece of paper with, let's say, 10 barcodes on it, I need to be able to identify in maybe a JSON string or something.  So in the JSON string, we need to somehow be able to configure the tool to say that the top left barcode on this piece of paper, that's the part number.  The one next to it, that's the serial number. So it's kind of position-based identification of what does this barcode represent.  And so I think those are the two things that we control, I think, in each station, because the engineer can make this piece of paper probably however they want.  In fact, it's probably going to be my job to do that, to produce the printout. And I'm guessing that the paper may have things on it that are not needed to be scanned at every station.  We may be able to make assumptions, like if we scanned at the first station and Picked up which seven fibers it has and which resin batch it's made of, then when we scan that same serial at the next station, we may not need to re-scan the fibers because we already know that information for that serial.  So this piece of paper may be all the barcodes needed for the entire journey, but we may or may not need to input them at each step along the way.  So I think we're talking about a relatively configurable system where we can somehow configure how to tell your computer vision how to tell or how to structure the JSON to tell us what each barcode is or its position or some sort of translation between the two.  Yeah.
+
+15:01 - Daniel Pora (136dpora@gmail.com)
+  So you talk about us outputting a big JSON string. How integrated do we want to be with KMD? Do we want to just give KMD this, or do we want to build the systems on KMD to handle this?
+
+15:21 - Kevin DiGilio
+  Well, right now the way it works is because they're using a scan gun, a scan gun works just like a keyboard.  Yeah. Right?
+
+15:32 - Daniel Pora (136dpora@gmail.com)
+  It just doesn't have buttons on it.
+
+15:33 - Kevin DiGilio
+  So when you pull a trigger on a scanning gun and it scans the barcode, it sends to the computer as if you like pasted the entire one, three, four, five all at once, right?  But it comes in as a keyboard input. The software knows nothing about where it came from. It can't tell if you did a paste or a scan.  When you're in the text box itself, it doesn't know. So that made it very simple for them to implement because it's just a different input to the computer.  But what we're talking about, I don't know, is slightly more complicated than that. So it may be like Okay.  And they may have to click something in the software or some trigger in the software that calls an API call that says, get me this station's JSON string.  Or, you know, I'm trying to figure out the actual mechanics of it because the first trigger is going to be camera found a piece of paper in its view that has barcodes.  Right. So, you know, do we have that send an API call into KMD? You know, like maybe on the KMD side, we have an incoming API endpoint that is like receive scan.  Yeah. Does KMD already have an API?
+
+16:57 - Daniel Pora (136dpora@gmail.com)
+  I can't remember. Oh, there's all sorts of flavors of API, but not one that does this.
+
+17:02 - Kevin DiGilio
+  Yeah.
+
+17:03 - Daniel Pora (136dpora@gmail.com)
+  This is new.
+
+17:06 - Kevin DiGilio
+  Because it may need to, in response to this API, may need to move to the right screen. Or, you know, because if you're passing an adjacent string to a specific part number, well, that part number is technically a project in the system.  So you may, if you're on the wrong screen in KMD, this API call may tell it to go to the right screen and start filling out fields.  Yeah. And so this is the part that we haven't exactly figured out yet and may need to be somewhat configurable, you know, depending on the client.  But if we, if we focus in on our friendly here, yeah, I guess I haven't thought through the mechanics of that.  Okay. But we're going to have a Windows application sitting there with some empty fields, and we're going to have a camera that is collecting the information that needs to go in those fields.  And we need to figure out how to make those work together. Yeah. And you're talking about this application running on your computer.
+
+18:10 - Daniel Pora (136dpora@gmail.com)
+  I think you said that aren't all these connected to like one terminal? Yeah, absolutely.
+
+18:19 - Kevin DiGilio
+  OK, so.
+
+18:21 - Daniel Pora (136dpora@gmail.com)
+  Yeah, that itself may be an interesting challenge.
+
+18:24 - Kevin DiGilio
+  Yeah. But we'll know. We should be able to know because one thing that they are doing now is they're making sure that each workstation has its own user account or unique machine name somehow.  I think they've decided to go with users. So when they're logged into FlexPro, they'll be logged in as like WC oven or WC grinder.  Yeah. So that we'll know by the instance where they're at.
+
+18:54 - Daniel Pora (136dpora@gmail.com)
+  OK. So do you think, I mean, I guess we could do an API call, but we could also just handle everything locally on the same network.  So, And For sending like stuff from the camera, if we do like a Raspberry Pi or something, stuff from there to that terminal, I guess we just have to look in what kind of decisions or, yeah.  So what do you mean API versus on the same network?
+
+19:25 - Kevin DiGilio
+  I mean, these API calls are not going to be Azure calls, right? This is all on-prem on a local network.
+
+19:31 - Daniel Pora (136dpora@gmail.com)
+  Nothing's leaving the network.
+
+19:33 - Kevin DiGilio
+  Okay, yeah. So the API call is going to be like localhost, something, something, right?
+
+19:39 - Daniel Pora (136dpora@gmail.com)
+  That's what I was thinking. I didn't know if we were going out of prim or not. Oh, we're not.  We are fully on-prem. So there's a very specific server.
+
+19:49 - Kevin DiGilio
+  It's the web server that supports FlexPro.
+
+19:52 - Daniel Pora (136dpora@gmail.com)
+  And so it would have the API endpoint. It's a big requirement, everything on-prem. Oh, yeah. Oh, yeah. There's no cloud services, no nothing.
+
+20:03 - Kevin DiGilio
+  And so I think the question that we're trying to answer is, you know, how do we get that? The results of the computer vision scan, right, because I'm assuming the camera is going to take its picture, send it somewhere where we have computer vision running, right?  So at this specific client, we are going to have an Ubuntu server running some AI stuff that Nathan and Max put together.  So it may make sense for it to be the thing that receives the image rather than this dumb terminal.  But when it receives the image, it's going to have to know, you know, where did the image come from?  And that'll kind of map to the current workstation, right? So if it came from workstation 1, then we're likely going to have to send that information in the API call.  Yeah. Because the input has to go onto the screen that's currently on workstation 1's computer. still there. Areot you'll selective  Or do the workstation one's user account logged into that main remote server? Okay.
+
+21:16 - Daniel Pora (136dpora@gmail.com)
+  So, yeah, there's a there's a wee bit of trickery here.
+
+21:20 - Kevin DiGilio
+  And so I'm not sure if it's, you know, device to device communication, or is it the image inserts that into a database table?  And then, you know, that same database table can be accessed by both pieces of software, the computer vision software inputting it, and the KMD software pulling it back out.  That feels like an option. I mean, we need some sort of trigger to say that it happened.
+
+21:58 - Daniel Pora (136dpora@gmail.com)
+  Yeah, so a little bit of, yeah, a little bit of a little bit of trickery here.
+
+22:02 - Kevin DiGilio
+  So, And I suspected that the actual scanning itself would not be our biggest challenge. Yeah. Because that technology has been around for a while.  That's why I was so confident in asking for it. I've seen products where you can pull up a camera and it picks up all the barcodes in the first swipe.  So what we're trying to do is deliver a very specific use case to just drastically save these guys some time and error.  Yeah.
+
+22:31 - Daniel Pora (136dpora@gmail.com)
+  Okay. So we know how there's kind of two parts of this project. Should we treat it as two parts?  Like try to get the first one done first and then second one? We can talk to our advisor about this since it's technically two parts.  Like how do I separate it? Probably not going to be two documents for one, but yeah. What's the priority on the first versus the second?  I would say.
+
+23:07 - Kevin DiGilio
+  Okay, the first one, this barcode scanning, seems more attainable, and I think they have a lot of stuff ready to support us there, right, so test data, test cases, you know, like he's building the machines now, they're doing the scanning now, I think this piece of paper with barcodes already exists, so that's more tangible and should, I don't want to say easy win, but should be an easy win.  Yeah. And the second one is a really cool idea that we're not sure how much you guys can do, so I'm not even sure what to ask them on what to do.  Okay. Right, so when you guys get close to understanding what the capabilities are, then we can ask them for, alright, I need a video feed of Johnny putting this thing together, and I need a video feed of a true professional doing it the right way.  Right, so we can use the right Yeah, to train the model. And then use Johnny's maybe doing it the wrong way, right?  So we may need a handful of videos. And this is the kind of stuff that I want you guys to tell me what we need.
+
+24:17 - Daniel Pora (136dpora@gmail.com)
+  Yeah. Right? Give me the perfect video. Give me the broken video.
+
+24:20 - Kevin DiGilio
+  Give me one that's really close to doing it right, but still wrong. You know, maybe I need one with seven steps.  Maybe I need one with two steps.
+
+24:33 - Daniel Pora (136dpora@gmail.com)
+  Okay. Yeah, that's, that's kind of an issue, but it's definitely two projects. Yeah. And this is the, this is the fun nature of a water.
+
+24:47 - Dzikowski, Jacob John
+  Hello. Yeah, because.
+
+24:50 - Daniel Pora (136dpora@gmail.com)
+  All right, maybe. Can you hear me?
+
+24:53 - Dzikowski, Jacob John
+  I can. No. Okay. Um, I thought we talked about. That the directions. I can hear myself echo. I thought we talked about that.  Uh, direction of, um, things that happened. Versus seeing them if they did it correctly, like how we discussed it correctly was not going to be the way we went down, because that's too hard.  Well, let me let me rephrase correctly in the right order.
+
+25:21 - Kevin DiGilio
+  Okay. Right, like maybe I'm supposed to sand it, then I'm supposed to scrape some edges, then I'm supposed to flip it over, sand it, scrape some edges.  I'm just making, making stuff up here, but if we, if we can identify what the seven steps are, and just make sure they happen in the right order.  Yeah, okay, that makes more sense.
+
+25:46 - Dzikowski, Jacob John
+  I just got thrown off by your correct usage.
+
+25:49 - Kevin DiGilio
+  Yeah, because correctly is, yeah, it's, yeah, it's a good one. Because it'd be really cool if they did step four before step three, we could figure that out before they got to step eight.  Yeah, I feel like, I feel like that's possible.
+
+26:07 - Dzikowski, Jacob John
+  Okay. Yeah, so correctly equals in the right order. Okay. All right.
+
+26:15 - Daniel Pora (136dpora@gmail.com)
+  I'm going to go through a little, a couple more questions. So what's going to be our process of, I guess, their process of training it?  Because we're going to have to get trained data from it. But if they use us for different stuff, we're not always going to be there.  So we might have to implement a way for them to train it. Is that something we do, do think?  Give them a way to train it? It does seem like a requirement.
+
+26:50 - Kevin DiGilio
+  Okay. You know, they would identify, you know, because now we're talking about how do we determine the steps for a workstation?  Yeah. And so, yeah, there might be, have to be like, mean, Nathan, I'm going back to your presentation, you know, you click a button, it's like time.  Time to train, right? And then it knows how many frames it needs to take, and there's a start and a finish button.  You know, maybe there's a way to, I mean, really just picturing the pen thing. What would you do? You captured a few frames and typed in a sentence, essentially?  Oh, we lost him.
+
+27:31 - Daniel Pora (136dpora@gmail.com)
+  Son of a gun. Son.
+
+27:33 - Kevin DiGilio
+  Anyway, what I saw is I believe he typed in the name of the step, like, put cap on pen.
+
+27:38 - Dzikowski, Jacob John
+  Yeah.
+
+27:39 - Kevin DiGilio
+  And then as he was putting the cap on the pen, Agrawal was clicking capture frame, capture frame, capture frame the whole time he was putting the cap on the pen.  Yeah. And all those frames went into training. This is what that step looks like. So that's my understanding of it.  But beyond that, I don't know. But it would be pretty slick if they could. Good. Good. Good. Good. Good.  Good. Good. Thank Since they have the camera, take a video and take that video, maybe it's like a six-second video, and identify where the steps start and stop in some way.  Or I don't know. This is where I'm, again, looking for ideas from you guys on, you know, what's the least complicated human steps to be able to train this thing.  These are busy people. don't know any of the stuff that we know. Right? If we could have just a regular dude go out there and do it, you know, he may be an agency employee that just got hired, and he's going to do the stuff because he recently got trained and audited.  He's not a computer expert. He's not a camera capture expert, right? He's none of those things. Yeah. So, you know, is it, you know, we capture some live video when he's doing it?  Thank Bye-bye. And then someone else, you know, maybe the operations manager or the someone who unders, maybe it's an engineer, maybe they take these videos and I don't know, kind of mark start and stop of each step.  I'm kind of just thinking out loud here.
+
+29:25 - Daniel Pora (136dpora@gmail.com)
+  Feel free. Yeah.
+
+29:28 - Kevin DiGilio
+  You know, what is the, what's necessary? My knowledge of what's necessary is very limited to Nathan's presentation. So is there, you know, how do we make it easy for them?  I mean, that's the magic we're after in all these cases, right? We know the technology is there. What clever thinking can we do to make it really work in their scenario?
+
+29:57 - Daniel Pora (136dpora@gmail.com)
+  It'd be nice if they had, or if we had like a existing system, because I mean, I don't know too much about how this process is going to go, but I can imagine it.  That's what you're So you have a video, and then you're going to have to have section it out, and each section will be a different step.  You'd have to mark times on that somehow. So I don't know if there's a tool that already exists out there to do that.
+  ACTION ITEM: Prepare demo of embedding/centroid tech for task identification in next group meeting. Include explanation of real-time processing capabilities.
+ - WATCH: https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay?timestamp=1477.269515  Nathan wrote one.
+
+30:26 - Kevin DiGilio
+  I guess, no, you captured frames. Are we? You're back. Oh, my mic finally works. Okay.
+
+30:34 - Nathan DiGilio
+  Yeah, I can show you when we meet as a group next. I can show you the demo that I had for one of the technologies I found, which was basically creating embeddings and kind of making a centroid of what each task is, and then comparing it to the current frame.  Yeah.
+
+30:55 - Daniel Pora (136dpora@gmail.com)
+  Okay.
+
+30:57 - Kevin DiGilio
+  And like all things where we have to do things for clients that are unknown. You know, like, I mean, Dan, you and I have made up some stuff along.
+
+31:07 - Daniel Pora (136dpora@gmail.com)
+  that's all. God.
+
+31:08 - Kevin DiGilio
+  For the retailers, when you built that text voice translation, we didn't bother asking the customer anything. You just made something up.  What do you got in your hand? that like a stress ball or something? Maybe you take a video of you picking up the stress ball, squeezing it, setting it back down.  How are you guys going to figure out the right steps of pick up, squeeze, set down? How do you chop it up in a video?  How do you make that easy for yourselves? How do make that easy for a non-technical person, right? Like, practicing Are you asking us to make a tool that automatically sparses Dan trains on these things, trains and quirks?
+
+31:51 - Nathan DiGilio
+  Well, mean, Dan's question was, how are they going to train it?
+
+31:56 - Kevin DiGilio
+  Yeah. So we're now responding to Dan's question of, how does each workstation get trained in the steps that it's responsible for, and what's that look like?  So it kind of seems like, yeah, there's probably a piece of software that either watches the action, like you did, with a constant clicking of frame, frame, frame, plus your text box where you're typing in the name of that series of frames, or is it one contiguous video where, like Dan was saying, where you mark, you know, picking it up as from second one to second three, you know, squeezing it from second three to second five, setting it down from five to seven, and then you guys pull the frames and whatever, you know, whatever magic you have to do, but, I mean, it's a great question.  How do we, how do we train each workstation's video?
+
+32:48 - Nathan DiGilio
+  I would guess that having the video itself would be best, because the random clicking works, but it doesn't. Yeah, it doesn't sound like it's very user friendly.  And if you need user friendly, and it's easy to skew, like, if I click six times on one step, two on the other two steps, it's gonna naturally skew towards the other parts.  If we had to move it.
+
+33:11 - Kevin DiGilio
+  And so I think, you know, if you guys can come up with a few use cases, and, you know, get enough confidence that we can go into the customer, or I'm not even sure that go in is what we need, right?  Really, all we need is videos from them.
+
+33:34 - Daniel Pora (136dpora@gmail.com)
+  Yeah, how, when I was working with Rhonda was CompositeFlex the same place? Okay, how reliable are they going to be with our data?  With, like, trying to give us videos and pictures of this stuff? Great question.
+
+33:56 - Kevin DiGilio
+  Do not have an answer. Okay. But I'm prepared to, in the event where they cannot produce these things for us, to drive out there and take some videos.
+
+34:10 - Daniel Pora (136dpora@gmail.com)
+  So they want me to come in and tour.
+
+34:12 - Kevin DiGilio
+  They like that idea. just, I like the work from home, so I haven't done that yet. And there's coordination, right?  I'm supposed to bring you guys. And I think Larry even agreed to you guys having a tour, but me bringing all you guys for a tour is far more complicated logistically than me showing up with a camera.  And yeah, but if we can be specific about what we want, yeah, tour is fun for us, right?
+
+34:40 - Daniel Pora (136dpora@gmail.com)
+  It's neat. We some pictures.
+
+34:42 - Kevin DiGilio
+  We learn some stuff, but you know, if we get very specific criteria of what we need, you know, we could send Nathan after Larry and ask him to take care of it.  Nathan has some pull in there. Okay. It's probably stronger than anyone else's pull.
+
+34:57 - Daniel Pora (136dpora@gmail.com)
+  Which Nathan are we talking about?
+
+35:00 - Nathan DiGilio
+  You.
+
+35:01 - Kevin DiGilio
+  Okay. I just have a feeling that if you asked Larry for videos, he would be born. So we're going to play that balance and do our best, but I've gotten them to agree to a lot of help.  So this is going to be interesting. We're installing the AI server pretty soon here, and that's a totally different project.  Language models and language translation and other stuff. But anyway, so we will do our best and I will work hard to make sure that the project is not delayed too tragically.  But the best way is to know as early as possible what you want to be prepared for it taking a week and a half to get it.  Yeah. Yeah, I think that's the whole point of this project starting as a waterfall format.
+
+36:07 - Nathan DiGilio
+  bro. Thank
+
+36:08 - Kevin DiGilio
+  Yeah, I mean, you've got to think about all this stuff, because there's, I mean, heck, last meeting, we didn't think about how to train it.  So, I mean, we're making good progress. There are some details that we have to really unearth here. I think it's a great project.  know the technology is more done than we thought, but that's okay, because you're not going be so lost in the technology, because what you're trying to figure out is how to run a project efficiently, effectively, deliver it on time, document it.  So, kind of good that it's not too insanely difficult. But there'll be some fun challenges along the way. I mean, we're finding them.
+
+36:54 - Nathan DiGilio
+  And then he mentioned yesterday that he would be willing to help us fill out some requirements as such, like if we needed help coming up with something, filling in some blanks.  Yeah, I'm good with words if I need to be.
+
+37:07 - Kevin DiGilio
+  I can make some stuff up. Okay, got a couple more questions.
+
+37:19 - Daniel Pora (136dpora@gmail.com)
+  Yeah, so we talked about the result output, kind of talked about the testing environment. That kind of just means like, oh yeah.  Yeah, so once we kind of confidently have a system that we're ready to install, what's our testing environment going to look like?  Are we just going to install it, see if it works, see what percentage or how accurate it is? Like how are we going to test this thing, I guess is what I'm trying to ask.
+
+37:58 - Kevin DiGilio
+  Well, I would say that before we go to the factory, we will have done enough testing in our own fake little factory.  Mm-hmm. That's maybe, you know, the room that I see behind you or a classroom or a something. Right. So I feel like we should be able to create a lot of things that simulate what we're talking about.  Yeah. But they don't have a test environment. Right. So we're going to walk into their live factory floor. And, you know, so we're probably going to have to pre-schedule some time where someone can do some relatively nonproductive work.  And so we may have to get, um, the engineering assistant guy. There's a guy named Mike there that we might, he may have to help us just because Larry's a pretty busy character, but they hired a Mike who's a really smart engineer, younger, probably less busy, but, so I think it's going to be  Yeah, relatively kind of, it won't be a production system, right, because we do have a staging piece of software there that we do our kind of testing around in.  So we'll be able to have a FlexPro staging with the form that's capturing the data. We'll be able to set up, you know, obviously the first version of the software is not going to be production, so we'll call it staging as well, or beta, or whatever you want to call it, right?  Yeah. Some kind of testing sandbox.
+
+39:39 - Daniel Pora (136dpora@gmail.com)
+  Okay, so do we know how concrete, you said these are prototypes for, the products are prototypes for the missiles, do you know how concrete their systems are going to be, like each individual station, are they going to change, how should we accommodate for that change?
+
+40:02 - Kevin DiGilio
+  I don't think we should use the word prototype. Yeah.
+
+40:07 - Daniel Pora (136dpora@gmail.com)
+  Because by
+
+40:07 - Kevin DiGilio
+  By the time they're getting to producing serial numbers of a part, they're likely beyond prototyping, and they probably won't use our software during the prototyping thing.  I think they prototype as they build the machines. These are crazy inventors building machines that build components, so they're prototyping as part of the machine build.  So by the time we're involved, each machine does a very specific set of steps. And while I'm open to it changing over time, it's not going to be a lot.  So whatever we do for the initial training would probably be the same thing they do for changes in training.  And so we would just tell them to do whatever they did again and update that. You know, so my brain is thinking of all sorts of data structures that we're going to need for that.  You know, what workstation are we at? What step is this? go. Where are the frames? What's the timing? I don't know how all that goes into this software, but it seems like we're collecting a lot of data during the training.
+
+41:20 - Daniel Pora (136dpora@gmail.com)
+  Yeah. So our advisor, Liao, knows a bit about AI, and he was talking to us about processing video and how it's very intensive.  Processed video. I'm not sure if he was talking about this for the first or second part, but how do we plan on processing the video?  Are we going to try to chunk it up into frames or what kind of hardware are we going to run this on?  Does it have to be pretty beefy? I can answer the second question.
+
+41:56 - Kevin DiGilio
+  mean, I don't know any of the other questions. interrupt first? Please, I don't have the answer. I think Liao still has a misunderstanding of what our project executive needs.
+
+42:07 - Nathan DiGilio
+  I hope I do believe the context was about the second part, because he's talking about like to analyze a video, just you're analyzing frames, but the way he was talking about it was chunking frames, because when you analyze the video, you need to do all of the frames.  Whereas I guess for our purposes, we only really need to take like chunks of the video and just see if the steps are being in order.  Like if we're trying to figure out if a task is completely done, right, then we definitely have to have more of an intensive workflow process of going through the entire video all at once.  Well, well, let's let's be clear.
+
+42:48 - Kevin DiGilio
+  This is a live feed of a human doing it right now. And we need to smack him in the middle of his stuff.  Yes. Right.
+
+42:55 - Nathan DiGilio
+  So I mean, this is a real time, like my my demo was real time, and I was just processing groups of frames.  Okay. And it's like, I was just describing it as it's a lot more work. But I was also processing live video on my laptop, and he was saying, was I processing video or processing frames, and I just, I don't see the difference.  If you process frames fast enough, it is just the video. Okay.
+
+43:23 - Kevin DiGilio
+  And Nathan, I think you have a general appreciation for the hardware involved, right? Yeah. An Ubuntu server with a whole bunch of GPU.  I mean, we have a Dell that we chose, but it's very similar to, we chose a smaller model. But it's got, you know, Buku GPUs and reasonable RAM.  I think there's only 32 RAM. But lots of GPUs.
+
+43:55 - Daniel Pora (136dpora@gmail.com)
+  Okay. So, I think you guys talked about existing software a little bit, but we were talking a little bit about YOLO.  And YOLO has licensing. How are we going to get around that if we do use assisting software? Like, are we going to license?
+
+44:23 - Nathan DiGilio
+  For at least the LLM project that we did over the summer, we decided to look for like MIT or Apache 2.0 license because those are kind of open source.  Anyone can use them for most purposes. Yes, we love the MIT.
+
+44:35 - Kevin DiGilio
+  That's at least what we did. Okay.
+
+44:38 - Nathan DiGilio
+  There are some that you can buy, which could also be an option if it's really a need-be thing, but...  Okay.
+
+44:47 - Daniel Pora (136dpora@gmail.com)
+  Yeah, we would prefer to not have to pay for stuff. Yeah, I get that. the goal. So then if we try using Raspberry Pis, which I don't know if it's since then, but we just bill you for this.  That's a great question.
+
+45:11 - Kevin DiGilio
+  I don't see any other direction. Yeah. But obviously ask the school first. Maybe they have some magical hidden budget.  Yeah. Yeah, right.
+
+45:23 - Daniel Pora (136dpora@gmail.com)
+  Let's see about that. I don't know. They got the budget for the things they want to have budget for, but I'm with you.
+
+45:29 - Kevin DiGilio
+  President got that. How much raise?
+
+45:31 - Daniel Pora (136dpora@gmail.com)
+  Like a 45% raise. 47.
+
+45:35 - Miller, Collin
+  Yeah.
+
+45:35 - Nathan DiGilio
+  Yeah, buddy. After that, they closed the shifts on the campuses because Penn State doesn't have money, but the president got a 47% raise.  Yeah, it makes perfect sense.
+
+45:46 - Miller, Collin
+  Okay.
+
+45:46 - Kevin DiGilio
+  So now that you guys understand how the world works, right? Y'all should probably try to be presidents and owners and entrepreneurs.
+
+45:59 - Daniel Pora (136dpora@gmail.com)
+  Especially in colleges. I'm going for the Penn State position.
+
+46:02 - Miller, Collin
+  Yeah. I think it's not, especially in don't see in colleges.
+
+46:07 - Kevin DiGilio
+  Okay. All of my advisors expect me to be making that same amount, just to start a business and go out and do these things, and to be strategic, you know, you've got to have a certain set of skills, and it takes a long time to acquire them, and the school can't survive without it, so understanding your value is an important thing in this world.  There's plenty of money out there.
+
+46:32 - Daniel Pora (136dpora@gmail.com)
+  Anyway. So, I think… Yeah, I kind of went through most of my questions, I think I have, like, one left, so for the second part, are we focusing on the person, or the part?  I think we kind of answered this before, but… Are we focusing more on the process? … For the result.  Like for the part two?
+
+47:14 - Nathan DiGilio
+  Yeah, part two. I would guess process because if we looked at the part, we would only know if it was like done right after the fact or wrong after the fact, whereas we're trying to tell them that they're in the wrong order.  like as they're doing it.
+
+47:31 - Daniel Pora (136dpora@gmail.com)
+  Okay. Yeah. From context from earlier in this meeting. Yep. Okay. I think that's my question.
+
+47:38 - Kevin DiGilio
+  Yeah, so like the mandrel one, the mandrel comes in and it's just this stainless steel, very specifically shaped long tube that's approximately the dimensions of the missile tube, right?  So the first step that they do is they'll, they grab a bucket off the ground and they dip a paintbrush into this bucket and they spread the resin all across the tube.  That's kind of step one. And step two is they take this cloth, it kind of looks like cheesecloth. They wrap a piece of it around the tube, and it sticks to the resin.  That's step two. And step three is they apply another layer of resin. That's step three, right? But that's step three, it's a fairly long step, right?  He reached down and grabbed the bucket again, he dipped in a paintbrush, he spread it all across the thing, and maybe that takes, I don't know, 20, 30 seconds for him to do it.  And then that's step three. Then step four might be start the winder, and then it starts winding fibers around this resin-covered cloth.  And who knows how long that step takes, necessarily. And then they probably, I'm guessing, they probably apply more cloth or more resin after it.  And so what I'm guessing is that if you forget to apply the resin and put the cloth on there, that's probably it.  Big problem. Yeah. Or if you forgot to apply the cloth and started wrapping the fibers. Now, these are obvious things that they should catch on their own, but it's the kind of stuff that would be great for us to be able to pick up on.  Yeah. It's got to be resin, cloth, resin, fiber, resin, whatever. And if they skip a resin, holy , we do not want them wrapping the fibers around it.  So if we can detect that, you know, make a beep come from the computer or let the operator see an error message or, you know, something that can get their attention.  Yeah. That could save them piles of money.
+
+49:43 - Daniel Pora (136dpora@gmail.com)
+  It sounds almost like what Amazon does with their drivers, where they'll have like cameras pointing towards the drivers to make sure they're doing the right thing, like having their seatbelt on or not being on their phone.
+  ACTION ITEM: Contact Dean Lewis re NDA for CompositeFlex project. Clarify process, get timeline for approval.
+ - WATCH: https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay?timestamp=2650.269515  Yep. Yeah. Yeah. Yeah. I got to get a tour of this place just to get a nice visual. Yeah.
+
+50:02 - Kevin DiGilio
+  Yeah. I think we're, I think we're close. Okay. Did you ever reach out?
+
+50:07 - Daniel Pora (136dpora@gmail.com)
+  from the NDA to Dean Lewis.
+
+50:13 - Kevin DiGilio
+  No. I have not. You can feel free to do that for me. I think it's yours up.
+
+50:26 - Nathan DiGilio
+  Oh, I didn't think I had any jobs.
+
+50:30 - Kevin DiGilio
+  You have a client mentor.
+
+50:33 - Nathan DiGilio
+  Hmm, interesting. Very interesting.
+
+50:47 - Kevin DiGilio
+  All right. I guess I can attempt to remember to do that.
+  ACTION ITEM: Consolidate team's requirement lists into single doc. Prepare for review w/ Kevin in next meeting. Include both parts, prioritize key features.
+ - WATCH: https://fathom.video/share/s3YUW-aJfiRQkpMzX3qxRJkR-suGPyay?timestamp=2713.269515
+
+50:55 - Nathan DiGilio
+  I guess with five minutes left, is there anything else we want to discuss? Well, I enjoyed question number 15.
+
+51:06 - Kevin DiGilio
+  Oh, .
+
+51:07 - Daniel Pora (136dpora@gmail.com)
+  Oh, God. God.
+
+51:10 - Nathan DiGilio
+  That's just open-ended enough to think of that's an ongoing question yeah I might have related more towards do we want part one part two both done yeah yeah I wrote that with that in mind sorry cool that was good I think for next meeting we should try to have as many requirements as we can yeah at least just a list like we don't need the story cards or whatever we just need as many requirements and then we can kind of go over those with Kevin and see if he's got any additions critiques things that uh if we're on the right track or not yeah yeah I gotta I made a big doc for a markdown just listing out all the requirements that I saw so
+
+52:08 - Daniel Pora (136dpora@gmail.com)
+  But we're going to have a ton more after this meeting. Oh, yeah.
+
+52:12 - Miller, Collin
+  Agreed.
+
+52:14 - Daniel Pora (136dpora@gmail.com)
+  All right. Cool.
+
+52:20 - Nathan DiGilio
+  Anything else? I think we're good.
+
+52:24 - Daniel Pora (136dpora@gmail.com)
+  All right.
+
+52:25 - Kevin DiGilio
+  And then you guys are to figure out part one, part two, do them in parallel, do them in serial, right?  Yeah. Yeah, we'll ask.
+
+52:34 - Daniel Pora (136dpora@gmail.com)
+  I anticipate them saying just do it in parallel or at least plan for it.
+
+52:38 - Nathan DiGilio
+  this point, and then if it gets towards the end of the next semester or running out of time, then they might have us change names once we're more in the agile phase.
+
+52:50 - Daniel Pora (136dpora@gmail.com)
+  Yeah, because I imagine when it gets to the code writing phase, I mean, there's four of you.
+
+52:54 - Kevin DiGilio
+  It could be a divide and conquer kind of situation. Yeah.
+
+52:59 - Daniel Pora (136dpora@gmail.com)
+  Yeah, that's the goals. good place.
+
+53:05 - Kevin DiGilio
+  Oh, okay.
+
+53:08 - Daniel Pora (136dpora@gmail.com)
+  This is going to be a cool project though, like if we get the massive Raspberry Pi, would be pretty sweet.  Just configuring all those would be cool. Yeah, we got to think about that learning interface. Where is that going to be held?  Are we going to have it on their terminal? Is it going be a part of KMD? We'll have to see.
+
+53:33 - Kevin DiGilio
+  Yeah, I'm guessing it's not likely going to be part of KMD. Okay. Just because I don't see any real great reasons to put it in that software.  Like Nathan, I'm kind of picturing what you and Max put together, just that simple web page. Yeah. It could just be something like that, that, you know, it's got a video feed and a couple of buttons on it.  Yeah, because it really doesn't have to be much.
+
+53:59 - Nathan DiGilio
+  And then the integration should be pretty simple. What we have, we could just like show put an endpoint that's KMD grabs there into the longer nerves, or whatever the machines are.  I kind of missed that part earlier when I was messing with my earbuds.
+
+54:12 - Kevin DiGilio
+  But, mean, we did something similar, I mean, I think it was like the year 2000, we were taking football video, marking the start and stop of each play, and they would say it's like an IT or an iPro formation, and they ran this play, and so they would go through and just mark the start and end of each video.  And so as far as the user interface, it was pretty simple, right? start, stop, label it, now the behind the scenes of, what's that?  For my demo? No. It was for Randy Bukowski's football programming, the football software. Yeah. But it was really just, you know, a handful of buttons and a video feed.  And then each time you click the button, they would add a little record to, you know, this is step one, start and finish, step two, start and finish.  So the technology. you. or the interface seems pretty simple. Now, what it's producing and capturing and how it feeds into your model is slightly more complicated, but I think the interface itself is a video feed and a handful of buttons.  So we could probably just build a web app for that and capture the data. In Lovable could do that in an hour, right?  I like that. Okay, then. So my other meeting is dinging at me. it one o'clock? Yeah, we have another meeting to go to as well that we kind of forgot about.
+
+55:47 - Daniel Pora (136dpora@gmail.com)
+  Excellent. High fives around. Well done, gents. We'll talk to you next week. All right. I'll see you guys. Okay.  Thanks. See you.
