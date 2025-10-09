@@ -23,12 +23,11 @@
 - **Source:** Sept 19: "configurable way to teach your system, you know, maybe top left or top down, left to right"; Oct 2: "configurable system to map barcode positions to data fields"
 
 #### UFR-1.3: Object Recognition for Non-Barcodeable Parts
-- **Requirement:** Identify and track large parts that cannot accommodate barcodes due to high-temperature processing or physical constraints
+- **Requirement:** Identify and track QR codes on large parts rather than sheets of paper
 - **Details:**
-  - Recognize etched identifiers on mandrels and large components
-  - Process carved/etched numbers, letters, or symbols (1, 2, 3 or A, B, C)
-  - Handle parts that undergo processes where barcodes would be destroyed
-  - Provide same data output format as barcode scanning
+  - Recognize QR codes on mandrels and large components
+  - QR codes may not be in ideal positions/angles
+  - Provide same data output format as barcode scanning from a paper
 - **Priority:** High
 - **Source:** Sept 19: "any barcodes, stickers, any of that kind of stuff would just get burnt off in the oven"
 
@@ -51,11 +50,11 @@
   - Recognize step start and completion events
   - Validate prerequisite steps before allowing subsequent operations
   - Focus on process sequence rather than final part quality assessment
-- **Priority:** High
+- **Priority:** Critical
 - **Source:** Sept 19: "You have to put the fabric on first before you apply the resin"; Oct 2: "AI to detect if steps are performed in correct order"
 
 #### UFR-2.2: Real-time Process Feedback and Alerts
-- **Requirement:** Provide immediate visual feedback and alerts for process status and violations
+- **Requirement:** Provide immediate visual feedback and alerts for process status and violations on terminals at work stations
 - **Details:**
   - Display step-by-step progress indicators (checkboxes, status lights)
   - Show green checkmarks for completed steps
@@ -71,7 +70,7 @@
   - Enable marking of step start/end points during training capture
   - Support on-production-floor training with minimal technical assistance
   - Store training data for model retraining and validation
-- **Priority:** Medium
+- **Priority:** Critical
 - **Source:** Oct 2: "simple UI for training system on correct process steps"; "Capture video of correct process, mark start/end of each step"
 
 #### UFR-2.4: Process Sequence Validation and Error Prevention
@@ -103,7 +102,7 @@
   - Include part/serial references and mapped field indicators
   - Support data recovery and audit trail requirements
   - Enable offline operation during network issues
-- **Priority:** Medium
+- **Priority:** High
 - **Source:** Oct 2: "Consider database table for intermediate data storage"
 
 ### UFR-4: Development and Testing Support
@@ -115,7 +114,7 @@
   - Support iterative development without production floor disruption
   - Enable comprehensive testing of multi-workstation scenarios
   - Include representative manufacturing process simulations
-- **Priority:** Medium
+- **Priority:** High
 - **Source:** Oct 2: "No dedicated test environment at CompositeFlex; Team should create simulated workstation for initial testing"
 
 #### UFR-4.2: Training Dataset Management
@@ -125,7 +124,7 @@
   - Organize datasets by part type, process, and workstation
   - Enable model retraining with new data sources
   - Support various lighting and environmental conditions
-- **Priority:** Medium
+- **Priority:** Critical
 - **Source:** Sept 19: "we'll be able to give you as many photos... of that A etched piece of metal as you need"
 
 ---
@@ -135,7 +134,7 @@
 ### Product: Usability Requirements
 
 #### PU-1: Factory Worker Ease of Use
-- **Requirement:** System must be extremely easy to use for manufacturing workers with minimal training
+- **Requirement:** System must be extremely easy to use for manufacturing workers with minimal training, needs to be easier than what is currently being done
 - **Details:**
   - Function reliably with workers wearing gloves, goggles, and hard hats
   - Work consistently on first attempt without repositioning requirements
@@ -161,16 +160,16 @@
   - In-situ capture capability for production floor use
   - Intuitive configuration for barcode mapping and field assignment
   - Clear visual feedback during training and setup procedures
-- **Priority:** Medium
+- **Priority:** High
 - **Source:** Oct 2: "Develop easy-to-use interface for non-technical workers to train system"
 
 #### PU-4: Diverse Workforce Accommodation
-- **Requirement:** Design system to accommodate workers with varying language skills and technical literacy
+- **Requirement:** Design system to accommodate workers with varying technical skills and possible disabilities
 - **Details:**
   - Visual indicators that transcend language barriers
   - Intuitive symbols and color coding for status communication
   - Support for temporary workers with minimal training
-  - Account for varying skill levels and tenure
+  - Account for varying skill levels
 - **Priority:** Medium
 - **Source:** Sept 19: "they sometimes don't speak our language"; "these folks that get hired, they come from temp agencies"
 
