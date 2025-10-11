@@ -1,6 +1,6 @@
 ## System Requirements (SR) for AIBI Computer Vision for Manufacturing
 
-This document maps the user-level requirements into testable system requirements. It follows the same structure and presentation style as `Unified_Requirements_Analysis.md` so engineers and stakeholders can review SRs by category.
+This master SR document consolidates system requirements derived from `Unified_Requirements_Analysis.md` and the prior draft `System_Requirements_from_UFR.md`. Duplicates were merged and removed; use this file as the single source of truth for system requirements.
 
 ---
 
@@ -19,7 +19,7 @@ This document maps the user-level requirements into testable system requirements
   - Detects and decodes 5–20 barcodes per image with >=95% accuracy in controlled lighting and >=90% in representative factory lighting for target hardware.
   - Each decoded record contains barcode type, raw value, bounding box, confidence, timestamp, and workstation ID.
 - Priority: Critical
-- Source: Derived from UFR-1.1
+- Source: Derived from UFR1
 
 #### SR-1.2: Configurable barcode field mapping (SR-2)
 - Requirement: Provide per-workstation configurable mapping to assign barcode spatial positions to named data fields (part number, serial number, material batch, spool IDs).
@@ -31,7 +31,7 @@ This document maps the user-level requirements into testable system requirements
   - Mapping UI supports labeled zones, ordering rules, and anchor points.
   - Mapping applied to test images maps barcodes to fields per configuration in >=98% of cases.
 - Priority: Critical
-- Source: Derived from UFR-1.2
+- Source: Derived from UFR2
 
 #### SR-1.3: Etched / visual identifier recognition (SR-3)
 - Requirement: Recognize and extract etched/carved alphanumeric identifiers on large parts (mandrels) and return identifier, bounding box, and confidence.
@@ -41,7 +41,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Recognition accuracy >=92% on provided etched dataset under representative conditions.
 - Priority: High
-- Source: Derived from UFR-1.3
+- Source: Derived from UFR3
 
 #### SR-1.4: Structured scan payload output (SR-4)
 - Requirement: Aggregate decoded and recognized values into a structured JSON document per scan event containing timestamps, workstation ID, per-field values, mapping metadata, confidences, and image reference.
@@ -51,7 +51,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - JSON schema validates sample outputs with no errors.
 - Priority: Critical
-- Source: Derived from UFR-1.4, EI-2
+- Source: Derived from UFR4, EIUR1
 
 #### SR-1.5: Real-time delivery and keyboard-emulation (SR-5)
 - Requirement: Support real-time delivery via local REST API, local DB persistence, and keyboard-emulation mode for legacy KMD integration.
@@ -63,7 +63,7 @@ This document maps the user-level requirements into testable system requirements
   - DB write completes <250 ms under normal conditions.
   - Keyboard-emulation produces configured keystroke sequence reliably.
 - Priority: Critical
-- Source: Derived from UFR-1.4, UFR-3.1, EI-1
+- Source: Derived from UFR4, UFR3, EIUR1
 
 ---
 
@@ -78,7 +78,7 @@ This document maps the user-level requirements into testable system requirements
   - Step timestamps within +/-2s of human-annotated ground truth on validation videos.
   - Sequence violation alert triggered within 1s of detection; false positive rate <=3% on validation set.
 - Priority: High
-- Source: Derived from UFR-2.1, UFR-2.4
+- Source: Derived from UFR6, UFR8
 
 #### SR-2.2: Real-time operator feedback and alerts (SR-7)
 - Requirement: Provide per-workstation UI overlay with live video, step progress indicators, visual status (green check/red alert), and optional audio alerts for violations.
@@ -88,7 +88,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - UI updates <250 ms after event detection; audio alert plays <500 ms after trigger.
 - Priority: High
-- Source: Derived from UFR-2.2, PU-1, PU-2
+- Source: Derived from UFR7, PUUR1, PUUR2
 
 #### SR-2.3: Training capture and annotation tool (SR-8)
 - Requirement: Provide an in-situ capture tool for non-technical users to record reference video, mark step start/end, label steps, and save training sessions with metadata.
@@ -98,7 +98,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Non-technical user completes capture + annotation + save within 3 minutes with no documentation.
 - Priority: Medium
-- Source: Derived from UFR-2.3
+- Source: Derived from UFR5
 
 #### SR-2.4: Process validation tolerance and configurable sensitivity (SR-9, SR-17)
 - Requirement: Models must tolerate natural worker variations (handedness, micro-variations) and provide configurable sensitivity per step to reduce nuisance alerts.
@@ -108,7 +108,20 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Configurable tolerance reduces false positives by >=30% vs fixed threshold baseline while maintaining detection power for true skips.
 - Priority: High
-- Source: Derived from UFR-2.4, OD-1
+- Source: Derived from UFR8, ODUR1
+
+#### SR-2.5: Log and notify incorrect or out-of-sequence steps
+- Requirement: The system shall log every detected incorrect, skipped, or out-of-sequence manufacturing step with timestamps, image/frame reference, detected step, expected step, and confidence. The system shall provide configurable delivery of these logs/alerts to the company's local endpoint(s) (local API, syslog, or message queue) for review and action.
+- Details:
+  - Logs must be persisted locally with audit metadata and survive restarts.
+  - Notification channels are configurable per site (local API endpoint, secure message queue, or on-premises syslog); default is local persistent storage.
+  - Notifications must not rely on external cloud services unless explicitly enabled by an admin (see SR-S1).
+- Acceptance criteria:
+  - For each detected incorrect or out-of-sequence event, a log record is written to the local audit store within 250 ms and contains required fields (timestamp, workstation_id, detected_step, expected_step, confidence, image_ref).
+  - When configured, the system successfully delivers the notification payload to a provided local endpoint and records delivery status in the audit trail.
+  - Delivery failures are queued and retried; queued deliveries survive process restarts and persist until successful or manually cleared.
+- Priority: High
+- Source: Derived from UFR8, UFR3
 
 ---
 
@@ -122,7 +135,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Local write latency <250 ms; queued records survive restarts and synchronize automatically on network restore.
 - Priority: Medium
-- Source: Derived from UFR-3.2
+- Source: Derived from UFR9
 
 #### SR-3.2: JSON schema and data contract publication (SR-13)
 - Requirement: Publish stable JSON schema and human-readable documentation for scan and event payloads including examples and required fields.
@@ -132,7 +145,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Schema file validates example payloads and is stored in repo/documentation.
 - Priority: High
-- Source: Derived from EI-2, UFR-3.1
+- Source: Derived from EIUR2, UFR3
 
 #### SR-3.3: Verification harness / simulated workstation (SR-14)
 - Requirement: Provide a simulated workstation environment to replay camera feeds, inject synthetic barcodes/etched IDs, and verify API/keyboard-emulation outputs before production deployment.
@@ -141,7 +154,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Harness can run test scenarios for multi-barcode decode, mapping, keyboard-emulation and produce pass/fail results.
 - Priority: Medium
-- Source: Derived from UFR-4.1
+- Source: Derived from UFR10
 
 #### SR-3.4: Training dataset management & export (SR-15)
 - Requirement: Provide tools and storage to capture, tag, version, and export labeled datasets for model training, including metadata (workstation, part type, lighting).
@@ -150,7 +163,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Labeled datasets exportable with manifest and support simple queries by workstation/part.
 - Priority: Medium
-- Source: Derived from UFR-4.2
+- Source: Derived from UFR11
 
 ---
 
@@ -163,7 +176,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Enable/disable per workstation with no data loss; pilot mode captures correlation logs.
 - Priority: Medium
-- Source: Derived from OO-3, EI-3
+- Source: Derived from OO1, EIUR3
 
 #### SR-4.2: Operator UI simplicity & internationalization (SR-19)
 - Requirement: UI shall use simple iconography, color coding, and minimal text to accommodate diverse language proficiencies and provide clear workflows for non-technical staff.
@@ -173,7 +186,7 @@ This document maps the user-level requirements into testable system requirements
 - Acceptance criteria:
   - Non-technical users complete core tasks in UAT with minimal instruction.
 - Priority: Medium
-- Source: Derived from PU-3, PU-4
+- Source: Derived from PUUR3, PUUR4
 
 ---
 
@@ -200,6 +213,18 @@ These entries capture performance, reliability, security, and operational constr
   - System runs at >=5 FPS on documented low-cost hardware with usable detection performance.
 - Priority: Medium
  - Source: Derived from PP-3, OO-1
+
+#### SR-C1: Multi-barcode capacity and accuracy (SNFR)
+- Requirement: The system shall support decoding multiple barcodes per single capture up to a supported capacity and meet validated accuracy and latency targets across that range.
+- Details:
+  - Target operational capacity range: 5–20 barcodes per image (typical layouts on paper or parts).
+  - Target accuracy: >=95% detection+decode in controlled test conditions; >=90% in representative factory lighting for target camera hardware.
+  - Processing performance: end-to-end decode latency must align with SR-P1 thresholds (API median <100 ms, UI update <250 ms) for supported hardware tiers.
+- Acceptance criteria:
+  - On a curated testset containing images with 5, 10, 15 and 20 barcodes, the system achieves the target accuracy levels above.
+  - Latency and throughput measurements on target hardware meet documented thresholds for median and 95th percentile.
+- Priority: Critical
+- Source: Derived from UFR-1.1, PP-1, PP-2
 
 ### SNFR-S: Security, Data Sovereignty & Audit
 
@@ -238,6 +263,66 @@ These entries capture performance, reliability, security, and operational constr
   - Hardware tiers, recommended configurations, and trade-offs.
 - Priority: Medium
  - Source: Derived from OO-1, OO-3
+
+---
+
+## Product Usability Requirements
+
+These requirements translate the user-level usability (PU-*) items into measurable system-level usability requirements.
+
+### USR-1: Factory worker ease-of-use
+- Requirement: Enable a factory worker to complete common tasks (scan & confirm, view step status, and log/clear alert) with no more than 3 clicks/keystrokes and without removing PPE.
+- Derived from: PU-1
+- Acceptance criteria:
+  - In UAT with representative workers wearing PPE, >=90% complete common tasks within 30 seconds.
+  - System achieves SUS >= 80 in UAT.
+- Priority: Critical
+
+### USR-2: Hands-free / minimal interaction operation
+- Requirement: Detect objects entering the camera FOV automatically and require no physical operator interaction for the standard scan workflow, with a configurable manual override.
+- Derived from: PU-2
+- Acceptance criteria:
+  - Automatic detection and processing begins without operator input in >=95% of valid presentations.
+  - Manual override available via one configurable button/hotkey.
+- Priority: High
+
+### USR-3: UI readability and PPE compatibility
+- Requirement: Visual UI elements (status icons, primary text) remain legible while operators wear PPE at typical workstation distances.
+- Derived from: PU-1, PU-2
+- Acceptance criteria:
+  - Minimum contrast ratio 4.5:1 for text/icons and legibility at 1.0 m with safety glasses across three lighting levels.
+  - Iconography and primary text legible at target display sizes (equivalent to 18pt at typical monitor scale).
+- Priority: High
+
+### USR-4: Minimal-training process training UI
+- Requirement: Non-technical staff can record a training clip, mark step boundaries, and save a labeled session in under 3 minutes using inline tooltips only.
+- Derived from: PU-3
+- Acceptance criteria:
+  - >=90% of non-technical participants complete capture + annotation + save within 3 minutes in UAT.
+- Priority: Medium
+
+### USR-5: Language‑independent UI and icons
+- Requirement: Primary operational UI shall rely on iconography and color coding; textual labels minimized and localizable.
+- Derived from: PU-4
+- Acceptance criteria:
+  - Core workflows operable using icons alone; localization framework present for secondary text.
+- Priority: Medium
+
+### USR-6: Immediate, clear feedback on violations
+- Requirement: When a violation is detected, present a clear visual state change and (optionally) audio cue; visual change must occur within 250 ms of detection.
+- Derived from: UFR-2.2, PU-1
+- Acceptance criteria:
+  - Visual update latency <250 ms and audio play <500 ms from event detection.
+  - Visual feedback includes icon + concise label and recommended operator action.
+- Priority: High
+
+### USR-7: Operator recovery and audit logging
+- Requirement: Operators can undo or flag a false-positive action within 30 seconds; such actions are logged in the audit trail with user ID and timestamp.
+- Derived from: PU-1, OO-3
+- Acceptance criteria:
+  - Undo/flag option accessible in UI and action recorded in audit log.
+  - Undo returns system to prior state when feasible.
+ - Priority: Medium
 
 ---
 
