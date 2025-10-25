@@ -1,0 +1,41 @@
+Recap Questions from last time
+    Composiflex is going to work on moving towards QR codes
+    We should also be in control of the position of the paper relative to the camera
+
+Bar codes vs QR codes
+    QR codes can have check sums 
+    Orientation does not matter
+    Can contain more info
+
+Multiple stations
+    Professor Q: Will different sections of the paper need to be scanned per workstation? Will it change per station?
+        Need to ask more about this, but the consensus was no, these are just used to track the object.
+Paper data
+    What does each section contain when it comes to the QR codes
+    Will the papers change? Will their contents change in the future?
+    Minor changes should be ok, but major ones will derail us
+
+Domain Expertise 
+    We need to “method act” so we know more about the topic
+    We need to get a tour asap
+    Talk to some employees to get more info
+    We need to try to be the domain experts on this
+
+Realistic expectations on Part 1 (P1) vs Part 2 (P2)
+    We discussed the priority of each to our sponsor
+        P1 needs to be done, P2 would be nice
+    Professor Q: How do we plan on implementing P2?
+        Nathan has a small demo on this, so it is feasible
+    When will P2 need to be implemented? When will these workstations be set in stone?
+        Creating our own test env is good, but real production tests are critical
+How do we plan on handling P1 vs P2 in our project
+    We need to document that P2 is optional
+    When should we branch off from doing both P1 and P2 concurrently to doing each individually?
+    P1 should be prioritized; we still need to think about P2
+    P1 and P2 should not be dependent	
+        The process of P1 should not affect P2
+    Try not to judge the difficulty of P1 vs P2 because it might not be as easy as you think.
+
+Us in Composiflex’s eyes
+    We are low priority
+    QA is huge for them

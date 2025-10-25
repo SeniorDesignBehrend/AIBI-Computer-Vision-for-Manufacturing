@@ -1,0 +1,281 @@
+When: October 23rd, 12:00pm
+Who: Daniel, Jacob, Nathan, Collin
+What:
+Impromptu Microsoft Teams Meeting - October 23
+VIEW RECORDING - 20 mins (No highlights): https://fathom.video/share/W5cjD38ofReYJfSTk2VcjKzAyXSczM_A
+
+---
+
+0:04 - Kevin DiGilio
+  I just got off a webinar, so I'm gathering my thoughts. It's okay.
+
+0:11 - Dzikowski, Jacob John
+  We have one late participant, so. Oh, man. That son of a gun. Fire him.
+
+0:21 - Kevin DiGilio
+  This is not a fire him scenario, though, is it?
+
+0:24 - Daniel Pora (136dpora@gmail.com)
+  Yeah, we can.
+
+0:25 - Dzikowski, Jacob John
+  We tried. Yeah.
+
+0:29 - Kevin DiGilio
+  He's a big fellow, too, so we don't want to get him angry. Yeah, so I just gave a webinar on AIBI and answered a bunch of questions.  Got to do our shameless plug, so good stuff. How'd go?
+
+0:57 - Daniel Pora (136dpora@gmail.com)
+  I think it went well.
+
+0:59 - Kevin DiGilio
+  I had very minimal ahs and ums, and I knew how answer all the questions, to answer all of questions, and of we  It was about 30 people, and they asked some pretty good questions. So, yeah. It was good. There's another woman there named Erin, and she has a company called Eventio, and they use AI to do event planning.  Yeah. So some pretty slick stuff they got going on there, but they're allowed to use the cloud, so it's a whole different world.  Yeah.
+
+1:35 - Daniel Pora (136dpora@gmail.com)
+  How are they doing that? Like, are they making their own model, or are they using a LLM? Oh, they're definitely using LLM.
+
+1:42 - Kevin DiGilio
+  I don't remember exactly which one she said, but. Yeah. Yeah, I don't think anyone's building their own day model at this point.  Yeah. These LLMs and their APIs are pretty easy to use, so. No sense in getting that crazy, building your own.  First, we have the free open source ones available. to go.
+
+2:03 - Daniel Pora (136dpora@gmail.com)
+  you.
+
+2:04 - Kevin DiGilio
+  Yeah, it doesn't make sense to do that. All right, while we're waiting for the long-haired fellow, I'm going to hit mute and walk out to the kitchen.
+
+2:21 - Daniel Pora (136dpora@gmail.com)
+  I'll be right back. Yep. Has anyone nudged him yet?
+
+2:28 - Nathan DiGilio
+  Terrible. It's ale out there causing connection problems with your mic.
+
+2:33 - Kevin DiGilio
+  No, I just have a very old headset. Yeah, Courtney found out that when her mic is up and it's supposed to be muted, I could hear her the whole time.  Nice. So that's a moderately disturbing feature to discover. She's like, wow, how many meetings have I been in where I wasn't muted and where I thought it was?  She's kind of sick now since she coughing and blowing her nose and stuff. Oh my gosh. How many meetings did I blow my nose through?
+
+2:58 - Daniel Pora (136dpora@gmail.com)
+  Go through the Fathom meetings, Fathom recordings. That's right, we'll find them. Okay, excellent. Well, guess we're all here. What are we talking about?  What did you think of the presentation last week?
+
+3:21 - Dzikowski, Jacob John
+  Yeah, I think it was good.
+
+3:23 - Kevin DiGilio
+  We have to keep Nathan from appearing angry when... ... ... ... Usually I was talking, but beyond that, I think, yeah, I'm pretty sure I saw his knuckle turning white whenever it's something.
+
+3:36 - Daniel Pora (136dpora@gmail.com)
+  Oh, man, he's going to fight her.
+
+3:38 - Kevin DiGilio
+  Somebody hold him back.
+
+3:41 - Daniel Pora (136dpora@gmail.com)
+  Yeah, I think I think it was good.
+
+3:43 - Kevin DiGilio
+  And yeah, obviously, the professors are supposed to beat you up on things. So that's good because, you know, you want to get good at presenting these things and you're there to learn.  So hopefully you guys can take that constructive criticism without. Yeah, I'm butthurt about it.
+
+4:02 - Dzikowski, Jacob John
+  Yeah, no, it was it was fun. Did you did you receive a copy of the like the report that we made, too?
+
+4:09 - Kevin DiGilio
+  Well, I don't know. Not one that I've laid eyes on. I don't think they get the reports.
+
+4:16 - Dzikowski, Jacob John
+  OK, yeah, I didn't know if you're supposed to or what. Just since it had all of our requirements in just in case you want to look over it.  I don't know what Ibrahim's rule on that is. He could probably go over it.
+
+4:30 - Daniel Pora (136dpora@gmail.com)
+  Yeah, we can definitely give him the trace table, too. Yeah, my question is, do you guys want me to look over it?
+
+4:38 - Dzikowski, Jacob John
+  I don't know. Apparently we did a pretty good job on it.
+
+4:40 - Nathan DiGilio
+  I guess we did get a good grade on it. There was very little comments on it, so. Yeah, so it was really just how much of that do you really jam into a presentation?
+
+4:52 - Kevin DiGilio
+  Yeah.
+
+4:54 - Dzikowski, Jacob John
+  Which is a tricky thing.
+
+4:55 - Kevin DiGilio
+  I was kind of thinking if you just had a single table that listed out all of them without the detail.  That's still really long.
+
+5:03 - Nathan DiGilio
+  We could, but it's still, we have a lot of requirements made at this point.
+
+5:08 - Daniel Pora (136dpora@gmail.com)
+  How long is the report? How many pages? 74, I think.
+
+5:11 - Miller, Collin
+  Yeah.
+
+5:12 - Daniel Pora (136dpora@gmail.com)
+  Yeah, I'll read it if you guys really, really, really need me to.
+
+5:16 - Kevin DiGilio
+  No, don't think there's really a necessity. was more of a, if you wanted to share a documentation or not.  Yeah, give me the skinny. It would be like, hey, I wrote this.
+
+5:26 - Daniel Pora (136dpora@gmail.com)
+  No. Oh .
+
+5:27 - Kevin DiGilio
+  Oh . That's right. This looks like something I created yesterday.
+
+5:36 - Nathan DiGilio
+  I don't know if we have really anything super particular on the agenda besides just continuing. If you had any more details, I don't remember.  I thought you said that you were going to meet with Larry, but I also think you said that you didn't end up meeting with Larry or something.
+  ACTION ITEM: Email Larry re: next-week tour (Tue AM or Thu this time); request photo/video permission; confirm licenses; send team update - WATCH: https://fathom.video/share/W5cjD38ofReYJfSTk2VcjKzAyXSczM_A?timestamp=146.22894600000004  Yeah, Larry is really good at not meeting with me.
+
+5:53 - Kevin DiGilio
+  This is going to be fun. So he didn't even respond at all last week. Yeah, so I don't have great details, but if you guys could give me times that you're available to take a tour, let's assume it's next week.  If you guys could give me some common times that will work for everyone. Yeah, we have that one document somewhere.
+
+6:13 - Daniel Pora (136dpora@gmail.com)
+  Right now. Yeah, I guess right now is a potential option.
+
+6:19 - Kevin DiGilio
+  So I think I should be able to get his time tomorrow. Tomorrow, want to try to get his attention.  He did say he would have time this week. I've just been prepping for the webinar. He's doing a bunch of other things, so I haven't gotten his attention to review, but I got 14 Excel files from him, so it seems like there's 14 steps in the process, and a couple of them are like barrel bursts and such, so there's some pretty wild stuff that goes on in there, and so I'll be building a form to kind of collect all that data, and so I kind of have an idea of at least what fields are going to be scanned.  I haven't actually seen, you know, the piece of paper that he's putting together for this. I'm not sure if it exists just yet, but I know that that's his plan.  How long would you think the tour is going to be? Oh, I don't know. I can't imagine more than an hour.  He'll probably walk us through and... Yeah, I just pasted it in our availability.
+
+7:21 - Daniel Pora (136dpora@gmail.com)
+  Okay.
+
+7:31 - Nathan DiGilio
+  Yeah, also threw in some more highlighted spots. The bottom ones are when I'm not free, but I can skip practice to four of that.
+
+7:44 - Kevin DiGilio
+  Whoa. So what am I looking at? Zero, four. Although I guess the evening, they're probably not working anymore. So I'm looking for dark green.  Dark green.
+
+7:53 - Nathan DiGilio
+  So probably that Tuesday or Thursday, like now. It's our best options.
+
+8:00 - Kevin DiGilio
+  Yeah, Tuesday morning or Thursday at this time. Yeah.
+
+8:06 - Nathan DiGilio
+  They probably don't want to be doing anything around three or four. It's probably when they're trying to get out of there.
+
+8:16 - Daniel Pora (136dpora@gmail.com)
+  Yeah, I'm not exactly sure how late they work.
+
+8:18 - Kevin DiGilio
+  know later doesn't get home until like six most nights, but... And they do. I think they are a 24-7 shop.  Yeah. It's just matter of... Yeah. It's just a matter of... I don't think they work on, so 24-6, I think.  I don't think they do Sunday, but they definitely have third shift workers, which makes doing updates interesting. There's not really an off time to republish things.  So yeah, so I'm going to target next week. Again, I don't know for sure if you can do that or not, but if it's just an hour, it shouldn't be that big a deal.  And so again, we're all going to need our licenses. We're going to check that. And I'm going to try to get permission on what we're allowed to take pictures of or videos of if any of that stuff applies.  I'm definitely going to get some markety type photos. Yeah, you missed your chance for the presentation.
+
+9:15 - Nathan DiGilio
+  Yeah, I can't believe I missed that. Yeah, there's only three more.
+
+9:21 - Daniel Pora (136dpora@gmail.com)
+  Is it three or four? I think there's four total, I thought. Yeah, I think four total.
+
+9:27 - Miller, Collin
+  One. One.
+
+9:30 - Kevin DiGilio
+  Yeah, so I'll have to do a better job on that and tell the world that we're making an impact on the community, blah, blah, blah, blah, so, yeah, good stuff.  That'd be good for you guys, too. Establish yourselves as experts in the field, masters of computer vision, and actually, what it turns out is you're the masters of all the nonsense that goes on between technology.  And honestly, that's, like, the best stuff that you guys can learn, because that's what the real world's like, right?  Like, we have all these really great technologies, but it's such a small piece of actually solving a problem. And so understanding the process and, you know, some of the challenges of, you know, like, how do we get that, you know, JSON string of scanned barcodes to a computer that's on some stupid remote desktop, right?  So, like, those extra challenges are not really heavy technology, but. Yeah. Solving unique problems, but I think you'll find when you get out there and start working on projects, that's the kind of stuff that you spend most of your time on because unless you're like a software engineer, right?  Like you're building the computer vision libraries. If you're not in that space, this would do. Yeah, that's a computer scientist.  Okay.
+
+10:48 - Daniel Pora (136dpora@gmail.com)
+  Yeah. So engineers, what we're doing or what do you do? Okay. Yeah.
+
+10:53 - Kevin DiGilio
+  So if you're not in that space where you're actually doing the inventing, then most of the technology is going to be done for you.  And you just have to figure out how to make it useful and error free and all that kind of stuff.  So that's, I found that to be true, even outside of computer vision and outside of anything AI, just the, just the regular stuff, you know, like Dan, once you crack the OCR, right, that was the small piece.  And then the rest of it was a bunch of extra nonsense that, yeah, very little deal with OCR. So, but I think that's, that's the reality of what we're, what you guys are getting into.  And what I've seen my whole career. So get used to it, or make a different job, I guess. Or go make the technology.  Right. Yeah, exactly.
+
+11:37 - Daniel Pora (136dpora@gmail.com)
+  Be a computer scientist.
+
+11:39 - Kevin DiGilio
+  Yeah. Yeah, I figure we're kind of like the carpenters, right? We get the 2x4s and the nails and screws, and they all work the way they're supposed to work, and we get to put it together.  So, okay. So I'm remembering one of the comments. I think it was Liao. Is that the dude sitting next to me?  Is that a name? Right, Liao? Yeah, he was the middle one. Yeah. So he probably has a pretty genuine concern about a single camera being able to detect human behavior and having the resolution to pick up the barcode.  So I'm very interested to see how that one's going to play out. Yeah, we really just need to see how close it is or what it looks like to kind of answer that.  Now, I think, while that is the truth, what I think, what I would want from you guys is to be able to define the reality of the situation, because if, you know, I would love to be able to hand specs to Larry saying, hey, if you use this camera, you have to be this close, or you need a second camera, because we're not going to be able to, like, just as technology developers, we're not always going to have the environment available to us.
+  ACTION ITEM: Email Ibrahim re: experimentation scope/allowance - WATCH: https://fathom.video/share/W5cjD38ofReYJfSTk2VcjKzAyXSczM_A?timestamp=158.429938  And the environment can change. So what our job is, is to define the technical specifications and the requirements for the system to work as we expect.
+
+13:06 - Nathan DiGilio
+  Yeah, I'm just not sure how much experimentation we're expected to do or allowed to do at this point. We can probably ask that to see how much, like, messing around we can do.
+
+13:20 - Kevin DiGilio
+  Yes, I would direct that question right to the aisle, with the goal in mind that we want to. Provide the manufacturer with the requirements of the exact thing that he brought up.
+
+13:33 - Nathan DiGilio
+  Can it be solved with the most expensive I with Agraw yesterday and he mentioned that we should be allowed to experiment and stuff.  Just the verbiage from Ibrahim is very unclear most of the time. Well, that's right. He's in charge of the whole thing, huh?
+
+13:51 - Kevin DiGilio
+  Okay. Yeah.
+
+13:53 - Nathan DiGilio
+  He's the head honcho. Head honcho.
+
+14:04 - Kevin DiGilio
+  Okay.
+
+14:10 - Daniel Pora (136dpora@gmail.com)
+  Well, that was a pretty easy meeting.
+
+14:11 - Kevin DiGilio
+  I got to look at some dark green and get that to align with Larry for next week. Is that what the main output of this meeting?
+
+14:19 - Daniel Pora (136dpora@gmail.com)
+  I think so. Jacob, you mentioned sathing about you Like, wanting to see if we could put this on our resume.  Did I read that right? Oh, yeah.
+
+14:35 - Dzikowski, Jacob John
+  Oh, yeah. Yeah. Well, man, if you can't, then what the hell are we even doing this for?
+
+14:41 - Kevin DiGilio
+  This is resume fodder for all of us. Oh, yeah.
+
+14:43 - Nathan DiGilio
+  It was just because we have the NDA. So we just didn't know how much we were allowed to talk about it.  Okay. Yeah. So let's be clear about that.
+
+14:54 - Kevin DiGilio
+  So information we get directly from CompositeFlex, including their name, we're going to not use because we have to get direct written permission to say the word CompositeFlex in print.  So you're building this for some random manufacturer. But we can say a manufacturer or like a composite manufacturer or something.
+
+15:13 - Nathan DiGilio
+  Yep.
+
+15:14 - Kevin DiGilio
+  Yep. And you can talk about you can talk about AIBI. I'm okay with that. But once we get deeper into the technology, you know, we're probably not going to have a ton of secret sauce, right?  It's just a matter of how we assemble things. Yeah. How we pull together. here work Yeah. So, I mean, I don't think I'm going to be too concerned about IP.  So the NDA is mostly for anything we get at Composite Flex, anything that you see while you're there. That's the stuff we're protecting because they're under government strict regulations.  If we end up doing any kind of security or encryption or something like that, obviously we won't talk about it, but certainly the key deliverables that you're delivering and the fact that AIBI is helping you, that's all fair game.  Cool. And half the benefit of the project, because I want you guys to be able to brag about the cool thing that you did so that when you try to get another job somewhere, it's going to be good.
+  ACTION ITEM: Draft LinkedIn recommendation for Kevin; send for approval - WATCH: https://fathom.video/share/W5cjD38ofReYJfSTk2VcjKzAyXSczM_A?timestamp=345.429938  And, oh, and Dan, I never wrote your recommendation, so. Oh, yeah.
+
+16:20 - Daniel Pora (136dpora@gmail.com)
+  So, yeah. So what do you want to say? Oh, I don't know. write one? Do you want to write one and have me agree to it or not?
+
+16:27 - Kevin DiGilio
+  Or do you really? and
+
+16:29 - Daniel Pora (136dpora@gmail.com)
+  I feel like you're both going to write it in the same manner.
+
+16:35 - Nathan DiGilio
+  Exactly. Yeah, similar tool.
+
+16:37 - Daniel Pora (136dpora@gmail.com)
+  Okay, so I'll say it this way.
+
+16:38 - Kevin DiGilio
+  If you write it and send it to me, that'll be a much faster path to success. Okay, I'll do that then.
+
+16:43 - Daniel Pora (136dpora@gmail.com)
+  And then I would encourage chat to not go over the top.
+
+16:46 - Kevin DiGilio
+  Yeah. Especially if you tell it it's a recommendation for LinkedIn. You know, it's going to give you like the light bulb story of like, you know, single-handedly, you know, updated the luminary device and, you know, in record time without safety incidents and blah, blah, blah, right?  So, you know, so things that come to mind are, you know, your ability to pick up new technologies quickly and make them work for us.  You know, that's been a huge strength that you've given to all the companies. You know, we didn't ever give you something that you knew how to do, right?  You had to go figure  out and connect things. Your ability to, you know, kind of vibe code. But, but I, but I saw a thing on LinkedIn, or I guess I don't know where I saw it, but.  But Vibe engineering is actually what we want to be happening, right? Vibe coding is like, please build this web app for me.  Vibe engineering is like, I want you to use React and Node to build this and connect it to this API, and we actually kind of tell it how to put the pieces together so that it doesn't create crap.  Or when you tell it to build a grid, it doesn't actually write the freaking web code for a grid-shaped thing.  It actually goes and finds a grid control. Yeah. So I think if you guys could use that attitude when you're getting into your Vibe-style coding, that the more instructions on the technologies you tell it to use, probably the better result you'll get.
+
+18:11 - Daniel Pora (136dpora@gmail.com)
+  Okay.
+
+18:11 - Kevin DiGilio
+  Nathan, I don't know if you're interested in a recommendation or if it even counts because we had the last name, but you can do the same thing.  Yeah, I'm okay for now. Okay. Try to get Paul to write me my recommendation.
+
+18:25 - Daniel Pora (136dpora@gmail.com)
+  I sent him a message and he said nothing back. doing like. Okay. He's not as recent. Paul? Paul, he's a character, huh?  Yeah.
+
+18:33 - Kevin DiGilio
+  You just got to talk to him on his Twitch chat.
+
+18:35 - Nathan DiGilio
+  I did once. That's funny.
+
+18:37 - Daniel Pora (136dpora@gmail.com)
+  Yeah. Okay. Well, I guess if we're done, then let's all get out of here and get some free time back.
+
+18:50 - Kevin DiGilio
+  I'm gonna go eat some lunch. So I'll let you know as soon as I talk to Larry, I'm guessing I'll get to him.
+  ACTION ITEM: Compile tour prep: questions, specs, camera/barcode resolution, 1-hr agenda; share w/ Kevin - WATCH: https://fathom.video/share/W5cjD38ofReYJfSTk2VcjKzAyXSczM_A?timestamp=522.429938  tomorrow afternoon, and then he'll be able to look at his calendar. I'm not sure if he's going to give us the tour or not.
+  ACTION ITEM: Compile tour prep: questions, specs, camera/barcode resolution, 1-hr agenda; share w/ Kevin - WATCH: https://fathom.video/share/W5cjD38ofReYJfSTk2VcjKzAyXSczM_A?timestamp=522.429938  I would like him to, because he invented these machines and he'd be the closest to it and be able to answer questions.
+  ACTION ITEM: Compile tour prep: questions, specs, camera/barcode resolution, 1-hr agenda; share w/ Kevin - WATCH: https://fathom.video/share/W5cjD38ofReYJfSTk2VcjKzAyXSczM_A?timestamp=522.429938  And then you guys should think about, you know, what kind of preparation would you guys need to do to be, to make this as valuable as possible?
+  ACTION ITEM: Compile tour prep: questions, specs, camera/barcode resolution, 1-hr agenda; share w/ Kevin - WATCH: https://fathom.video/share/W5cjD38ofReYJfSTk2VcjKzAyXSczM_A?timestamp=522.429938  What questions do we have? You know, what, you know, it's really, if we only get an hour, let's, let's get everything that you guys can.  a good hour. Yeah, exactly. So that would be an action I would like to give to the four of you to kind of think that through.  And then let's appear smart to our first client that we really thought this through and we understand the challenges and that kind of stuff.  So, okay. All right. High five for now, gents. I'll shoot out an email when I have more information. All right.  Sweet. Okay. Thanks, guys.
+
+19:53 - Daniel Pora (136dpora@gmail.com)
+  See you. See you. See you. See you.

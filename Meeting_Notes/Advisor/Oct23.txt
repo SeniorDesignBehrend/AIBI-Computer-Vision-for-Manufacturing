@@ -1,0 +1,29 @@
+Main topics from advisor meeting:
+    Need to schedule a tour of the facility asap!
+Cameras
+    Liaw is skeptical about using only one camera to do two processes.
+        Zooming in and out functionality will be expensive for a camera
+        There will be more failure/weak points with this approach
+        Fixed lens cameras are very cheap
+        Multi-cameras might be the best option
+Experimentation
+    Experimentation needs to be done for this project
+        By the end of this semester, we NEED to be 25% done with our project, but Liaw would like us to be 45% done
+        Documentation seems less important than experimentation with cmpsc
+    We need to figure out the distances 
+        Cams should be able to be bought by Behrend
+        We need to get/make a sample env that matches the production env
+        We really need to get more details on this from our sponsor
+Requirements
+    We need to figure out UI details/reqs
+        Come up with a mockup of the UI (the 25%)
+        Get done asap then give to sponsor
+    How will cloud work (internally)?
+    Composifex will constantly need to modify its processes
+    We need to make our product as flexible and dynamic as possible to accommodate this.
+Integrations
+    How is everything going to work with integrations (with what we know now)
+    To what degree are we integrating?
+        What will we need to do for the backend?
+        Will we need to encrypt our data
+        NEED to keep on asking for integration details

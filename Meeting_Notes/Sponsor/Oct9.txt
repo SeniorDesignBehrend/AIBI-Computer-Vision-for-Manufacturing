@@ -1,0 +1,639 @@
+When: October 9th, 12:00pm
+Who: Daniel, Jacob, Nathan, Collin
+What:
+
+0:00 - Nathan DiGilio
+  Yeah, the cards, and then there was the other thing, the trace tables or something. I don't remember what he called them.  Yeah, the requirements, trace tables. Gentlemen.
+
+0:19 - Kevin DiGilio
+  Hello. How are doing?
+
+0:22 - Miller, Collin
+  Good.
+
+0:23 - Daniel Pora (136dpora@gmail.com)
+  All right.
+
+0:27 - Kevin DiGilio
+  I had a pretty good chat with our target client today, and they're, you know, all hot and bothered about this project we're working on, so they're gonna be ready way before we are to implement it, so it'll be good.  They'll be ready when we get them, but, yeah, he brought up the concept of operators doing the wrong  all the time.  So, I guess the second one where we're able to monitor what they're supposed to do, and then watch what they're actually doing, and yell at  accordingly. That seems to be a pretty, pretty exciting one for them. So, yeah, that'll be fun. Yeah, we definitely want them to be interested.  And so he kind of thought of that all on his own today, like it was his own idea. I'm like, boy, do I got news for you.  Yeah. So this will be fun.
+
+1:27 - Daniel Pora (136dpora@gmail.com)
+  So, do we want to talk about the QR codes, maybe? Nathan? Oh, yeah.
+
+1:35 - Nathan DiGilio
+  So, we're in, or you're in charge of making the QR codes, right? Or the, these codes in general? These scannable objects?
+
+1:48 - Kevin DiGilio
+  Like you're most likely going to be in charge? Well, believe Larry and his engineer have created the paper with  The barcodes, and I think they're working towards QR codes because they hold more information.
+
+2:06 - Nathan DiGilio
+  Yeah, because that's what we thought we heard you say last meeting was that you were in charge of making these sheets, or we're going to be, but maybe we misunderstood.
+  ACTION ITEM: Reach out to Larry for sample of barcodes/QR codes they've produced
+ - WATCH: https://fathom.video/share/FLF5xMzyffzZ1sgksSDcjmgAyooftAYs?timestamp=128.9999
+
+2:19 - Kevin DiGilio
+  Well, what I will do is I will reach out to Larry and have him send us a sample so that we get an idea of what he's talking about.  Yeah. But then I think if I were in your shoes, I would take the sample that I was given and then I would make a whole bunch of other samples so that I know that things are working properly.  Yeah. So like test data is a huge portion of, you know, code writing, and so you've got to be able to generate your own tests.  But I will reach out to Larry and ask him to give us an idea of what he has produced so that we can kind of react to that.  Okay. Yeah.
+
+3:01 - Nathan DiGilio
+  Yeah, one of the things that Liao mentioned was that QR codes would be beneficial because that could indicate their order, I guess, because, like, I haven't used any of the scanning technologies yet or tested with them, so I don't know about the order on the sheet on which they scan, but in the QR code you can have them start with IDs, kind of like how we're talking with Maxim over the summer with, like, parts start with N or different materials start with N.  other things to signify their difference between just the numbers themselves, and so if we have nine QR codes that start with a different character to differentiate them and put them on the correct form or spot on the form, I guess, we're picturing.
+
+3:55 - Kevin DiGilio
+  Yes, I could see that being a possible way of doing it so that the. The QR code itself is really just reported in the JSON.  Yeah, QR codes aren't affected by, like, orientation and such.
+
+4:07 - Nathan DiGilio
+  They're pretty resilient compared to barcodes. Okay.
+
+4:13 - Kevin DiGilio
+  So I'm not sure I can demand that be the reality, but I can certainly see what they have come up with.  Okay. And so I'm picturing in my head a bunch of barcodes because that's what – and I'm not even convinced that they have control over these codes, too, right?  Like, they may be getting these spools of fibers or threads that we talked about from a vendor, and it may have a barcode on it.  Yeah. And they may be taking that and putting it on the paper. So I guess, yes, that is an open question, but I see what Liao is talking about.
+
+4:58 - Daniel Pora (136dpora@gmail.com)
+  Okay. Okay. So – Okay. I wrote up some requirements using the transcript, and I'll use a little bit of chat for this, but do we want to go over it just to see, like double check, make sure these are right, and also maybe how critical they are?  Does that sound all right? Looks like we have presentation next week, huh? I got an invitation and a special parking pass.
+
+5:28 - Kevin DiGilio
+  Oh man, you got it, I didn't know that. Oh, yeah. Yeah, baby, I don't have to pay for parking, or they just want me to park close.  So yeah, I think I'm going to bring Courtney, although it's on her birthday, so it better be a hell of a presentation.
+
+5:46 - Miller, Collin
+  No pressure. No pressure.
+
+5:50 - Kevin DiGilio
+  I'm sure she'll find it absolutely riveting. You guys will do fine.
+
+5:55 - Daniel Pora (136dpora@gmail.com)
+  All right, so let's see here. Do you guys see My screen? Yeah.
+
+6:02 - Miller, Collin
+  All right.
+
+6:02 - Daniel Pora (136dpora@gmail.com)
+  So real quick, yeah, I have my user functional requirements. I also have my non-functional, so we'll go over the functional real quick first.  So UFR1, our requirement is that we need to be able to have a fixed camera at each station and then process these barcodes.  It should be like 5 to 10 per, 5 to 20 per paper. And they need to be scanned when they're in front of the camera's view.  So that seems pretty critical, right? Yeah, I agree. That seems critical.
+
+6:42 - Kevin DiGilio
+  All right.
+
+6:43 - Daniel Pora (136dpora@gmail.com)
+  So then next one, this one might change. Configurable barcode fieldnet thing. So, yeah, we need to have that mapping system in place.  But if we use the QR codes, we might be able to get passed. I see that. I agree. Yeah.  Pretty critical. Probably. Yeah, agree. That's critical.
+
+7:14 - Kevin DiGilio
+  Yep. Until we prove otherwise, it should be a critical requirement. Okay. Because I'm not sure that we can demand that each and every use case is going to have QR codes.  So there was this one.
+
+7:31 - Daniel Pora (136dpora@gmail.com)
+  Are we still going to have this be a requirement, accommodating large parts of it?
+
+7:38 - Nathan DiGilio
+  You mentioned that they were already working on a solution for this. Yeah.
+
+7:43 - Kevin DiGilio
+  So it seems like, yeah, I guess we need to ask Larry, but he did mention that he found a way a to put a code QR or bar, whatever, on the thing that we were trying to detect.  So, So, this feels like less of a requirement, if a requirement at all. Okay.
+
+8:15 - Daniel Pora (136dpora@gmail.com)
+  Then, let me just get right down some notes real quick. Okay, so then, this one we talked about having that JSON payload coming from, and then giving it to KMD.  Does that sound right?
+
+8:39 - Kevin DiGilio
+  Aggregate all decoded values into a structured JSON payload. Yes.
+
+8:44 - Daniel Pora (136dpora@gmail.com)
+  I guess, it wouldn't be all, but it'd be the ones we care about, just from that sheet or that paper.  Yeah, would say, yeah. Yeah, batch it with whatever, just pass in front of the camera.
+
+8:55 - Kevin DiGilio
+  Yeah. Okay, so then. And there may be a use case of... I'm totally sure, but since the, based on the previous one, that there is a, you know, this big thing that has a barcode on it that is not on the piece of paper, I'm not sure where that fits into all of this, but, and that's really only at one of the workstations, I think.  So, yeah, I'm not sure where that would go in the, in the flow of all this, and so I guess if I'm, I'm looking back up at 1.3, you know, maybe it's better described as, you know, picking up a barcode that came across the screen that's not on that piece of paper.  Yeah, that would be a pretty good description. And again, with QR codes, it would have something in there to tell us which field it is, but without a QR code, we would want to know that it came from the mandrel.
+
+10:03 - Nathan DiGilio
+  Just to interrupt before we move on to the next part, Aliyah also mentioned that it would be easier if we could have, like, a specific spot on the table that the workers are expected to put this piece of paper, instead of just, like, if we had a marked rectangle where this paper sits.  Is that, like, realistic, or...? That's a configurable option, right?
+
+10:27 - Kevin DiGilio
+  We're talking about a bunch of different workstations, so... That might be part of the mapping.
+
+10:35 - Nathan DiGilio
+  But it was mostly a concern of there will be a spot where it has a clear view for, like, regular scanning for whatever it is.
+
+10:44 - Kevin DiGilio
+  That seems like a fair requirement, yes. Okay.
+
+10:50 - Daniel Pora (136dpora@gmail.com)
+  Okay, so we're saying that there should be a certain spot where this person has that paper that they put it...  Yeah, because that was kind of concerns over orientation and such.
+
+11:04 - Nathan DiGilio
+  But without testing or using these libraries and testing with them, I'm not sure how strict we need to be with these.  Yeah. Because layout seems to have a, I want to say almost a pessimistic view on libraries' capabilities. So, until we actually use and test these, orientation might not even matter at all with QR code scanning because computer vision has excelled greatly in that area.
+
+11:35 - Daniel Pora (136dpora@gmail.com)
+  Yeah.
+
+11:35 - Kevin DiGilio
+  Yeah, we just watched a demo of software for retail where they're going to just take their phone out and scan the entire shelf, just kind of walk down the aisle, pointing the camera at the shelf, and it's able to detect if the product's out of shelf, it's been damaged, all the QR codes and barcodes and everything.
+  ACTION ITEM: Check licensing of potential barcode/QR code scanning libraries
+ - WATCH: https://fathom.video/share/FLF5xMzyffzZ1sgksSDcjmgAyooftAYs?timestamp=709.9999  So, and there's definitely technology out there that should be pretty, pretty magical, whether it's built in a library that's accessible.  Yeah.
+
+12:00 - Nathan DiGilio
+  Yeah, found some pretty accessible libraries via chat. need to double check their licensing and such.
+
+12:13 - Daniel Pora (136dpora@gmail.com)
+  Okay, so part two of our user functional requirements, yeah, we need to be able to monitor and validate that the steps being performed at each station is correct.  So that's probably pretty critical. mean, that's just the second part of this project, right? Yep, that is critical.
+
+12:34 - Kevin DiGilio
+  Okay.
+
+12:37 - Daniel Pora (136dpora@gmail.com)
+  And then we're talking about the real-time process feedback and alerts. So the worker knows, is it the worker knows that they messed up or a higher employer or like a manager knows that they messed up?  So maybe we were going to have like those check boxes you were talking about. Yeah, that's a great question.
+
+12:59 - Kevin DiGilio
+  Yeah.
+
+13:04 - Nathan DiGilio
+  Chat recommended like an audible beep or something or an alert of some sort. was definitely thinking that same thing, too.
+
+13:12 - Kevin DiGilio
+  Some indication. Not something like annoying or super intrusive, but something enough.
+
+13:19 - Daniel Pora (136dpora@gmail.com)
+  taser in front of them?
+
+13:21 - Miller, Collin
+  I mean, relatively intrusive.
+
+13:22 - Kevin DiGilio
+  mean, the way the guy was talking today, he wants someone to reach out and smack him in mouth. Be like, dude, we showed you how to do this yesterday.  Rubber bullets. Ooh, now we're talking.
+
+13:32 - Miller, Collin
+  That's a good one.
+
+13:34 - Dzikowski, Jacob John
+  Those rubber balls they used on Jackass? Hmm.
+
+13:38 - Kevin DiGilio
+  That was pretty brutal. So, yeah, this is a tricky one because part of it is can we, you know, I'm trying to figure out what's your job, right?  Is it your job to do the, you know, hardware detection and alert? fire movement. And then we feed that, like, through some Json event.  Theo And about And Uh, cause like the, for all the, the UFR number one, it's clear that that, that data is just going to get fed back into, you know, Gamedy projects.  Yeah. But this second one feels like it's more independent. I mean, the data might get there, but we're really trying to build this alerting system.  So it's, it almost feels like a, an interface overlay on top of the video to allow us to have the check boxes, the flashing red, the, you know, whatever the heck it is.  You're talking about interface over the video.
+
+14:35 - Daniel Pora (136dpora@gmail.com)
+  Is there going to be like a TV screen next to this guy who's doing the thing? Yeah.
+
+14:39 - Kevin DiGilio
+  That's the part that I'm not super clear about because this is kind of a new thing.
+
+14:47 - Dzikowski, Jacob John
+  Maybe it could be like a manager's watching the screen with other workers and then it'll like light up red if a worker messes up a step or something.  Now I do know they have a, they have two, they have two people at each work.
+
+15:00 - Kevin DiGilio
+  One that does the work and one that's running the software, so there's a, you know, I kind of talked to you guys about those dumb terminals, right, so I mean, so there's a computer screen there, so if it had, you know, a little window that showed the video plus this overlay, we wouldn't necessarily need another screen, and then, you know, the computer operator could be the one receiving the error messages and, right, so that they can do that.  You know, Nathan's doing the work, Dan's watching the work, and Dan's like, Nathan, come on, you did step three wrong.  Stop the process, some kind of, something like that, so that we're not introducing new hardware, necessarily, in that regard.
+
+15:50 - Daniel Pora (136dpora@gmail.com)
+  You said there were two people at the station, one the worker, and then one handles the software, what does the software guy do?  cool. He is, like, is, 건 Martin, right?
+
+16:00 - Kevin DiGilio
+  have might... I mean, all this scanning they're doing now. So like this stuff's all happening now. So this piece of paper arrives with a part.  Then the guy with the gloves and the heat shield, he starts doing all the glovey heat shieldy stuff while the other guy's like, all right, Nathan and Dan are working on this job.  It's job number six. We're going to scan this fiber. We're going to scan this glue, right? Kind of doing all the stuff that needs to happen for the tracking, checking the job out, you know, all of the data tracking stuff.  And so we're trying to drastically reduce his work. Yeah. We're not really helping the guy who's, you doing the manual work because we, you know, we can't really help with manual work.  So we're helping the software guy not make mistakes.
+
+16:45 - Daniel Pora (136dpora@gmail.com)
+  Yeah. Could the software guy also watch, make sure he's doing the right steps or is it, or is he right now making sure he's doing the right steps?  Oh, I imagine they have, I imagine they have some element of that.
+
+17:00 - Kevin DiGilio
+  I can't say that I know specifically, but they're both expected to know how to do the job. But I'd like to believe that if Nathan was doing it wrong, and Nathan and Dan, you saw that, you'd be like, hey man, you're doing it wrong, rather than just blindly ignoring.  But I guess I don't know exactly, at every station, the level of visibility. So, I mean, having a camera pointing at the spot that needs to be seen, yeah, so this may enable it in scenarios where the software operator cannot see the activities of the other person.  I think they can see, and there probably is that. But, so we're probably trying to, again, make that guy's job easier and less error-prone.  Yeah. Yeah.
+
+17:54 - Daniel Pora (136dpora@gmail.com)
+  If we're making his job easier, then would that allow him to look over that person? Or are we trying to just, I don't know, maybe I'm going astray here, but...
+
+18:08 - Kevin DiGilio
+  I agree, you're slightly astray, but what we're trying to do is build really cool technology, present it to the customer, but we ultimately can't decide how they're going to have their people work.  I mean, we can suggest these things, but if we're going to give them cool technologies to tell them, hey, Bob needs to watch Tom, we're like, dude, we know how to run our people.  You guys are the software guys, so give me cool technology.
+
+18:31 - Daniel Pora (136dpora@gmail.com)
+  Yep.
+
+18:32 - Kevin DiGilio
+  So we'll probably stay in that realm of, this is the cool feature, you can decide to use it or not.  You know, it's kind of like spell check. Yep. We're going to go ahead and check your spelling, but we don't care if you listen to it or not, and we can't tell you.  Yeah.
+
+18:45 - Daniel Pora (136dpora@gmail.com)
+  Okay, so we kind of decided that since there are two people, one guy who's a software guy, he has a terminal there, will display these results on that terminal, and then it will be the software guy's job to kind of tell the other.  Okay.
+
+19:02 - Kevin DiGilio
+  Right, yeah, so the audible beep, the red flashing, that's going to happen with the software guy. So this 2.2 here, that feels like a little video window that's on the terminal, hooked up to a specific camera at a specific job.
+
+19:25 - Miller, Collin
+  Would we want to create a log of every time they mess something up? To send the company? Just to be like, hey, this is how many mess ups you had this day?  Oh, probably. I think quality would love that, yeah.
+
+19:38 - Kevin DiGilio
+  Okay. Yeah, and so we, you know, I'm picturing kind of those check boxes, right? We could definitely log, you know, the successful traversal of the steps.  But yeah, when something goes out of order, because we may find out that there's something stupid about their process, right?  If 99% of the time. And the human messes it up. Well, it's probably not the human's fault at that point for your problem with the process.  So yeah, I like that. And I can see us throwing some AI at all of that data to kind of give a summary of what to do.  Yeah. OK.
+
+20:20 - Daniel Pora (136dpora@gmail.com)
+  All right. So the, which one was that? I think that's 2.3.
+
+20:35 - Kevin DiGilio
+  Yeah, 2.3, definitely critical. We have to be able to teach the machine how to do it. Yeah. Because there's 12 different stations and that's just the first customer, right?  We want this to work for anybody. We should be able to train anything, anywhere, and so that, yeah, that seems important.
+
+20:57 - Daniel Pora (136dpora@gmail.com)
+  It seems like this is of just a duplicate. I don't know. We'll of this one up here. So talk about Section 3.  Yeah, we need to integrate with KMD technology, which we were talking about that with setting that JSON. But I guess this more describes the way we send that JSON to KMD.  So you said just a local API, probably good enough?
+
+21:25 - Kevin DiGilio
+  Yeah, would say you should be able to expect that a local API exists for you to send this to.  Provide local API, network connector, keyboard. You know what kind of API already exists?
+
+21:42 - Daniel Pora (136dpora@gmail.com)
+  Like WebSocket, WebHook, I think.
+
+21:53 - Kevin DiGilio
+  Yeah, that's an interesting one. I'm picturing just a regular API to consume it.
+
+22:00 - Daniel Pora (136dpora@gmail.com)
+  than that, but we We're
+
+22:00 - Kevin DiGilio
+  That can get the data from you into a database, but then how do we get, you know, the information in real time from the database as the input?  I think that was the tricky piece because right now scanning happens from a barcode scanner that acts like a keyboard, and we're going from that to a video feed that takes JSON, sends that to a standard API call, and I'm just picturing an API just like what we build for accurate.  Yeah, just a REST API. Yeah, just a REST API, and we have a very specific endpoint that knows how to handle these things.  Yeah.
+
+22:44 - Daniel Pora (136dpora@gmail.com)
+  Okay, yeah, I think that REST API is probably good enough for that. Yeah, it's pretty standard. mean, eventually we can get into cool MCP agent, blah, blah, blah, but all that needs an API anyway.  that, Ensign. Yeah. Assim… I can't see there…
+
+23:00 - Kevin DiGilio
+  The class at one o'clock about MCP, good stuff. 3.2.
+
+23:12 - Daniel Pora (136dpora@gmail.com)
+  Yeah, okay, yeah, this is what we were just talking about.
+
+23:14 - Kevin DiGilio
+  So we have the API for 3.1, 3.2 is it's got to land in a database. And then we have to somehow trigger the UI to know that it just landed in the database.  And that's the part that is, I guess, clear as mud, to steal a Carlos phrase. Yeah.
+
+23:35 - Daniel Pora (136dpora@gmail.com)
+  All right, so we have, we have our, all right, let's say that we're using these cameras, which are Raspberry Pis.  These are only going to be sending data. They're never going to be receiving data. So this is going to be sent to an existing API, right?  Yep. So we're not building this API at all. Um.
+
+23:58 - Kevin DiGilio
+  Um. I mean, the fact that you have 3.2 involved and include part, several data recovery. So I guess, yeah, that's a good question.  I mean, we know, I think we all know that this API call does not exist, right? Because, I mean, we've never done this before.  There's no API call that says, hey, that current form on that one machine, here's a bunch of JSON to fill it out.  So that's kind of a new, that's a new concept. So I guess in the name of you guys doing the work, not me, you should expect to build it.  And now I may take that controller, right, to be very specific about API talk, I may take that controller and include it in an already existing API.  But I think for your project's sake, you should not assume that there's an existing API. And if we have to...  And up a whole nother endpoint just for this. That's probably acceptable. So I'm trying not to have too many things where you need me because then you're going to be stuck in your project.  Yeah. You have to build something fake anyway, so you might as well go ahead and build the API.
+
+25:23 - Daniel Pora (136dpora@gmail.com)
+  So what kind of software do you already have built right now for this? Because I know right now we have that scanner tool.  Did you write the software to take the input from that scanner tool? No, there is no software for the scanner tool.
+
+25:44 - Kevin DiGilio
+  It's purely hardware. So the scanner tool is plugged in just like a keyboard.
+
+25:48 - Daniel Pora (136dpora@gmail.com)
+  Yeah. I guess what I'm trying to say. box and they scan. Yeah, those checkboxes. they scan for the checkboxes.  Do they have like a KMD form? None of that exists. Okay. Okay. So.
+
+26:00 - Kevin DiGilio
+  So for the object or the human behavior-detecting piece of this, nothing exists except for a cool idea. Yeah. What about the QR code scanner?
+
+26:14 - Daniel Pora (136dpora@gmail.com)
+  That is not a software thing.
+
+26:16 - Kevin DiGilio
+  That's just... Yeah, he's trying to ask, where are we sending these codes?
+
+26:22 - Nathan DiGilio
+  What's the end of this code delivery?
+
+26:28 - Kevin DiGilio
+  Well, I guess for in Nathan terms, there's probably going to be a properties form that has all the fields on it.  Okay, that's what I was picturing. And so it's the trigger on how to get it there that's the interesting piece.  You know, like worst case scenario, when this form is open, it checks every two seconds for a new record in the database.  I'd like to believe there's a more elegant trigger than constantly checking, but just to kind of get our brains around what we're doing here is, you know, we have hardware collecting...  Data, that same data being sent to a database, and then triggering the right UI to read that record. And so it might be a matter of, you know, sending the data with a very specific camera code saying this is camera number six.  And then when workstation six is, you know, live, then in every, you know, two seconds, it's looking for any new JSON from camera six.
+
+27:33 - Daniel Pora (136dpora@gmail.com)
+  Okay, so this might have been answered earlier, but this database that we're talking about, does this exist? Will we be, okay, so what do you think are the existing systems that we're going to have to integrate with?  You said that we're probably going to make our own. Uh. But we should be able to connect to a database that's already there.  Yeah.
+
+28:07 - Kevin DiGilio
+  So I think, again, for the sake of this project and not needing to have a test install of KMD somewhere, this is likely going to be a new table that's simply used for the transfer of this data.  So I think we should say that the database does not exist. So that you guys can just, you know, create a simple local database and dump your data into it from that API call.  So that you guys can just set up a database there at Penn State and write to it. You can do all the testing that way.
+
+28:53 - Daniel Pora (136dpora@gmail.com)
+  Right now we're creating the system to send the barcodes. Let's say that... But it's setting that in a JSON.  So we're going to make that system to send it or receive it, which would be that API. And then we're going to make a database to hold that.  Will we also have to make that form you're talking about that will constantly look for these updates?
+
+29:22 - Kevin DiGilio
+  That's a great question. I don't think I want you making the form because whatever form you make is going to be probably not what they're going to use.  Yep. So I guess you guys can just use SQL Management Studio to make sure that it's working. Yeah. It's really what I'm looking for from you guys is, you know, can we get, you know, all these barcodes into a database table?  I think I think that's the main job, and we'll do that through an API call just because we know the hardware is going to be separate from the API.  And we don't want the hardware having code to write directly. To a database or anything like that. So I think, yeah, collect it from the camera, send the JSON to an API call, API call writes to a database on the same network, and you guys would create all of that.  And so then I will task, when we get towards the end of that, it'll probably be Max or myself, or heck, maybe I'll make Nathan do it later, write that background thread that will constantly check from this form.  Okay, so, because we're kind of picturing it as this properties form that's already existed, but over the next two months, I'll be working with them to build a, they're calling it the shop floor module.  It's going to be some custom code that we write for them, because in addition to these scanned barcodes, they're also going to be sending, you know, oven temperatures and CNC spin cycles and all this other stuff that we have to capture.  Yeah. So I'll be working on that separately.
+
+30:59 - Daniel Pora (136dpora@gmail.com)
+  So I guess while I'm working.
+
+31:00 - Kevin DiGilio
+  Working on that, we'll train that interface to, you know, on some frequency, check your database. So I think you guys don't have to worry about the form.  And for testing, you can just use Management Studio.
+
+31:14 - Daniel Pora (136dpora@gmail.com)
+  Okay, so let's say there's two parts of this. First part is barcode. Second part is making sure the steps are correct.  So with that second part, we're going to be making that form or that application, the UI, to be ran on that terminal.
+  ACTION ITEM: Prepare demo of previous video overlay work to show team
+ - WATCH: https://fathom.video/share/FLF5xMzyffzZ1sgksSDcjmgAyooftAYs?timestamp=1892.9999
+
+31:30 - Kevin DiGilio
+  Yeah, yeah, does seem like it's, yeah, some, yeah, some video with an overlay. Isn't that what you did, Nathan?
+
+31:43 - Nathan DiGilio
+  Yeah. In your demo, right? Did you have text and stuff?
+
+31:47 - Kevin DiGilio
+  Yeah, so I'm picturing that.
+
+31:52 - Nathan DiGilio
+  Yeah, when we made, I found my demo when we meet later today.
+
+31:55 - Kevin DiGilio
+  can show you guys the demo.
+
+31:57 - Nathan DiGilio
+  Yeah. Yeah, we need a tour of Composite Blood.
+
+32:02 - Daniel Pora (136dpora@gmail.com)
+  Yes. Yep. Courtney just said that today too.
+
+32:05 - Kevin DiGilio
+  So I need to get Larry's attention. I believe that he's just about done building the machines. And when he's done, he's going to hand it off to a team of operators because right now they are, I believe in the next two or maybe by the end of the month, they have to have their, what do they call it, low quantity production run.  So they have to produce these parts from start to finish and then send them off for inspection to their client.  So once, once they have accomplished that, Larry should have some breathing room to do the tour, a little more explanation on, you know, we should be able to see each workstation we're going to have to deal with.
+  ACTION ITEM: Schedule tour of CompositeFlex for team + Courtney end of Oct/early Nov
+ - WATCH: https://fathom.video/share/FLF5xMzyffzZ1sgksSDcjmgAyooftAYs?timestamp=1956.9999  So, so I think let's say end of October, beginning of November, we'll get this gang plus Courtney to take a tour.  Does that timing seem reasonable for you guys? Okay. That way we can see all of the machines at once.  I think there's still a few more that aren't quite working. know we've got the first cool one working, but there's a couple of steps in there.  And they just passed a bunch of audits, so they're pretty pleased with us right now. They passed their DFARS and FARS?  Oh, don't know if it was that one, per se, but they had a customer audit and an ISO audit, I believe.  And yeah, that went pretty well for them. Yeah.
+
+33:40 - Daniel Pora (136dpora@gmail.com)
+  All right. Well, let's keep on chugging through these. So that was 3.2. I'll talk about 4. So we need to have that assessing environment with those camera views to make sure that we can have that step capturing system.  we'll They were talking about. Yeah, I mean, that seems pretty, pretty logical to have that.
+
+34:10 - Kevin DiGilio
+  Yeah, and I would think you probably need an environment for the barcode scanning as well, right? I mean, and test environment is fancy talk for a camera pointing somewhere, right?  Yeah.
+
+34:21 - Daniel Pora (136dpora@gmail.com)
+  Essentially? Okay.
+
+34:24 - Kevin DiGilio
+  Because that's how you're going to test, you know, orientation and angle and, you know, all the crap that a piece of paper could have, you know, if the camera isn't mounted, you know, two inches above the paper and perfectly square, right?  Because that's something that I want you guys to really play around with is, you know, what are the limits of this camera in the barcode scanning?  You know, how close does it have to be? Can it be 10 feet away? Can it be 10 feet away with a 45 degree angle?  Yeah. You know, what are the limitations so we can guide the install at each workstation?
+
+34:58 - Daniel Pora (136dpora@gmail.com)
+  So then we talked about, yeah, having those. tools to be able to train that model with those certain steps when you make an application for that.  So would you say, what would the priority be on that, medium, critical, or medium, high, or critical?
+
+35:16 - Kevin DiGilio
+  I would say without the ability to train, the other piece is useless. OK, so pretty critical. It seems as critical as the other because we can't, how do we tell it what's right and what's wrong?  OK, so something that just popped into my head that I'm assuming they're going to want to use one camera for both of these jobs, right, one fixed spot.  So if they can fix it on the operator and then that operator is going to have a piece of paper or maybe there's a table next to the operator or something along those lines, but to keep the hardware requirements low.  well, I'm So they it on they can on along they the We'd really like to be able to pull off both of these things from that same camera view.
+
+36:14 - Daniel Pora (136dpora@gmail.com)
+  Okay, so more of an overall kind of broad question. We have, let's see. Yeah, so we have user functional requirement two and one.  So one is the barcode tracking, and then two would be that quality assurance, making sure they're doing the right steps.  How would you rank those in priority? You have them ranked properly.
+
+36:57 - Kevin DiGilio
+  Number one is more important. I think it's easier to test, easier to get a win, and something that they're already doing.  So this operator thing, this is something that I'm likely going to have to sell them that is cool. Where the first thing, they're like, yeah, we'll definitely use that.  It'll save obvious amounts of time and error. So yeah, you have them racked properly, or ranked properly.
+
+37:29 - Daniel Pora (136dpora@gmail.com)
+  The big part of this senior design project is making sure that we have enough work to do, or making sure this can be a project, but we also have to make sure that it's not going to be too much of a project, and we're not going to be.  Oh yeah, there's a balance in there somewhere.
+
+37:46 - Kevin DiGilio
+  Yeah, that second one has the possibility of going awry. Yeah, that's what I'm a little worried about.
+
+37:56 - Daniel Pora (136dpora@gmail.com)
+  But I think once you see Nathan's demo, I mean, I think he's already...
+
+38:01 - Kevin DiGilio
+  So I'm not sure what you guys are going to work on, because Nathan already did this.
+
+38:05 - Daniel Pora (136dpora@gmail.com)
+  Yeah, we have to work on a lot of stuff, because you have that UI, we have to be able to train it, we have to have the...  Yeah, he's got all that. Train the person who to train it. Because they're not, yeah, the employee's not going to be like Nathan, they're not going to know what to do.  So we're going to have to give them a super good description on how to do it, like how to actually train it.
+
+38:35 - Kevin DiGilio
+  Okay, so I would say, rather than thinking about giving them a super description, you're going to make it so damn easy that a monkey can do it.  Yeah. Like, click button, start training. Click button, done training. Here, there's the video, right? Because that's, I mean, it almost needs to be that easy.  To train it. Yeah. For a user to do it. So I'm not sure. If you've ever written instructions for users, but they can't read.  Yeah, they cannot read.
+
+39:07 - Daniel Pora (136dpora@gmail.com)
+  I mean, they can.
+
+39:08 - Kevin DiGilio
+  mean, obviously they have work instructions and such, but we need to keep in mind user-friendliness is critical so that what we're really talking about is training based on a video clip.  Yeah.
+
+39:22 - Daniel Pora (136dpora@gmail.com)
+  I'm just worried that there may be some things that they have to focus on in the video that wouldn't seem to I guess intuitive.  I don't know. I just got to look into more of Nathan's demo just to see what it's like.
+
+39:40 - Kevin DiGilio
+  Yeah, because Nathan's demo was hard and requires intelligence. What we're looking for is go stand in front of the camera and do it right.  Okay. And then that's how you train it. Yeah. It's just a different mode for the interface. I'm in training mode, so don't grade me at this moment.  Capture this video and feed it to the training model. You are
+
+40:08 - Daniel Pora (136dpora@gmail.com)
+  Yeah, let's talk about non-functional. We were just talking about this. This needs to be easy to use. So like a guy with gloves on should be able to just show that picture or put it in like a certain location and then it should be able to scan it all.  Yeah, I like bullet number three.
+
+40:33 - Kevin DiGilio
+  I'm not sure how that goes, but right. So we got guy holding piece of paper with gloves on. Yeah.  And guy at the station understanding if it went well or not. And it may be possible that the guy who's at the computer station, it may be his job to do this paper part.  Yeah. Because glove guy has resin on his gloves or something.
+
+40:55 - Daniel Pora (136dpora@gmail.com)
+  Yeah. So glad it's gloves. Okay. Let me write that down real quick. Thank Yeah. Bye.
+
+41:04 - Kevin DiGilio
+  Yeah, would be good to capture all these things that Kevin wasn't real sure about the answer. guess Fathom's probably doing it, though, because these could be great things to make sure that we have in a list when we go for the tour or something I can send an email to Larry to get him kind of thinking about it or both, I guess.  Yeah.
+
+41:35 - Daniel Pora (136dpora@gmail.com)
+  Okay. So, yeah, product, user requirement two, it's pretty broad.
+
+41:51 - Kevin DiGilio
+  It is pretty broad, but I like the way it's stated because we're trying to go away from someone having to physically use please.  Yeah. And a bunch of stuff with a conscious effort to the scanning as a byproduct of something they're already doing.
+
+42:07 - Daniel Pora (136dpora@gmail.com)
+  And that's, I mean, that piece there is the magic behind it all. I'm just picturing myself at the self-checkout struggling and we don't want that.
+
+42:19 - Kevin DiGilio
+  It just needs to be easier than before. Yes.
+
+42:30 - Daniel Pora (136dpora@gmail.com)
+  All right, yeah, and we were talking about this, that training in phase should be intuitive enough so that we don't have to have a ton of instructions.  That's probably a priority, pretty high, I'd say. Yeah, I think that's an important detail.
+
+42:49 - Kevin DiGilio
+  Absolutely. And again, I would have phrased it that the, you know, the, the backend training should be able to train based on a, a video clip.  Yeah. So then the interface becomes.
+
+43:01 - Daniel Pora (136dpora@gmail.com)
+  Start and stop of said video clip from the live camera feed.
+
+43:08 - Kevin DiGilio
+  So like the non-technical training interface is really probably just buttons showing up on the normal interface, just a different mode.  Yeah.
+
+43:18 - Daniel Pora (136dpora@gmail.com)
+  OK, so then we got that. This fourth one might not be super high priority, but you're talking about, it might not speak our language, but we need to accommodate for.  No, no, no, you guys don't have to deal with language stuff.
+
+43:42 - Kevin DiGilio
+  Let's not let's not sprinkle that one in there. I think Max did a good job. He's got a document translator.  Yeah, so I don't think we're going to have an on screen language translator for the steps or anything like that.  So. Let's drop that one unless you really think we need more work, but that that doesn't seem to fit.  But again, I kind of like the first bullet, you know, but I think you kind of had that elsewhere where we're going to use something, some indicator on the screen, so wherever that one was, we could, you know, maybe add a requirement to that, that we want to use something that, and I guess the way you've written it is okay because we, red and green isn't necessarily good because colorblind people can't see that.  You know, shapes, words. So, I don't know, this, the more we talk about it, this does sound smart, but I don't think it's necessarily language skills or technical literacy.  It's more of like colorblind and... Like accessibility.
+
+44:53 - Daniel Pora (136dpora@gmail.com)
+  Yeah.
+
+45:01 - Kevin DiGilio
+  And so rather than them being like subpar humans, like we're kind of writing here like these darn agency folks, but it's more of like, yeah, 503 compliant, yeah.
+
+45:15 - Daniel Pora (136dpora@gmail.com)
+  All right, so. Ooh, tenure. Oh, that was definitely written by chat.
+
+45:20 - Kevin DiGilio
+  Beautiful.
+
+45:21 - Daniel Pora (136dpora@gmail.com)
+  I don't think I've ever heard you use the word tenure.
+
+45:25 - Kevin DiGilio
+  Good stuff.
+
+45:31 - Daniel Pora (136dpora@gmail.com)
+  So. Yeah, minimal latency, that's. And so that's the process video feeds.
+
+45:48 - Kevin DiGilio
+  Yeah, which one's that talking about? That's the barcode. Yeah, I mean, definitely. Yeah. Yeah. out of sequence operation.
+
+45:58 - Daniel Pora (136dpora@gmail.com)
+  All right, it's covering everything.
+
+45:59 - Kevin DiGilio
+  Okay, so. it's. So yeah, I. I That's pretty important, because it's just not going to work. Otherwise, they won't use it.  So I agree with your priority of critical, and I like the details.
+
+46:11 - Daniel Pora (136dpora@gmail.com)
+  Okay, then, yeah, we need to be pretty accurate with the barcode detection. If we switch to QR code, accuracy is going to be not… it's going to be there.  You're saying QR has better accuracy than bar? Yeah, I think so. Okay.
+
+46:33 - Kevin DiGilio
+  Yep, lighting conditions, false positive, parts, quality control. Yep.
+
+46:48 - Daniel Pora (136dpora@gmail.com)
+  And then that low cost, we were just talking about using Raspberry Pi as early at each station with the camera.  Yeah, so Raspberry Pi is just that motherboard thingy, right? Yeah. Yeah. Yeah. Yeah. Yeah, like that you you do?  something. Random camera that we find? Yep. So, we get a grant, or we have funding for this through the school.
+  ACTION ITEM: Research Raspberry Pi + camera options within $250 budget
+ - WATCH: https://fathom.video/share/FLF5xMzyffzZ1sgksSDcjmgAyooftAYs?timestamp=2824.9999  Excellent. Do you guys remember, was it like 250? Yeah.
+
+47:14 - Miller, Collin
+  250.
+
+47:15 - Daniel Pora (136dpora@gmail.com)
+  So, if we want to go through them, we can probably do that. I'm not sure how much all this stuff would cost, depending on how many Raspberry Pis we need and the cameras and what kind of Pi, because it needs to be connected to probably Wi-Fi.  So, should we go through the school? say you just need one.
+
+47:40 - Kevin DiGilio
+  I'd say start with that, because I think that based on that budget, you should be able to get, you know, like I'm looking at this web camera that I got at Walmart, and that was like 60 bucks, right?  So, I take that and plug it into a Raspberry Pi. I don't know what that costs to throw a Wi-Fi on it.  Not sure what that costs. Yeah.
+
+47:59 - Daniel Pora (136dpora@gmail.com)
+  A lot of them should already come with Wi-Fi. Bye. Okay, capability. And then some of the cameras you can get for them are literally just like plug-in, kind of super easy, made for Raspberry Pi.  That's something we could look into. I think that last bullet is important, right?
+
+48:19 - Kevin DiGilio
+  The cost versus performance. Yeah.
+
+48:30 - Daniel Pora (136dpora@gmail.com)
+  Yeah, we talked about this. Everything is beyond frame. Yeah, no cloud. Everything needs to be local, like local API.  Yeah, we will prevent it from being able to access the cloud.
+
+48:44 - Kevin DiGilio
+  So don't have any of those dependencies. It won't find it. Yep.
+
+48:50 - Daniel Pora (136dpora@gmail.com)
+  Then, yeah, so we're, this kind of talks about with that, the accuracy, but we need to be able to.  Yeah. Well, this one, this one's important.
+
+49:03 - Kevin DiGilio
+  And in fact, we were, Nathan, you sent me something, right? Scanners, cameras, and whatnot. I think that was you.  And I shared that with Pat and, you know, he kind of, his immediate response was, you know, these are hardened pieces of equipment that can survive in these harsh environments.  And now, I don't know that the environments are all that harsh. But, I mean, we got to believe that there's both dust and noise.  I'm not sure they're going to be any heat pressure, per se, but... Yeah, so what we need to...
+
+49:41 - Daniel Pora (136dpora@gmail.com)
+  We need to kind of design some kind of shield digger around this Raspberry Pi in the camera.
+
+49:53 - Kevin DiGilio
+  Yeah, that's a, that is a great question. Or will Combina Flex be able to do this?
+
+49:59 - Daniel Pora (136dpora@gmail.com)
+  I mean, I can imagine... doesn't seem doesn't like that.
+
+50:02 - Kevin DiGilio
+  It didn't seem like that fits into the scope of a software project for you guys. So, yeah, I think if you – yeah, I don't think that's anything that we have the – I don't think we have the moxie to be able to handle that.  And if they have to buy a more expensive camera or a more expensive Raspberry Pi something or put it in a container or something, we can make them do that.  Okay, so don't worry about durability, but worry about accuracy.
+
+50:39 - Daniel Pora (136dpora@gmail.com)
+  Right. Right. mean, certainly expect it to be noisy.
+
+50:42 - Kevin DiGilio
+  I don't think any of this stuff involves audio. So I don't see that as being a problem. But when I look at the heat and dust, I'm like, yeah, it's just the Raspberry Pi motherboard just sitting out there is definitely going to be trouble.  But we can lean on Larry for that one.
+
+51:05 - Daniel Pora (136dpora@gmail.com)
+  Okay, so then, yeah, we were talking about minimizing cost, maybe using some open source libraries or some that have that nice MIT.  Okay. Yeah, and then cost optimization again. The more money we save, the better. And then this needs to be able to work.  Technically, it should work at CompositeFlex, but we need to possibly look into maybe having it run other places.
+
+51:44 - Kevin DiGilio
+  Yeah, and I think that will happen just based on the fact that we have to make it adaptable for the 12 workstations.  Yeah. That probably covers most of the flexibility we're going to need. Different camera positions, angles, mounting, yeah. so that.  let's go. Exactly. But they're going to mount the cameras. mean, Larry was already talking about where he was starting to think about where to mount them and what to do.  He's been building all this stuff. So he's ripe and ready to do that if we show up with the software side.  And he'll end up buying the right Raspberry Pi. And so, how much configuration is involved in these Raspberry Pis and cameras?
+
+52:27 - Nathan DiGilio
+  They're just, a mini computer, so they're just, like, setting up a little server. Okay.
+
+52:37 - Kevin DiGilio
+  Yeah, some documentation around that would be helpful for whoever's going to do that, whether it be Larry or Max or if we end up hiring one of you guys.
+
+52:47 - Nathan DiGilio
+  Yeah, they could definitely handle it. Raspberry Pis is pretty easy.
+
+52:52 - Daniel Pora (136dpora@gmail.com)
+  Because if we just make, like, a... What is it called? image, right? If we just make an image for that, they could just download it.  And then... Something like that. Yeah.
+
+53:05 - Kevin DiGilio
+  Okay.
+
+53:06 - Daniel Pora (136dpora@gmail.com)
+  Okay. Yeah, so ResMind 5 needs to be easily set up. Yeah, and I guess this isn't full. Not a crazy requirement, but being able to not disrupt systems with our system, which is… Yep, that's a good one.  That is the name of the game.
+
+53:41 - Kevin DiGilio
+  We constantly fight that as we launch new processes. Yeah, I'm not sure what that means for you guys. You know, I'm not exactly sure what work you guys would do to create support for that.  Yeah.
+
+54:01 - Daniel Pora (136dpora@gmail.com)
+  Yeah.
+
+54:03 - Kevin DiGilio
+  The coexistence will probably exist just naturally because they're doing it well some way already and whenever they install it on the next workstation.  All right, we got five minutes left, so we'll kind of go through this real quick.
+
+54:16 - Daniel Pora (136dpora@gmail.com)
+  Yeah, so we need to be compatible with that existing KMD. So that means for the first half, this probably just talks about, we need to be able to send that data.  We need that API call that we need to make. We also need to have our data table that can accept it with that database.  Yeah, so I'm looking at that first bullet.
+
+54:39 - Kevin DiGilio
+  If that is somehow possible to where Raspberry Pi can plug into like a USB and send the JSON directly to the computer like a keyboard, that's freaking magic.
+  ACTION ITEM: Investigate Bluetooth/USB keyboard emulation for Raspberry Pi data input
+ - WATCH: https://fathom.video/share/FLF5xMzyffzZ1sgksSDcjmgAyooftAYs?timestamp=3282.9999  I just don't know if that's realistic or not.
+
+54:53 - Daniel Pora (136dpora@gmail.com)
+  I think it's possible. just got to know what their system accepts, I guess.
+
+54:59 - Nathan DiGilio
+  Yeah. Well, now they have a barcode.
+
+55:01 - Kevin DiGilio
+  That's USB that they plug into the side of something and that's just like, does it just enter the text into the field or something?
+
+55:08 - Nathan DiGilio
+  Yes.
+
+55:10 - Kevin DiGilio
+  So they could just be like a keyboard.
+
+55:12 - Daniel Pora (136dpora@gmail.com)
+  Yeah. And they have the form already on their screen.
+
+55:16 - Nathan DiGilio
+  Right. All right.
+
+55:18 - Daniel Pora (136dpora@gmail.com)
+  Let write that down. That might be possible. So, yeah, see if that's possible.
+
+55:22 - Kevin DiGilio
+  And then our backup plan will be the. And do we know how far these cameras are going to be from the terminals?
+
+55:28 - Daniel Pora (136dpora@gmail.com)
+  Like how long is this fire going to be? It might not be something we have to worry about, but if it's not possible to connect the wire.  Yeah. With like safety.
+
+55:37 - Kevin DiGilio
+  There could be a possible wireless connection, but.
+
+55:43 - Nathan DiGilio
+  Yeah. Bluetooth or something.
+
+55:46 - Daniel Pora (136dpora@gmail.com)
+  Bluetooth or even just since they're on the same network, they should be able to connect to each other. Yeah.
+
+55:53 - Kevin DiGilio
+  But the computer on the same network, remember, it's that terminal server. So, so Bluetooth and keyboard or USB type.  That of thing seems reasonable, but going across the network, we're going to have to use the API database approach, I think, because we won't know which session on the server necessarily.  That might get kind of hairy.
+
+56:14 - Daniel Pora (136dpora@gmail.com)
+  But then if we also want to log these values, we probably should have it go through a server, an API, just so they can get caught somewhere in a database.  Yeah, depending on which one you're talking about.
+
+56:30 - Kevin DiGilio
+  I mean, if we're just going to use the scanning thing and the camera becomes the scanner and just fills out the form, then the form itself, when they click save, will log these values.  Okay. But the stuff that was brought up about logging the steps as they happen just for auditability, that's kind of a different animal.  Okay.
+
+56:55 - Daniel Pora (136dpora@gmail.com)
+  All right. So, what do you think we should do? Should we try to make... You get like a Bluetooth, almost like a keyboard input.
+
+57:05 - Kevin DiGilio
+  I mean, if it was a Bluetooth keyboard input, that feels freaking magical. But where that fails, we can go with the backup API integration stuff.
+
+57:17 - Nathan DiGilio
+  So we could put both as like a lower priority. I'll just try to get one of them or like have the Bluetooth be like a medium priority and then the other one be like low.  And if it doesn't work out, we just switch kind of thing. Yeah. Okay. So does it feel like there's anything we're missing in our requirements?  Does it feel like we have a pretty good complete picture? I know we still have a few more, but we're at it.
+
+57:47 - Kevin DiGilio
+  This is pretty good. This is a lot more than was in my brain. So you guys did a good job of.  Is there any in your brain that we missed?
+
+57:59 - Nathan DiGilio
+  Not at moment.
+
+58:00 - Kevin DiGilio
+  No. Okay. Okay. But if think about it, I can bring it up in the middle of your presentation in front of everybody if you want.  Yeah.
+
+58:11 - Daniel Pora (136dpora@gmail.com)
+  That'll be fun. No, these guys didn't listen to me at all.
+
+58:15 - Miller, Collin
+  Talk about all this other stuff.
+
+58:20 - Kevin DiGilio
+  Now we're going to put a muscle on you. You're not allowed to talk. Interesting.
+
+58:24 - Daniel Pora (136dpora@gmail.com)
+  All right. Well, of course, you can do the talking then. All right. So I guess we got one more minute left, but yeah, I think that should mostly be it.  Yeah. Trying to think of what else to talk about. Yeah, I guess that's kind of it. Yeah, guess that's good.  Okay. wrong.
+
+59:01 - Kevin DiGilio
+  We're to learn about building and testing MCP servers. I'm going to speed to campus so that I can get Wait, I thought you had an accurate dev meeting at one.
+
+59:12 - Daniel Pora (136dpora@gmail.com)
+  Oh, no, I'm not going to that. I ain't got time for listening to Paul. Paul's just going to say I'm going to stop at end.  all a little bit. Yeah. I'm going to do some training.
+
+59:20 - Dzikowski, Jacob John
+  All right. Good job, guys.
+
+59:22 - Daniel Pora (136dpora@gmail.com)
+  This was good. See you later.
