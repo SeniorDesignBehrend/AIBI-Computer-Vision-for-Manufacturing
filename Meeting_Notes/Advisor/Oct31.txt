@@ -1,0 +1,35 @@
+Main topics from advisor meeting:
+
+What did we learn from the tour?
+    Composifex confirmed they will be using QR codes
+        6 QR codes total
+        2 for each part (4 total since the part is cut into 2)
+        2 for the workstation
+    QR codes are put on the inside of the part
+    Lighting is great
+    We watched them only making one part at a time, but it is likely that 2 will be made at the same time
+
+Questions from the tour:
+    When/Where should we be scanning
+    How do we scan those internal codes
+
+Liaw: What kind of configuration will we have for this?
+    We cannot foresee change, but can we figure out a common denominator?
+    Our goal is to be very flexible/adaptive
+    Looking at the production line, what are some things that don't change from station to station?
+    We need to brainstorm solutions to these hypothetical problems
+        Try to cover 80% of the problems
+        However, their engineers may need to configure it themselves
+
+Liaw: Are we still going to be focusing on the second part? (ensuring correct steps)
+    Not really, it seems that the second part is less important
+        Also, the first part seems like it is getting more complicated
+    Liaw also thinks we should not focus on the second part
+
+Liaw: This feels like a pretty complicated problem
+    Come up with our version of the “best” solution and present it to our sponsor
+    It is important to come up with multiple versions and have our sponsor give us feedback
+
+Important: Ensure that our advisor fully understands our situation; he is our best resource
+    We need to narrow our scope with our sponsor, or things can get messy
+    In our presentations, we need to compare our previous knowledge to what we know now and show this to our advisors.
