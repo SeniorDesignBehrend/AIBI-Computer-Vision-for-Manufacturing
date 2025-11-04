@@ -1,0 +1,142 @@
+# ------------------------
+# Python
+# ------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+*.pickle
+*.pyc
+*.pyd
+*.pyo
+
+# C extensions
+*.so
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Pipenv
+Pipfile.lock
+
+# Poetry
+poetry.lock
+
+# PyInstaller
+*.spec
+
+# Distribution / build
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.coverage
+.tox/
+.nox/
+.pytest_cache/
+htmlcov/
+coverage.xml
+.cache
+
+# Jupyter Notebook
+.ipynb_checkpoints
+jupyter_output/
+*.nb.html
+
+# Spyder / Rope IDE
+.spyproject/
+.ropeproject/
+
+# VSCode
+.vscode/
+.settings/
+
+# PyCharm
+.idea/
+*.iml
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+
+# Flask
+instance/
+.webassets-cache
+
+# FastAPI
+*.log
+
+# Logs
+*.log
+logs/
+
+# Mac / Windows OS junk
+.DS_Store
+Thumbs.db
+
+# ------------------------
+# Machine Learning / CV
+# ------------------------
+# Common model weights / outputs
+*.h5
+*.hdf5
+*.ckpt
+*.ckpt.*
+*.pth
+*.pt
+*.onnx
+*.engine
+*.trt
+
+# Datasets and large files
+data/
+datasets/
+*.npz
+*.npy
+
+# Checkpoints / experiments
+runs/
+outputs/
+experiments/
+lightning_logs/
+
+# ------------------------
+# Project specific
+# ------------------------
+# environment variables
+*.env
+.env.*
+
+# compiled code
+*.dll
+*.exe
+
+# Others
+profile_default/
+ipython_config.py
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# JetBrains
+.idea/
