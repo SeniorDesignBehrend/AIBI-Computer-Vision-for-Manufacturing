@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+src/aibi_cv/__init__.py
+src/aibi_cv/cli.py
+src/aibi_cv.egg-info/PKG-INFO
+src/aibi_cv.egg-info/SOURCES.txt
+src/aibi_cv.egg-info/dependency_links.txt
+src/aibi_cv.egg-info/requires.txt
+src/aibi_cv.egg-info/top_level.txt
+tests/test_sanity.py

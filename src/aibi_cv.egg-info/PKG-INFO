@@ -1,3 +1,11 @@
+Metadata-Version: 2.4
+Name: aibi-cv
+Version: 0.1.0
+Summary: Barebones starter for the AIBI CV project using uv
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: opencv-python>=4.12.0.88
+
 # AIBI Computer Vision for Manufacturing
 
 A computer vision project for manufacturing applications using **uv** for dependency management.
@@ -39,7 +47,9 @@ uv sync
 
 ### 3. Run examples
 ```bash
+# Face recognition example
+uv run python examples/face_recognition/simple_face_recog.py
 
 # QR code example
-uv run python examples/qr/simple_qr_scanner.py
+uv run python examples/qr/qr_test.py
 ```
