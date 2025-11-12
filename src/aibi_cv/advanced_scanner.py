@@ -34,6 +34,17 @@ def decode_qr(img):
 
 def parse_barcode(data: str) -> tuple:
     """Parse barcode data to extract name and value."""
+    # Try to parse as JSON first
+    try:
+        json_data = json.loads(data)
+        if isinstance(json_data, dict):
+            # Get first key-value pair
+            for key, value in json_data.items():
+                return key, str(value)
+    except:
+        pass
+    
+    # Fallback to colon format
     if ":" in data:
         parts = data.split(":", 1)
         return parts[0].strip(), parts[1].strip()
