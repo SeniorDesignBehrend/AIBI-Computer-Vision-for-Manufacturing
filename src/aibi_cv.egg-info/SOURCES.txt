@@ -1,7 +1,6 @@
 README.md
 pyproject.toml
 src/aibi_cv/__init__.py
-src/aibi_cv/api_server.py
 src/aibi_cv/barcode_scanner.py
 src/aibi_cv/cli.py
 src/aibi_cv/config_manager.py
