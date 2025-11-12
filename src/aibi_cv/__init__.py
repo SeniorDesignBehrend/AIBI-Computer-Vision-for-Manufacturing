@@ -1,7 +1,7 @@
 """AIBI Computer Vision for Manufacturing - QR/Barcode Scanning System."""
 
 from .barcode_scanner import BarcodeScanner, BarcodeDetection
-from .config_manager import ConfigManager, WorkstationConfig, FieldMapping
+from .config_manager import ConfigManager, WorkstationConfig, BarcodeField
 from .data_formatter import DataFormatter
 from .data_storage import DataStorage
 from .vision_system import VisionSystem
@@ -13,7 +13,7 @@ __all__ = [
     "BarcodeDetection",
     "ConfigManager",
     "WorkstationConfig",
-    "FieldMapping",
+    "BarcodeField",
     "DataFormatter",
     "DataStorage",
     "VisionSystem",
