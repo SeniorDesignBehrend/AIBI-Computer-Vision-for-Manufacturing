@@ -47,9 +47,7 @@ uv sync
 
 ### 3. Run examples
 ```bash
-# Face recognition example
-uv run python examples/face_recognition/simple_face_recog.py
 
 # QR code example
-uv run python examples/qr/qr_test.py
+uv run python examples/qr/simple_qr_scanner.py
 ```
