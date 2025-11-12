@@ -9,7 +9,11 @@ def decode_qr(img: np.ndarray) -> List[Tuple[str, np.ndarray]]:
     """Decode QR codes using OpenCV."""
     detector = cv2.QRCodeDetector()
     try:
-        texts, points, _ = detector.detectAndDecodeMulti(img)
+        result = detector.detectAndDecodeMulti(img)
+        if len(result) == 3:
+            texts, points, _ = result
+        else:
+            texts, points = result
         results = []
         if points is not None:
             for i, text in enumerate(texts):
@@ -19,7 +23,11 @@ def decode_qr(img: np.ndarray) -> List[Tuple[str, np.ndarray]]:
         return results
     except:
         # Fallback to single detection
-        text, pts, _ = detector.detectAndDecode(img)
+        result = detector.detectAndDecode(img)
+        if len(result) == 3:
+            text, pts, _ = result
+        else:
+            text, pts = result
         if text and pts is not None:
             return [(text, pts.astype(np.int32))]
         return []
@@ -28,7 +36,8 @@ def draw_detections(img: np.ndarray, detections: List[Tuple[str, np.ndarray]]) -
     """Draw bounding boxes and text on image."""
     for text, box in detections:
         cv2.polylines(img, [box], True, (0, 255, 0), 2)
-        x, y = int(box[0][0]), int(box[0][1])
+        pt = box[0].flatten()
+        x, y = int(pt[0]), int(pt[1])
         cv2.putText(img, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
     return img
 
