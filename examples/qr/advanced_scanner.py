@@ -91,12 +91,20 @@ def main():
         
         # Process detections
         for text, box in detections:
+            # Debug: show raw text
+            print(f"DEBUG: Detected QR code: '{text}'")
+            
             name, value = parse_barcode(text)
+            print(f"DEBUG: Parsed as name='{name}', value='{value}'")
             
             # Only track barcodes in our field list
             if name and name in all_fields and name not in scanned_data:
                 scanned_data[name] = value
                 print(f"✓ Scanned: {name} = {value}")
+            elif name and name not in all_fields:
+                print(f"⚠ Ignored (not in field list): {name}")
+            elif name and name in scanned_data:
+                print(f"⚠ Already scanned: {name}")
             
             # Draw on frame
             if box is not None:

@@ -1,0 +1,7 @@
+{
+  "instructions": "Generate ONE QR code for EACH string below (4 separate QR codes total)",
+  "qr_code_1": "product_id:PROD-2024-001",
+  "qr_code_2": "operator_id:OP-123",
+  "qr_code_3": "quality_check:PASS",
+  "qr_code_4": "notes:All tests passed"
+}
