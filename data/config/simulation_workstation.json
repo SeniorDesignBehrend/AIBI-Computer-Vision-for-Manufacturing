@@ -1,0 +1,21 @@
+{
+  "workstation_id": "simulation_workstation",
+  "field_mappings": [
+    {
+      "position_index": 0,
+      "field_name": "part_number",
+      "required": true
+    },
+    {
+      "position_index": 1,
+      "field_name": "serial_number",
+      "required": true
+    },
+    {
+      "position_index": 2,
+      "field_name": "batch_id",
+      "required": false
+    }
+  ],
+  "camera_index": 0
+}
