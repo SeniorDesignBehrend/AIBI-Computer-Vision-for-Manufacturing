@@ -4,11 +4,13 @@
 import cv2
 import json
 import numpy as np
+import time
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Set
 
 from .config_manager import ConfigManager
+from .advanced_scanner import decode_qr, parse_barcode
 
 
 def generate_qr_image(data: str, size: int = 300) -> np.ndarray:
@@ -24,36 +26,6 @@ def generate_qr_image(data: str, size: int = 300) -> np.ndarray:
     x_offset = (size - qr_size) // 2
     img[y_offset:y_offset+qr_size, x_offset:x_offset+qr_size] = qr_resized
     return img
-
-
-def decode_qr(img):
-    """Decode QR codes using OpenCV."""
-    detector = cv2.QRCodeDetector()
-    try:
-        result = detector.detectAndDecodeMulti(img)
-        if len(result) >= 2:
-            texts, points = result[0], result[1]
-        else:
-            return []
-        results = []
-        if points is not None:
-            for i, text in enumerate(texts):
-                if text:
-                    results.append((text, points[i]))
-        return results
-    except:
-        result = detector.detectAndDecode(img)
-        if len(result) >= 2 and result[0]:
-            return [(result[0], result[1])]
-        return []
-
-
-def parse_barcode(data: str) -> tuple:
-    """Parse barcode data to extract name and value."""
-    if ":" in data:
-        parts = data.split(":", 1)
-        return parts[0].strip(), parts[1].strip()
-    return None, data
 
 
 def main():
@@ -105,7 +77,7 @@ def main():
                 name, value = parse_barcode(text)
                 if name and name in all_fields and name not in scanned_data:
                     scanned_data[name] = value
-                    print(f"✓ Scanned: {name} = {value}")
+                    print(f"Scanned: {name} = {value}")
         
         # Check if complete
         missing_required = required_fields - scanned_data.keys()
@@ -125,9 +97,11 @@ def main():
             with open(output_file, 'w') as f:
                 json.dump(output_data, f, indent=2)
             
-            print(f"✓ Saved to {output_file}")
+            print(f"Saved to {output_file}")
         else:
-            print(f"✗ Incomplete - missing: {', '.join(missing_required)}")
+            print(f"Incomplete - missing: {', '.join(missing_required)}")
+        
+        time.sleep(1)
     
     print("\n=== Simulation Complete ===")
 
