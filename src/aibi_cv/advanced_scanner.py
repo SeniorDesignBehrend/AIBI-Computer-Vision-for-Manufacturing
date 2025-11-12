@@ -74,6 +74,9 @@ def main():
     
     # Tracking
     scanned_data: Dict[str, str] = {}
+    last_seen: Dict[str, int] = {}  # Track when each code was last seen
+    cooldown_frames = 30  # Ignore same code for 30 frames (~1 second)
+    frame_count = 0
     
     # Open camera
     cap = cv2.VideoCapture(config.camera_index)
@@ -93,25 +96,24 @@ def main():
         if not ret:
             break
         
+        frame_count += 1
+        
         # Detect QR codes
         detections = decode_qr(frame)
         
         # Process detections
         for text, box in detections:
-            # Debug: show raw text
-            print(f"DEBUG: Detected QR code: '{text}'")
-            
             name, value = parse_barcode(text)
-            print(f"DEBUG: Parsed as name='{name}', value='{value}'")
+            
+            # Check cooldown
+            if name in last_seen and (frame_count - last_seen[name]) < cooldown_frames:
+                continue
             
             # Only track barcodes in our field list
             if name and name in all_fields and name not in scanned_data:
                 scanned_data[name] = value
+                last_seen[name] = frame_count
                 print(f"✓ Scanned: {name} = {value}")
-            elif name and name not in all_fields:
-                print(f"⚠ Ignored (not in field list): {name}")
-            elif name and name in scanned_data:
-                print(f"⚠ Already scanned: {name}")
             
             # Draw on frame
             if box is not None:
@@ -147,6 +149,7 @@ def main():
             break
         elif key == ord('r'):
             scanned_data.clear()
+            last_seen.clear()
             print("\n--- Reset ---\n")
         elif key == ord('s'):
             if not missing_required:
