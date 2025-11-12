@@ -11,25 +11,97 @@ from .config_manager import ConfigManager
 
 
 def decode_qr(img):
-    """Decode QR codes using OpenCV."""
-    detector = cv2.QRCodeDetector()
+    """Decode QR/barcodes from `img`.
+
+    Attempts to use `pyzbar` first (reliable multi-barcode detection for many
+    symbologies). Falls back to OpenCV's `QRCodeDetector.detectAndDecodeMulti`.
+
+    Returns a list of tuples `(text, points)` where `points` is either a
+    numpy array of polygon points or `None` if not available.
+    """
+    results = []
+
+    # Prefer pyzbar when available (handles multiple barcodes reliably)
     try:
-        result = detector.detectAndDecodeMulti(img)
-        if len(result) >= 2:
-            texts, points = result[0], result[1]
-        else:
-            return []
-        results = []
-        if points is not None:
-            for i, text in enumerate(texts):
-                if text:
-                    results.append((text, points[i]))
-        return results
-    except:
-        result = detector.detectAndDecode(img)
-        if len(result) >= 2 and result[0]:
-            return [(result[0], result[1])]
-        return []
+        from pyzbar.pyzbar import decode as pyzbar_decode
+        try:
+            decoded = pyzbar_decode(img)
+            if decoded:
+                import numpy as _np
+                for d in decoded:
+                    try:
+                        text = d.data.decode('utf-8') if isinstance(d.data, (bytes, bytearray)) else str(d.data)
+                    except Exception:
+                        text = str(d.data)
+
+                    pts = None
+                    if getattr(d, 'polygon', None):
+                        try:
+                            pts = _np.array([[p.x, p.y] for p in d.polygon], dtype=int)
+                        except Exception:
+                            pts = None
+
+                    results.append((text, pts))
+                return results
+        except Exception:
+            # If pyzbar fails for some reason, fall through to OpenCV fallback
+            results = []
+    except Exception:
+        # pyzbar not installed or import failed; use OpenCV fallback
+        pass
+
+    # OpenCV fallback: try multi-detect-decode first
+    try:
+        detector = cv2.QRCodeDetector()
+        res = detector.detectAndDecodeMulti(img)
+
+        # detectAndDecodeMulti has different return shapes across OpenCV
+        # versions; attempt to normalize to (texts, points)
+        texts = None
+        points = None
+        if isinstance(res, tuple) and len(res) >= 2:
+            # Try to find the list-of-strings and the points array inside the tuple
+            for item in res:
+                if isinstance(item, (list, tuple)) and item and all(isinstance(x, str) for x in item):
+                    texts = list(item)
+                elif hasattr(item, 'shape') or (isinstance(item, (list, tuple)) and item and isinstance(item[0], (list, tuple))):
+                    points = item
+        elif isinstance(res, list):
+            # Some bindings may return a list-of-texts directly
+            texts = res
+
+        if texts:
+            import numpy as _np
+            for i, t in enumerate(texts):
+                if not t:
+                    continue
+                pts = None
+                try:
+                    if points is not None:
+                        pts = _np.array(points[i], dtype=int)
+                except Exception:
+                    pts = None
+                results.append((t, pts))
+            if results:
+                return results
+    except Exception:
+        pass
+
+    # Final fallback: single QR decode
+    try:
+        detector = cv2.QRCodeDetector()
+        text, pts, _ = detector.detectAndDecode(img)
+        if text:
+            try:
+                import numpy as _np
+                pts_arr = _np.array(pts, dtype=int) if pts is not None else None
+            except Exception:
+                pts_arr = None
+            return [(text, pts_arr)]
+    except Exception:
+        pass
+
+    return []
 
 
 def parse_barcode(data: str) -> tuple:
