@@ -5,6 +5,10 @@ Summary: Barebones starter for the AIBI CV project using uv
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 Requires-Dist: opencv-python>=4.12.0.88
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: fastapi>=0.104.0
+Requires-Dist: uvicorn>=0.24.0
+Requires-Dist: pydantic>=2.0.0
 
 # AIBI Computer Vision for Manufacturing
 
