@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Simple QR/Barcode scanner using main camera."""
+"""Simple QR/Barcode scanner that outputs to JSON file."""
 
 import cv2
 import numpy as np
+import json
+from datetime import datetime
+from pathlib import Path
 from typing import List, Tuple
 
 def decode_qr(img: np.ndarray) -> List[Tuple[str, np.ndarray]]:
@@ -47,7 +50,14 @@ def main():
         print("Error: Could not open camera")
         return
     
-    print("Press 'q' to quit")
+    output_dir = Path("outputs")
+    output_dir.mkdir(exist_ok=True)
+    output_file = output_dir / "qr_scans.json"
+    
+    scans = []
+    seen_codes = set()
+    
+    print("Press 's' to save and quit, 'q' to quit without saving")
     
     while True:
         ret, frame = cap.read()
@@ -55,11 +65,28 @@ def main():
             break
             
         detections = decode_qr(frame)
+        
+        for text, box in detections:
+            if text not in seen_codes:
+                scan_data = {
+                    "timestamp": datetime.now().isoformat(),
+                    "data": text,
+                    "type": "QR_CODE"
+                }
+                scans.append(scan_data)
+                seen_codes.add(text)
+                print(f"Detected: {text}")
+        
         frame = draw_detections(frame, detections)
+        cv2.imshow('QR Scanner - Press S to save', frame)
         
-        cv2.imshow('QR/Barcode Scanner', frame)
-        
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('s'):
+            with open(output_file, 'w') as f:
+                json.dump(scans, f, indent=2)
+            print(f"Saved {len(scans)} scans to {output_file}")
+            break
+        elif key == ord('q'):
             break
     
     cap.release()

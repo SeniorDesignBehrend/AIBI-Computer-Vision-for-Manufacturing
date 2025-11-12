@@ -4,7 +4,6 @@ import sys
 import argparse
 from pathlib import Path
 from .vision_system import VisionSystem
-from .api_server import run_server
 
 
 def cmd_scan(args):
@@ -21,19 +20,6 @@ def cmd_scan(args):
     
     system.run_live(display=not args.no_display)
 
-
-def cmd_server(args):
-    """Run API server."""
-    config_dir = Path(args.config_dir)
-    db_path = Path(args.db_path)
-    
-    print(f"Starting API server on {args.host}:{args.port}")
-    run_server(
-        host=args.host,
-        port=args.port,
-        config_dir=config_dir,
-        db_path=db_path
-    )
 
 
 def cmd_config(args):
@@ -90,20 +76,6 @@ def main():
         help="Disable video display"
     )
     
-    # Server command
-    server_parser = subparsers.add_parser("server", help="Run API server")
-    server_parser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="Server host"
-    )
-    server_parser.add_argument(
-        "--port",
-        type=int,
-        default=8000,
-        help="Server port"
-    )
-    
     # Config command
     config_parser = subparsers.add_parser("config", help="Manage configurations")
     config_parser.add_argument(
@@ -120,8 +92,6 @@ def main():
     
     if args.command == "scan":
         cmd_scan(args)
-    elif args.command == "server":
-        cmd_server(args)
     elif args.command == "config":
         cmd_config(args)
     else:

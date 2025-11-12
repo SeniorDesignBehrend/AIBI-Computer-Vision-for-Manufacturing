@@ -1,6 +1,6 @@
 # QR Code Scanning System
 
-Complete implementation of the barcode/QR code scanning system as specified in the AIBI CV for Manufacturing Report 1.5.
+Simple QR code scanning system that outputs scan data to JSON files.
 
 ## System Architecture
 
@@ -9,12 +9,8 @@ The system implements the following key requirements:
 ### Functional Requirements Implemented
 
 - **SFR1, SFR15, SFR16**: Fixed-station cameras detect, decode, and output all barcodes/QR codes in a single frame
-- **SFR2**: Configurable per-workstation mapping of barcode positions to data fields
 - **SFR4**: Aggregates decoded values into structured JSON documents
-- **SFR5**: Real-time delivery via local REST API and local DB persistence
-- **SFR11**: Local data storage with audit metadata and replay/synchronization support
-- **SFR12**: Published JSON schema with documentation
-- **SFR13**: Simulation environment for testing without live camera
+- **SFR11**: Local data storage with audit metadata
 
 ### Core Components
 
@@ -25,7 +21,6 @@ src/aibi_cv/
 ├── data_formatter.py     # JSON payload formatting
 ├── data_storage.py       # SQLite-based local persistence
 ├── vision_system.py      # Main system controller
-├── api_server.py         # REST API for integration
 └── cli.py               # Command-line interface
 ```
 
@@ -37,7 +32,16 @@ src/aibi_cv/
 uv sync
 ```
 
-### 2. Run Live Scanning
+### 2. Run Simple QR Scanner
+
+```bash
+# Outputs to outputs/qr_scans.json
+uv run python examples/qr/simple_qr_scanner.py
+```
+
+Press 's' to save scans to JSON file, 'q' to quit without saving.
+
+### 3. Run Advanced Scanner (Optional)
 
 ```bash
 # Using CLI
@@ -47,16 +51,10 @@ uv run python -m aibi_cv.cli scan --workstation workstation_01
 uv run python examples/qr/advanced_scanner.py
 ```
 
-### 3. Run Simulation (No Camera Required)
+### 4. Run Simulation (No Camera Required)
 
 ```bash
 uv run python examples/qr/simulation_test.py
-```
-
-### 4. Start API Server
-
-```bash
-uv run python -m aibi_cv.cli server --host 127.0.0.1 --port 8000
 ```
 
 ## Configuration
@@ -91,7 +89,23 @@ uv run python -m aibi_cv.cli config --list
 
 ## JSON Output Schema
 
-All scan events follow this schema (v1.0):
+### Simple Scanner Output
+
+The simple scanner outputs to `outputs/qr_scans.json`:
+
+```json
+[
+  {
+    "timestamp": "2024-01-15T10:30:45.123456",
+    "data": "QR_CODE_CONTENT",
+    "type": "QR_CODE"
+  }
+]
+```
+
+### Advanced Scanner Output
+
+The advanced scanner follows this schema (v1.0):
 
 ```json
 {
@@ -120,44 +134,6 @@ All scan events follow this schema (v1.0):
     "required_fields_complete": true
   }
 }
-```
-
-## REST API Endpoints
-
-### Health Check
-```
-GET /
-```
-
-### List Workstations
-```
-GET /api/v1/workstations
-```
-
-### Get Workstation Status
-```
-GET /api/v1/workstation/{workstation_id}/status
-```
-
-### Get Unsynced Scans
-```
-GET /api/v1/scans/unsynced?limit=100
-```
-
-### Mark Scans as Synced
-```
-POST /api/v1/scans/mark-synced
-Body: [1, 2, 3]  # Event IDs
-```
-
-### Get System Logs
-```
-GET /api/v1/logs?limit=100&level=ERROR
-```
-
-### Get JSON Schema
-```
-GET /api/v1/schema
 ```
 
 ## Data Storage
@@ -239,14 +215,13 @@ This tests multiple scenarios:
 - **Audit Trail**: Complete logging of all events
 - **Data Privacy**: No external data transmission
 
-## Integration with KMD Systems
+## Integration
 
 The system provides multiple integration methods:
 
-1. **REST API**: Real-time event streaming
-2. **Database**: Direct SQLite access for batch processing
-3. **JSON Files**: Export scan events as JSON
-4. **Keyboard Emulation**: Future support for legacy systems
+1. **JSON Files**: Simple scanner outputs to `outputs/qr_scans.json`
+2. **Database**: Advanced scanner uses SQLite for batch processing
+3. **Python API**: Direct integration via VisionSystem class
 
 ## Troubleshooting
 
@@ -254,12 +229,6 @@ The system provides multiple integration methods:
 ```bash
 # Test camera access
 uv run python -c "import cv2; print(cv2.VideoCapture(0).isOpened())"
-```
-
-### View System Logs
-```bash
-# Check logs via API
-curl http://localhost:8000/api/v1/logs?level=ERROR
 ```
 
 ### Database Issues
@@ -271,7 +240,6 @@ sqlite3 data/scans.db "SELECT COUNT(*) FROM scan_events;"
 ## Next Steps
 
 1. **Barcode Support**: Add support for 1D barcodes using pyzbar
-2. **Step Verification**: Implement manufacturing step monitoring (SFR6-SFR10)
-3. **Training Interface**: Build UI for process training (SFR8)
-4. **Keyboard Emulation**: Add legacy system support
-5. **Performance Optimization**: GPU acceleration for high-throughput scenarios
+2. **Enhanced Output**: Add more metadata to JSON output
+3. **Batch Processing**: Process multiple images from a folder
+4. **Performance Optimization**: Optimize detection speed
