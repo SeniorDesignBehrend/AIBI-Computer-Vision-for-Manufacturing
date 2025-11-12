@@ -7,11 +7,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, Set
 
-# Add src to path
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
-
-from aibi_cv.config_manager import ConfigManager
+from .config_manager import ConfigManager
 
 
 def decode_qr(img):

@@ -28,13 +28,13 @@ Press 's' to save, 'q' to quit. Output: `outputs/qr_scans.json`
 
 **Advanced Scanner** - Tracks required barcodes per workstation:
 ```bash
-uv run python examples/qr/advanced_scanner.py
+uv run python -m aibi_cv.advanced_scanner
 ```
 Press 's' to save (when complete), 'r' to reset, 'q' to quit.
 
 **Simulation Test** - Test without camera (generates synthetic QR codes):
 ```bash
-uv run python examples/qr/simulation_test.py
+uv run python -m aibi_cv.simulation_scanner
 ```
 
 ## Barcode Format
