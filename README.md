@@ -32,6 +32,11 @@ uv run python examples/qr/advanced_scanner.py
 ```
 Press 's' to save (when complete), 'r' to reset, 'q' to quit.
 
+**Simulation Test** - Test without camera (generates synthetic QR codes):
+```bash
+uv run python examples/qr/simulation_test.py
+```
+
 ## Barcode Format
 
 Format barcodes as: `field_name:value`

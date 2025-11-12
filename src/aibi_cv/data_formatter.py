@@ -15,17 +15,10 @@ class DataFormatter:
     
     def format_scan_event(self, detections: List[BarcodeDetection]) -> Dict[str, Any]:
         """Format detections into structured JSON payload."""
-        # Map detections to configured fields
+        # Map detections by position index
         mapped_fields = {}
-        for mapping in self.config.field_mappings:
-            matching_detection = next(
-                (d for d in detections if d.position_index == mapping.position_index),
-                None
-            )
-            if matching_detection:
-                mapped_fields[mapping.field_name] = matching_detection.data
-            elif mapping.required:
-                mapped_fields[mapping.field_name] = None
+        for i, detection in enumerate(detections):
+            mapped_fields[f"field_{i}"] = detection.data
         
         # Build complete payload
         payload = {
@@ -48,10 +41,7 @@ class DataFormatter:
             },
             "metadata": {
                 "total_detections": len(detections),
-                "required_fields_complete": all(
-                    mapped_fields.get(m.field_name) is not None
-                    for m in self.config.field_mappings if m.required
-                )
+                "required_fields_complete": len(detections) > 0
             }
         }
         
@@ -75,10 +65,10 @@ class DataFormatter:
         
         # Check required data fields
         if "scan_data" in payload and "fields" in payload["scan_data"]:
-            for mapping in self.config.field_mappings:
-                if mapping.required:
-                    value = payload["scan_data"]["fields"].get(mapping.field_name)
+            for field in self.config.barcode_fields:
+                if field.required:
+                    value = payload["scan_data"]["fields"].get(field.name)
                     if value is None:
-                        errors.append(f"Missing required field: {mapping.field_name}")
+                        errors.append(f"Missing required field: {field.name}")
         
         return len(errors) == 0, errors
