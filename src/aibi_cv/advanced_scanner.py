@@ -238,7 +238,7 @@ def main():
                 
                 # Check if all required fields are now complete
                 if required_fields.issubset(scanned_data.keys()):
-                    print("\n🎯 All required fields scanned - auto-entering to Excel...")
+                    print("\nAll required fields scanned - auto-entering to Excel...")
                     
                     # Type to Excel in configured order
                     if not type_to_excel(scanned_data, field_order):
@@ -279,9 +279,13 @@ def main():
         y_pos += 30
         
         for field in required_fields:
-            status = "✓" if field in scanned_data else "✗"
-            color = (0, 255, 0) if field in scanned_data else (0, 0, 255)
-            cv2.putText(frame, f"{status} {field}", (10, y_pos),
+            if field in scanned_data:
+                display_text = f"✓ {field}: {scanned_data[field]}"
+                color = (0, 255, 0)
+            else:
+                display_text = f"✗ {field}"
+                color = (0, 0, 255)
+            cv2.putText(frame, display_text, (10, y_pos),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
             y_pos += 25
         
