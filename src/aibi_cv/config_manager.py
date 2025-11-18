@@ -7,10 +7,9 @@ from dataclasses import dataclass, asdict
 
 
 @dataclass
-class FieldMapping:
-    """Maps a barcode position to a data field."""
-    position_index: int
-    field_name: str
+class BarcodeField:
+    """Defines a barcode field to scan."""
+    name: str
     required: bool = True
 
 
@@ -18,22 +17,22 @@ class FieldMapping:
 class WorkstationConfig:
     """Configuration for a specific workstation."""
     workstation_id: str
-    field_mappings: List[FieldMapping]
+    barcode_fields: List[BarcodeField]
     camera_index: int = 0
     
     def to_dict(self) -> dict:
         return {
             "workstation_id": self.workstation_id,
-            "field_mappings": [asdict(fm) for fm in self.field_mappings],
+            "barcode_fields": [asdict(bf) for bf in self.barcode_fields],
             "camera_index": self.camera_index
         }
     
     @classmethod
     def from_dict(cls, data: dict) -> 'WorkstationConfig':
-        mappings = [FieldMapping(**m) for m in data.get("field_mappings", [])]
+        fields = [BarcodeField(**f) for f in data.get("barcode_fields", [])]
         return cls(
             workstation_id=data["workstation_id"],
-            field_mappings=mappings,
+            barcode_fields=fields,
             camera_index=data.get("camera_index", 0)
         )
 
@@ -73,10 +72,10 @@ class ConfigManager:
         """Create a default configuration for a workstation."""
         config = WorkstationConfig(
             workstation_id=workstation_id,
-            field_mappings=[
-                FieldMapping(0, "part_number", True),
-                FieldMapping(1, "serial_number", True),
-                FieldMapping(2, "batch_id", False),
+            barcode_fields=[
+                BarcodeField("part_number", True),
+                BarcodeField("serial_number", True),
+                BarcodeField("batch_id", False),
             ],
             camera_index=0
         )

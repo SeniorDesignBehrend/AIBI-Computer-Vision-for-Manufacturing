@@ -1,0 +1,6 @@
+{
+  "instructions": "Generate ONE QR code for EACH string below (3 separate QR codes total)",
+  "qr_code_1": "part_number:PN-12345",
+  "qr_code_2": "serial_number:SN-67890",
+  "qr_code_3": "batch_id:BATCH-2024-01"
+}
