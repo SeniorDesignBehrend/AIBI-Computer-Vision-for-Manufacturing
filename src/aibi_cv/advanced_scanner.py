@@ -6,6 +6,11 @@ import json
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Set
+import keyboard
+import time
+import pygetwindow as gw
+import tkinter as tk
+from tkinter import messagebox
 
 from .config_manager import ConfigManager
 
@@ -123,6 +128,47 @@ def parse_barcode(data: str) -> tuple:
     return None, data
 
 
+def type_to_excel(scanned_data: Dict[str, str]):
+    """Type scanned data into Excel using keyboard simulation."""
+    # Store current scanner window
+    scanner_windows = [w for w in gw.getAllWindows() if 'Advanced Scanner' in w.title]
+    
+    # Find Excel window
+    excel_windows = [w for w in gw.getAllWindows() if 'excel' in w.title.lower()]
+    
+    if excel_windows:
+        excel_windows[0].activate()
+        print("\n✓ Switched to Excel")
+        time.sleep(0.5)
+    else:
+        # Show popup window
+        root = tk.Tk()
+        root.withdraw()  # Hide main window
+        messagebox.showerror("Excel Not Found", "Please open Excel and try again.")
+        root.destroy()
+        print("\n⚠️ Excel not found - please open Excel")
+        return False
+    
+    for name, value in scanned_data.items():
+        keyboard.write(value)
+        keyboard.press_and_release('tab')
+        time.sleep(0.1)
+    
+    keyboard.press_and_release('enter')
+    print("✓ Data typed into Excel")
+    
+    # Switch back to scanner
+    time.sleep(0.5)
+    if scanner_windows:
+        scanner_windows[0].activate()
+        print("✓ Switched back to scanner")
+    else:
+        # Fallback: try to activate OpenCV window
+        cv2.setWindowProperty('Advanced Scanner', cv2.WND_PROP_TOPMOST, 1)
+        cv2.setWindowProperty('Advanced Scanner', cv2.WND_PROP_TOPMOST, 0)
+    return True
+
+
 def main():
     # Setup paths
     project_root = Path(__file__).parent.parent.parent
@@ -160,7 +206,7 @@ def main():
     print(f"Required fields: {', '.join(required_fields)}")
     print(f"Optional fields: {', '.join(optional_fields)}")
     print("\nFormat barcodes as: field_name:value")
-    print("Press 's' to save (when all required fields scanned)")
+    print("Data will auto-enter to Excel when all required fields are scanned")
     print("Press 'r' to reset, 'q' to quit\n")
     
     while True:
@@ -186,6 +232,33 @@ def main():
                 scanned_data[name] = value
                 last_seen[name] = frame_count
                 print(f"✓ Scanned: {name} = {value}")
+                
+                # Check if all required fields are now complete
+                if required_fields.issubset(scanned_data.keys()):
+                    print("\n🎯 All required fields scanned - auto-entering to Excel...")
+                    
+                    # Type to Excel
+                    if not type_to_excel(scanned_data):
+                        continue  # Excel not found, don't save/reset
+                    
+                    # Save to JSON
+                    output_data = {
+                        "workstation_id": workstation_id,
+                        "timestamp": datetime.now().isoformat(),
+                        "barcodes": [
+                            {"name": name, "value": value}
+                            for name, value in scanned_data.items()
+                        ]
+                    }
+                    
+                    output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                    with open(output_file, 'w') as f:
+                        json.dump(output_data, f, indent=2)
+                    
+                    print(f"✓ Saved to {output_file}")
+                    scanned_data.clear()
+                    last_seen.clear()
+                    print("--- Ready for next scan ---\n")
             
             # Draw on frame
             if box is not None:
@@ -210,7 +283,7 @@ def main():
             y_pos += 25
         
         if not missing_required:
-            cv2.putText(frame, "READY TO SAVE (Press S)", (10, y_pos),
+            cv2.putText(frame, "AUTO-ENTERING TO EXCEL...", (10, y_pos),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         
         cv2.imshow('Advanced Scanner', frame)
@@ -223,27 +296,7 @@ def main():
             scanned_data.clear()
             last_seen.clear()
             print("\n--- Reset ---\n")
-        elif key == ord('s'):
-            if not missing_required:
-                # Save to JSON
-                output_data = {
-                    "workstation_id": workstation_id,
-                    "timestamp": datetime.now().isoformat(),
-                    "barcodes": [
-                        {"name": name, "value": value}
-                        for name, value in scanned_data.items()
-                    ]
-                }
-                
-                output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                with open(output_file, 'w') as f:
-                    json.dump(output_data, f, indent=2)
-                
-                print(f"\n✓ Saved to {output_file}")
-                scanned_data.clear()
-                print("--- Ready for next scan ---\n")
-            else:
-                print(f"\n✗ Cannot save - missing: {', '.join(missing_required)}\n")
+
     
     cap.release()
     cv2.destroyAllWindows()
