@@ -128,8 +128,8 @@ def parse_barcode(data: str) -> tuple:
     return None, data
 
 
-def type_to_excel(scanned_data: Dict[str, str]):
-    """Type scanned data into Excel using keyboard simulation."""
+def type_to_excel(scanned_data: Dict[str, str], field_order: list):
+    """Type scanned data into Excel using keyboard simulation in configured order."""
     # Store current scanner window
     scanner_windows = [w for w in gw.getAllWindows() if 'Advanced Scanner' in w.title]
     
@@ -149,8 +149,10 @@ def type_to_excel(scanned_data: Dict[str, str]):
         print("\n⚠️ Excel not found - please open Excel")
         return False
     
-    for name, value in scanned_data.items():
-        keyboard.write(value)
+    # Type data in configuration order
+    for field_name in field_order:
+        if field_name in scanned_data:
+            keyboard.write(scanned_data[field_name])
         keyboard.press_and_release('tab')
         time.sleep(0.1)
     
@@ -185,10 +187,11 @@ def main():
         config = config_manager.create_default_config(workstation_id)
         print(f"Created default config for {workstation_id}")
     
-    # Build required fields set
+    # Build required fields set and maintain order
     required_fields: Set[str] = {f.name for f in config.barcode_fields if f.required}
     optional_fields: Set[str] = {f.name for f in config.barcode_fields if not f.required}
     all_fields = required_fields | optional_fields
+    field_order = [f.name for f in config.barcode_fields]  # Maintain config order
     
     # Tracking
     scanned_data: Dict[str, str] = {}
@@ -237,17 +240,17 @@ def main():
                 if required_fields.issubset(scanned_data.keys()):
                     print("\n🎯 All required fields scanned - auto-entering to Excel...")
                     
-                    # Type to Excel
-                    if not type_to_excel(scanned_data):
+                    # Type to Excel in configured order
+                    if not type_to_excel(scanned_data, field_order):
                         continue  # Excel not found, don't save/reset
                     
-                    # Save to JSON
+                    # Save to JSON in configured order
                     output_data = {
                         "workstation_id": workstation_id,
                         "timestamp": datetime.now().isoformat(),
                         "barcodes": [
-                            {"name": name, "value": value}
-                            for name, value in scanned_data.items()
+                            {"name": name, "value": scanned_data[name]}
+                            for name in field_order if name in scanned_data
                         ]
                     }
                     
