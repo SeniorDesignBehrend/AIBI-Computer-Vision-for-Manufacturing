@@ -16,6 +16,9 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### 2. Install dependencies
 ```bash
 uv sync
+
+# For development (includes pytest)
+uv sync --extra dev
 ```
 
 ### 3. Run Scanner
@@ -104,6 +107,23 @@ Each workstation defines required barcode fields in `data/config/{workstation_id
 2. Define required barcode fields
 3. Update `workstation_id` in `advanced_scanner.py`
 4. Run scanner
+
+## Testing
+
+**Run all tests:**
+```bash
+uv run pytest
+```
+
+**Run with coverage:**
+```bash
+uv run pytest --cov=src/aibi_cv --cov-report=term-missing
+```
+
+**Test runner script:**
+```bash
+uv run python run_tests.py
+```
 
 ## Troubleshooting
 

@@ -9,6 +9,9 @@ Requires-Dist: pyzbar>=0.1.9
 Requires-Dist: numpy>=1.24.0
 Requires-Dist: keyboard>=0.13.5
 Requires-Dist: pygetwindow>=0.0.9
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
 
 # AIBI Computer Vision for Manufacturing
 
