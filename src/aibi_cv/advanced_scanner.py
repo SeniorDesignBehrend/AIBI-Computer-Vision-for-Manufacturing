@@ -226,7 +226,7 @@ def main():
         for text, box in detections:
             name, value = parse_barcode(text)
             
-            # Check cooldown
+            # Check cooldown, if the same code has been seen in the last N frames, then skip
             if name in last_seen and (frame_count - last_seen[name]) < cooldown_frames:
                 continue
             
@@ -242,6 +242,7 @@ def main():
                     
                     # Type to Excel in configured order
                     if not type_to_excel(scanned_data, field_order):
+                        print("Error: Excel not found, scan data will not be saved/reset.")
                         continue  # Excel not found, don't save/reset
                     
                     # Save to JSON in configured order
