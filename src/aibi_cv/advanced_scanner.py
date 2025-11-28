@@ -16,6 +16,9 @@ from .config_manager import ConfigManager
 
 class AdvancedScanner:
 
+    def __init__(self):
+        pass
+
     def decode_qr(img):
         """Decode QR/barcodes from `img`.
 
@@ -243,7 +246,7 @@ class AdvancedScanner:
                         
                         # Type to Excel in configured order
                         if not type_to_excel(scanned_data, field_order):
-                        print("Error: Excel not found, scan data will not be saved/reset.")
+                            print("Error: Excel not found, scan data will not be saved/reset.")
                             continue  # Excel not found, don't save/reset
                         
                         # Save to JSON in configured order
