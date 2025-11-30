@@ -62,7 +62,7 @@ class Camera:
 
         scanned_data = {}
         last_seen = {}
-        saved_items = set()
+        # saved_items removed: status will reflect only current `scanned_data`
         cooldown_frames = 30
         frame_count = 0
 
@@ -122,10 +122,8 @@ class Camera:
                             print("\nAll required fields scanned - attempting output...\n")
 
                             # Try automated Excel entry (OutputData). If not available, save JSON.
-                            try:
-                                excel_ok = self.__output.to_exel(scanned_data, field_order)
-                            except Exception:
-                                excel_ok = False
+                            if not self.__output.to_exel(scanned_data, field_order):
+                                print("Error: Excel not found, scan data will be saved in a file")
 
                             output_data = {
                                 "workstation_id": self.__workstation_id,
@@ -139,12 +137,11 @@ class Camera:
                             with open(output_file, 'w', encoding='utf-8') as f:
                                 json.dump(output_data, f, indent=2)
 
-                            print(f"✓ Saved to {output_file}")
-                            # Remember which fields were saved so they remain green
-                            saved_items.update(scanned_data.keys())
-                            scanned_data.clear()
-                            last_seen.clear()
-                            print("--- Ready for next scan ---\n")
+                                print(f"✓ Saved to {output_file}")
+                                # Clear scanned state so UI returns to waiting (red) state
+                                scanned_data.clear()
+                                last_seen.clear()
+                                print("--- Ready for next scan ---\n")
 
                     # Draw detection polygon
                     if box is not None:
@@ -161,8 +158,8 @@ class Camera:
             y_pos += 30
 
             for field in required_fields:
-                # Consider a field completed if it's scanned now or was previously saved
-                completed = (field in scanned_data) or (field in saved_items)
+                # Field is marked complete only while present in scanned_data
+                completed = (field in scanned_data)
                 status = "✓" if completed else "✗"
                 color = (0, 255, 0) if completed else (0, 0, 255)
                 cv2.putText(frame, f"{status} {field}", (10, y_pos),
@@ -181,7 +178,6 @@ class Camera:
             elif key == ord('r'):
                 scanned_data.clear()
                 last_seen.clear()
-                saved_items.clear()
                 print("\n--- Reset ---\n")
 
         cap.release()
