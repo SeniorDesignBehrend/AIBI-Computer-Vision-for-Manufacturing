@@ -31,10 +31,11 @@ class Camera:
     __decode: DecodeQr
     __parse: Parse
     __output: OutputData
-    __workstation_id: str = 'workstation_01' #Set this to the proper workstation id
+    __workstation_id: str 
     __config_manager: ConfigManager
 
-    def __init__(self):
+    def __init__(self, workstationId: str):
+        self.__workstation_id = workstationId
         self.__decode = DecodeQr()
         self.__parse = Parse()
         self.__output = OutputData(self.__workstation_id, "./output")
@@ -184,7 +185,7 @@ class Camera:
         cv2.destroyAllWindows()
 
 def main():
-    camera = Camera()
+    camera = Camera("workstation_1")
     camera.start()
 
 if __name__ == "__main__":
