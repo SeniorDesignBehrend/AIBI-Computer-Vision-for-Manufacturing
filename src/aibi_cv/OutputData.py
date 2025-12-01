@@ -1,4 +1,6 @@
 import time
+from datetime import datetime
+import json
 import keyboard
 
 try:
@@ -17,6 +19,38 @@ class OutputData:
         self.__workstation_id = workstation_id
         self.__outputDir = outputDir
 
+    def to_json(self, scanned_data: dict[str, str], field_order: list):
+        """Try to type scanned data into a JSON file. Returns True on success.
+        """
+        try:
+            output_data = {
+                "workstation_id": self.__workstation_id,
+                "timestamp": datetime.now().isoformat(),
+                "barcodes": [
+                    {"name": n, "value": scanned_data[n]}
+                    for n in field_order if n in scanned_data
+                ]
+            }
+            from pathlib import Path
+            # Ensure the output directory exists before writing the file
+            output_dir_path = Path(self.__outputDir)
+            output_dir_path.mkdir(parents=True, exist_ok=True)
+
+            output_file = output_dir_path / f"scan_{self.__workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            
+            # Create output file if it doesn't exist
+            output_file.touch(exist_ok=True)
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(output_data, f, indent=2)
+
+                print(f"✓ Saved to {output_file}")
+                # Clear scanned state so UI returns to waiting (red) state
+                return True
+        except Exception as e:
+            print(f"[OutputData] Unexpected error in to_json: {e}")
+            return False
+          
+
     def to_exel(self, scanned_data: dict[str, str], field_order: list):
         """Try to type scanned data into Excel. Returns True on success.
 
@@ -28,7 +62,7 @@ class OutputData:
         # If pygetwindow is not available, skip GUI automation and fall back
         if gw is None:
             print("[OutputData] pygetwindow not available; falling back to CSV export")
-            return self._write_csv_fallback(scanned_data, field_order)
+            return self.to_json(scanned_data, field_order)
 
         try:
             # Store current scanner window (if present)
@@ -46,7 +80,7 @@ class OutputData:
                     root.destroy()
                 except Exception:
                     pass
-                return self._write_csv_fallback(scanned_data, field_order)
+                return self.to_json(scanned_data, field_order)
 
             # Activate Excel window
             try:
@@ -55,7 +89,7 @@ class OutputData:
                 time.sleep(0.5)
             except Exception as e:
                 print(f"[OutputData] Failed to activate Excel window: {e}; falling back to CSV")
-                return self._write_csv_fallback(scanned_data, field_order)
+                return self.to_json(scanned_data, field_order)
 
             # Type data in config order
             try:
