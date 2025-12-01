@@ -1,0 +1,18 @@
+{
+  "workstation_id": "workstation_01",
+  "barcode_fields": [
+    {
+      "name": "part_number",
+      "required": true
+    },
+    {
+      "name": "serial_number",
+      "required": true
+    },
+    {
+      "name": "batch_id",
+      "required": false
+    }
+  ],
+  "camera_index": 0
+}

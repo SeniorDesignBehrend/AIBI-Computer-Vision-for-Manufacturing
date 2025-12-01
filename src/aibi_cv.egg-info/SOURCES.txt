@@ -1,5 +1,9 @@
 README.md
 pyproject.toml
+src/aibi_cv/Camera.py
+src/aibi_cv/DecodeQr.py
+src/aibi_cv/OutputData.py
+src/aibi_cv/Parse.py
 src/aibi_cv/__init__.py
 src/aibi_cv/advanced_scanner.py
 src/aibi_cv/config_manager.py
@@ -10,11 +14,9 @@ src/aibi_cv.egg-info/dependency_links.txt
 src/aibi_cv.egg-info/requires.txt
 src/aibi_cv.egg-info/top_level.txt
 tests/test_barcode_parsing.py
-tests/test_barcode_scanner.py
 tests/test_config_manager.py
 tests/test_integration.py
 tests/test_qr_detection.py
 tests/test_sanity.py
 tests/test_simple_scanner.py
 tests/test_simulation_scanner.py
-tests/test_vision_system.py

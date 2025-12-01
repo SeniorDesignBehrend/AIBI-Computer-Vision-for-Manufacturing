@@ -160,7 +160,7 @@ class Camera:
             for field in required_fields:
                 # Field is marked complete only while present in scanned_data
                 completed = (field in scanned_data)
-                status = "✓" if completed else "✗"
+                status = "Scanned" if completed else "Missing"
                 color = (0, 255, 0) if completed else (0, 0, 255)
                 cv2.putText(frame, f"{status} {field}", (10, y_pos),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
