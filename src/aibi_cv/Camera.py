@@ -125,25 +125,15 @@ class Camera:
                             # Try automated Excel entry (OutputData). If not available, save JSON.
                             if not self.__output.to_exel(scanned_data, field_order):
                                 print("Error: Excel not found, scan data will be saved in a file")
-
-                            output_data = {
-                                "workstation_id": self.__workstation_id,
-                                "timestamp": datetime.now().isoformat(),
-                                "barcodes": [
-                                    {"name": n, "value": scanned_data[n]}
-                                    for n in field_order if n in scanned_data
-                                ]
-                            }
-                            output_file = output_dir / f"scan_{self.__workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                            with open(output_file, 'w', encoding='utf-8') as f:
-                                json.dump(output_data, f, indent=2)
-
-                                print(f"✓ Saved to {output_file}")
-                                # Clear scanned state so UI returns to waiting (red) state
-                                scanned_data.clear()
-                                last_seen.clear()
-                                print("--- Ready for next scan ---\n")
-
+                                if self.__output.to_json(scanned_data, field_order):
+                                    print(f"✓ Saved to {self.output_file}")
+                                    # Clear scanned state so UI returns to waiting (red) state
+                                    scanned_data.clear()
+                                    last_seen.clear()
+                                    print("--- Ready for next scan ---\n")
+                                else:
+                                    print("Error: Failed to save scan data")
+                               
                     # Draw detection polygon
                     if box is not None:
                         try:
