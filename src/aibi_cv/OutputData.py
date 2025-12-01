@@ -32,7 +32,14 @@ class OutputData:
                 ]
             }
             from pathlib import Path
-            output_file = Path(self.__outputDir) / f"scan_{self.__workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            # Ensure the output directory exists before writing the file
+            output_dir_path = Path(self.__outputDir)
+            output_dir_path.mkdir(parents=True, exist_ok=True)
+
+            output_file = output_dir_path / f"scan_{self.__workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            
+            # Create output file if it doesn't exist
+            output_file.touch(exist_ok=True)
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(output_data, f, indent=2)
 
