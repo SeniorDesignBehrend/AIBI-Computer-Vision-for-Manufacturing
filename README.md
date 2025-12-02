@@ -110,20 +110,31 @@ Each workstation defines required barcode fields in `data/config/{workstation_id
 
 ## Testing
 
+**Run SFR compliance tests:**
+```bash
+uv run python run_sfr_tests.py --sfr-only
+```
+
 **Run all tests:**
 ```bash
-uv run pytest
+uv run python run_sfr_tests.py
 ```
 
 **Run with coverage:**
 ```bash
-uv run pytest --cov=src/aibi_cv --cov-report=term-missing
+uv run python run_sfr_tests.py --coverage
 ```
 
-**Test runner script:**
+**Legacy test runner:**
 ```bash
 uv run python run_tests.py
 ```
+
+### Test Categories
+
+- **SFR Compliance Tests** (`test_comprehensive.py`) - Full Software Functional Requirements validation
+- **Basic Tests** (`test_*.py`) - Core functionality verification
+- **Integration Tests** - End-to-end workflow validation
 
 ## Troubleshooting
 
