@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from unittest.mock import patch, MagicMock
 
-from aibi_cv.advanced_scanner import decode_qr
+from aibi_cv.advanced_scanner import AdvancedScanner
 
 
 class TestBasicQRDetection:
@@ -14,7 +14,7 @@ class TestBasicQRDetection:
     def test_empty_image_returns_empty_list(self):
         """Test QR detection on empty image returns empty list."""
         img = np.zeros((100, 100, 3), dtype=np.uint8)
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         assert results == []
 
     @patch('aibi_cv.advanced_scanner.cv2.QRCodeDetector')
@@ -28,6 +28,6 @@ class TestBasicQRDetection:
         mock_detector.detectAndDecode.side_effect = Exception("Single detection failed")
         
         img = np.ones((100, 100, 3), dtype=np.uint8) * 255
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         
         assert results == []

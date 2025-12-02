@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, mock_open
 from datetime import datetime
 
-from aibi_cv.advanced_scanner import decode_qr, parse_barcode
+from aibi_cv.advanced_scanner import AdvancedScanner
 from aibi_cv.config_manager import ConfigManager, WorkstationConfig, BarcodeField
 
 
@@ -27,7 +27,7 @@ class TestSFR1QRDetection:
         )
         
         img = np.ones((100, 100, 3), dtype=np.uint8) * 255
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         
         assert len(results) == 1
         assert results[0][0] == "test_code_1"
@@ -45,7 +45,7 @@ class TestSFR1QRDetection:
         )
         
         img = np.ones((200, 200, 3), dtype=np.uint8) * 255
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         
         assert len(results) == 3
         detected_codes = [result[0] for result in results]
@@ -57,14 +57,14 @@ class TestSFR2FieldMapping:
     
     def test_parse_colon_format(self):
         """Test mapping colon-separated format to fields."""
-        name, value = parse_barcode("part_number:PN-12345")
+        name, value = AdvancedScanner.parse_barcode("part_number:PN-12345")
         assert name == "part_number"
         assert value == "PN-12345"
     
     def test_parse_json_format(self):
         """Test mapping JSON format to fields."""
         json_data = '{"serial_number": "SN-67890"}'
-        name, value = parse_barcode(json_data)
+        name, value = AdvancedScanner.parse_barcode(json_data)
         assert name == "serial_number"
         assert value == "SN-67890"
     
@@ -80,8 +80,8 @@ class TestSFR2FieldMapping:
         )
         
         # Test that parsed fields match config expectations
-        name1, value1 = parse_barcode("part_number:PN-TEST")
-        name2, value2 = parse_barcode("serial_number:SN-TEST")
+        name1, value1 = AdvancedScanner.parse_barcode("part_number:PN-TEST")
+        name2, value2 = AdvancedScanner.parse_barcode("serial_number:SN-TEST")
         
         config_field_names = {f.name for f in config.barcode_fields}
         assert name1 in config_field_names
@@ -215,7 +215,7 @@ class TestSFR15MultiCodeDetection:
         )
         
         img = np.ones((300, 300, 3), dtype=np.uint8) * 255
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         
         # Verify all codes detected
         assert len(results) == len(all_codes)
@@ -313,7 +313,7 @@ class TestPPSR2PerformanceLatency:
         
         # Measure detection time
         start_time = time.time()
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         end_time = time.time()
         
         latency_ms = (end_time - start_time) * 1000
@@ -346,7 +346,7 @@ class TestPPSR5AccuracyMetrics:
         successes = 0
         for i in range(test_cases):
             img = np.ones((100, 100, 3), dtype=np.uint8) * 255
-            results = decode_qr(img)
+            results = AdvancedScanner.decode_qr(img)
             if results:
                 successes += 1
         

@@ -11,6 +11,7 @@ dependencies = [
     "numpy>=1.24.0",
     "keyboard>=0.13.5",
     "pygetwindow>=0.0.9",
+    "pytest>=9.0.1",
 ]
 
 [project.optional-dependencies]

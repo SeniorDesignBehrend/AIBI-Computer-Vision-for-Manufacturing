@@ -15,6 +15,7 @@ dependencies = [
     { name = "numpy" },
     { name = "opencv-python" },
     { name = "pygetwindow" },
+    { name = "pytest" },
     { name = "pyzbar" },
 ]
 
@@ -30,6 +31,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.24.0" },
     { name = "opencv-python", specifier = ">=4.12.0.88" },
     { name = "pygetwindow", specifier = ">=0.0.9" },
+    { name = "pytest", specifier = ">=9.0.1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
     { name = "pyzbar", specifier = ">=0.1.9" },

@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, mock_open
 from datetime import datetime
 
-from aibi_cv.advanced_scanner import decode_qr, parse_barcode
+from aibi_cv.advanced_scanner import AdvancedScanner
 from aibi_cv.config_manager import ConfigManager, WorkstationConfig, BarcodeField
 
 
@@ -29,7 +29,7 @@ class TestTCSFR1AUTO01:
         )
         
         img = np.ones((200, 200, 3), dtype=np.uint8) * 255
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         
         # Verify N codes returned with correct payloads
         assert len(results) == 3
@@ -58,7 +58,7 @@ class TestTCSFR2AUTO01:
         # Process mapping
         mapped_data = {}
         for qr_data in decoded_qrs:
-            name, value = parse_barcode(qr_data)
+            name, value = AdvancedScanner.parse_barcode(qr_data)
             if name in {f.name for f in config.barcode_fields}:
                 mapped_data[name] = value
         
@@ -215,7 +215,7 @@ class TestTCSFR15AUTO01:
         )
         
         img = np.ones((250, 250, 3), dtype=np.uint8) * 255
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         
         # Verify all codes decoded
         detected_codes = [result[0] for result in results]
@@ -321,7 +321,7 @@ class TestTCPPSR2AUTO01:
         
         # Simulate system load and measure latency
         start_time = time.perf_counter()
-        results = decode_qr(img)
+        results = AdvancedScanner.decode_qr(img)
         end_time = time.perf_counter()
         
         latency_ms = (end_time - start_time) * 1000
@@ -355,7 +355,7 @@ class TestTCPPSR5AUTO01:
         # Run accuracy test
         successes = 0
         for i in range(test_cases):
-            results = decode_qr(img)
+            results = AdvancedScanner.decode_qr(img)
             if results:
                 successes += 1
         
