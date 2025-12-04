@@ -11,7 +11,7 @@
     },
     {
       "name": "batch_id",
-      "required": false
+      "required": true
     }
   ],
   "camera_index": 0
