@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, Set
 
 from .config_manager import ConfigManager
-from .advanced_scanner import decode_qr, parse_barcode
+from .advanced_scanner import AdvancedScanner
 
 
 def generate_qr_image(data: str, size: int = 300) -> np.ndarray:
@@ -71,10 +71,10 @@ def main():
             qr_img = generate_qr_image(code_text)
             
             # Decode it
-            detections = decode_qr(qr_img)
+            detections = AdvancedScanner.decode_qr(qr_img)
             
             for text, _ in detections:
-                name, value = parse_barcode(text)
+                name, value = AdvancedScanner.parse_barcode(text)
                 if name and name in all_fields and name not in scanned_data:
                     scanned_data[name] = value
                     print(f"Scanned: {name} = {value}")
