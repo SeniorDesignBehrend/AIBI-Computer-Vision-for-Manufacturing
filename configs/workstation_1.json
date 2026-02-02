@@ -1,5 +1,5 @@
 {
-  "workstation_id": "workstation_01",
+  "workstation_id": "workstation_1",
   "barcode_fields": [
     {
       "name": "part_number",
@@ -11,7 +11,7 @@
     },
     {
       "name": "batch_id",
-      "required": true
+      "required": false
     }
   ],
   "camera_index": 0

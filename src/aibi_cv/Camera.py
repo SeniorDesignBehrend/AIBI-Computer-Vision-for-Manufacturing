@@ -126,13 +126,14 @@ class Camera:
                             if not self.__output.to_exel(scanned_data, field_order):
                                 print("Error: Excel not found, scan data will be saved in a file")
                                 if self.__output.to_json(scanned_data, field_order):
-                                    print(f"✓ Saved to {self.output_file}")
-                                    # Clear scanned state so UI returns to waiting (red) state
-                                    scanned_data.clear()
-                                    last_seen.clear()
-                                    print("--- Ready for next scan ---\n")
+                                    print(f"Saved to {self.output_file}")
                                 else:
                                     print("Error: Failed to save scan data")
+                            
+                            # Clear scanned state so UI returns to waiting (red) state
+                            scanned_data.clear()
+                            last_seen.clear()
+                            print("--- Ready for next scan ---\n")
                                
                     # Draw detection polygon
                     if box is not None:

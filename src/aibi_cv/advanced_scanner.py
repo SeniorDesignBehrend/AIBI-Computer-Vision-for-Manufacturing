@@ -224,11 +224,11 @@ class AdvancedScanner:
             frame_count += 1
             
             # Detect QR codes
-            detections = decode_qr(frame)
+            detections = AdvancedScanner.decode_qr(frame)
             
             # Process detections
             for text, box in detections:
-                name, value = parse_barcode(text)
+                name, value = AdvancedScanner.parse_barcode(text)
                 
                 # Check cooldown, if the same code has been seen in the last N frames, then skip
                 if name in last_seen and (frame_count - last_seen[name]) < cooldown_frames:
@@ -245,7 +245,7 @@ class AdvancedScanner:
                         print("\nAll required fields scanned - auto-entering to Excel...")
                         
                         # Type to Excel in configured order
-                        if not type_to_excel(scanned_data, field_order):
+                        if not AdvancedScanner.type_to_excel(scanned_data, field_order):
                             print("Error: Excel not found, scan data will not be saved/reset.")
                             continue  # Excel not found, don't save/reset
                         
@@ -315,4 +315,4 @@ class AdvancedScanner:
 
 
 if __name__ == "__main__":
-    main()
+    AdvancedScanner.main()

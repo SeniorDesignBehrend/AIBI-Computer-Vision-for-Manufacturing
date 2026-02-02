@@ -15,7 +15,7 @@
     },
     {
       "name": "notes",
-      "required": false
+      "required": true
     }
   ],
   "camera_index": 0
