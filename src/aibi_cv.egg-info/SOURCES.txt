@@ -13,6 +13,8 @@ src/aibi_cv.egg-info/SOURCES.txt
 src/aibi_cv.egg-info/dependency_links.txt
 src/aibi_cv.egg-info/requires.txt
 src/aibi_cv.egg-info/top_level.txt
+src/aibi_cv/step_validation/app.py
+src/aibi_cv/step_validation/dinoTest.py
 tests/test_barcode_parsing.py
 tests/test_comprehensive.py
 tests/test_config_manager.py
