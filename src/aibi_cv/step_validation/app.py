@@ -32,23 +32,64 @@ class ProcessManager:
         st.session_state.steps = []
         st.session_state.current_op_step = 0
 
-# Mocking DINOv2 for UI demonstration
-# REPLACE THIS with the actual DINOv2 model code from the previous prompt
+import torch
+import torchvision.transforms as T
+from PIL import Image
+
+# DINOv2 Model Setup
+@st.cache_resource
+def load_dinov2_model():
+    model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+    model.eval()
+    return model
+
+# Image preprocessing for DINOv2
+transform = T.Compose([
+    T.Resize(256, interpolation=T.InterpolationMode.BICUBIC),
+    T.CenterCrop(224),
+    T.ToTensor(),
+    T.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+])
+
 def get_embedding(frame):
-    # Returns a random vector to simulate an embedding
-    return np.random.rand(384).astype(np.float32) 
+    """Extract DINOv2 embedding from frame."""
+    model = load_dinov2_model()
+    
+    # Convert BGR to RGB and to PIL
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    pil_image = Image.fromarray(frame_rgb)
+    
+    # Preprocess and get embedding
+    with torch.no_grad():
+        img_tensor = transform(pil_image).unsqueeze(0)
+        embedding = model(img_tensor)
+        return embedding.squeeze().cpu().numpy() 
 
 def calculate_similarity(embedding, steps):
-    # Mock classification logic
-    # In reality: Compare 'embedding' to step.centroids using Cosine Similarity
-    # Returns: Index of the detected step, Confidence Score
-    import random
-    if not steps: return -1, 0.0
+    """Compare embedding to stored step centroids using cosine similarity."""
+    if not steps:
+        return -1, 0.0
     
-    # Simulate finding a step randomly
-    detected_idx = random.randint(0, len(steps) - 1)
-    confidence = random.uniform(0.7, 0.99)
-    return detected_idx, confidence
+    best_match_idx = -1
+    best_similarity = 0.0
+    
+    for i, step in enumerate(steps):
+        if not step.centroids:
+            continue
+            
+        # Calculate average centroid for this step
+        step_centroid = np.mean(step.centroids, axis=0)
+        
+        # Cosine similarity
+        similarity = np.dot(embedding, step_centroid) / (
+            np.linalg.norm(embedding) * np.linalg.norm(step_centroid)
+        )
+        
+        if similarity > best_similarity:
+            best_similarity = similarity
+            best_match_idx = i
+    
+    return best_match_idx, best_similarity
 
 # --- 2. The User Interface ---
 
