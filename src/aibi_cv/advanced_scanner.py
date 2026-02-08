@@ -132,46 +132,65 @@ class AdvancedScanner:
         return None, data
 
 
-    def type_to_excel(scanned_data: Dict[str, str], field_order: list):
-        """Type scanned data into Excel using keyboard simulation in configured order."""
+    def type_to_excel(scanned_data: Dict[str, str], field_order: list | None = None, append_key: str = "TAB"):
+        """Type scanned data into Excel. `field_order` optional; `append_key` is TAB|ENTER|NONE."""
         # Store current scanner window
         scanner_windows = [w for w in gw.getAllWindows() if 'Advanced Scanner' in w.title]
-        
+
         # Find Excel window
         excel_windows = [w for w in gw.getAllWindows() if 'excel' in w.title.lower()]
-        
+
         if excel_windows:
             excel_windows[0].activate()
             print("\n✓ Switched to Excel")
             time.sleep(0.5)
         else:
             # Show popup window
-            root = tk.Tk()
-            root.withdraw()  # Hide main window
-            messagebox.showerror("Excel Not Found", "Please open Excel and try again.")
-            root.destroy()
+            try:
+                root = tk.Tk()
+                root.withdraw()  # Hide main window
+                messagebox.showerror("Excel Not Found", "Please open Excel and try again.")
+                root.destroy()
+            except Exception:
+                pass
             print("\n⚠️ Excel not found - please open Excel")
             return False
-        
+
+        keys = field_order if field_order is not None else list(scanned_data.keys())
+        append_map = {"TAB": "tab", "ENTER": "enter", "NONE": None}
+        mapped = append_map.get((append_key or "").upper(), "tab")
+
         # Type data in configuration order
-        for field_name in field_order:
-            if field_name in scanned_data:
-                keyboard.write(scanned_data[field_name])
-            keyboard.press_and_release('tab')
-            time.sleep(0.1)
-        
-        keyboard.press_and_release('enter')
-        print("✓ Data typed into Excel")
-        
+        try:
+            for name in keys:
+                if name in scanned_data:
+                    keyboard.write(str(scanned_data[name]))
+                if mapped:
+                    keyboard.press_and_release(mapped)
+                time.sleep(0.1)
+
+            try:
+                keyboard.press_and_release('enter')
+            except Exception:
+                pass
+            print("✓ Data typed into Excel")
+        except Exception as e:
+            print(f"Error typing to Excel: {e}")
+
         # Switch back to scanner
         time.sleep(0.5)
         if scanner_windows:
-            scanner_windows[0].activate()
-            print("✓ Switched back to scanner")
+            try:
+                scanner_windows[0].activate()
+                print("✓ Switched back to scanner")
+            except Exception:
+                pass
         else:
-            # Fallback: try to activate OpenCV window
-            cv2.setWindowProperty('Advanced Scanner', cv2.WND_PROP_TOPMOST, 1)
-            cv2.setWindowProperty('Advanced Scanner', cv2.WND_PROP_TOPMOST, 0)
+            try:
+                cv2.setWindowProperty('Advanced Scanner', cv2.WND_PROP_TOPMOST, 1)
+                cv2.setWindowProperty('Advanced Scanner', cv2.WND_PROP_TOPMOST, 0)
+            except Exception:
+                pass
         return True
 
 
@@ -191,11 +210,11 @@ class AdvancedScanner:
             config = config_manager.create_default_config(workstation_id)
             print(f"Created default config for {workstation_id}")
         
-        # Build required fields set and maintain order
-        required_fields: Set[str] = {f.name for f in config.barcode_fields if f.required}
-        optional_fields: Set[str] = {f.name for f in config.barcode_fields if not f.required}
-        all_fields = required_fields | optional_fields
-        field_order = [f.name for f in config.barcode_fields]  # Maintain config order
+        # New config shape: use expected_qr_count, scan_direction, append_key
+        expected_qr_count = getattr(config, 'expected_qr_count', None)
+        scan_direction = getattr(config, 'scan_direction', 'any')
+        append_key = getattr(config, 'append_key', 'TAB')
+        field_order = None
         
         # Tracking
         scanned_data: Dict[str, str] = {}
@@ -210,8 +229,9 @@ class AdvancedScanner:
             return
         
         print(f"=== Advanced Scanner - {workstation_id} ===")
-        print(f"Required fields: {', '.join(required_fields)}")
-        print(f"Optional fields: {', '.join(optional_fields)}")
+        print(f"Expected QR count: {expected_qr_count}")
+        print(f"Scan direction: {scan_direction}")
+        print(f"Append key: {append_key}")
         print("\nFormat barcodes as: field_name:value")
         print("Data will auto-enter to Excel when all required fields are scanned")
         print("Press 'r' to reset, 'q' to quit\n")
@@ -226,47 +246,82 @@ class AdvancedScanner:
             # Detect QR codes
             detections = AdvancedScanner.decode_qr(frame)
             
-            # Process detections
-            for text, box in detections:
+            # Process detections (apply ordering later)
+            sorted_detections = detections
+            # centroid helper
+            def _centroid(box):
+                try:
+                    import numpy as _np
+                    pts = _np.array(box, dtype=float)
+                    cx = pts[:, 0].mean()
+                    cy = pts[:, 1].mean()
+                    return cx, cy
+                except Exception:
+                    return None, None
+
+            if scan_direction and scan_direction != 'any':
+                def _sort_key(item):
+                    _, box = item
+                    cx, cy = _centroid(box)
+                    if cx is None:
+                        return (float('inf'), float('inf'))
+                    if scan_direction in ('row-major', 'left-to-right-down'):
+                        return (cy, cx)
+                    if scan_direction == 'right-to-left-down':
+                        return (cy, -cx)
+                    if scan_direction in ('column-major', 'top-to-bottom-left-to-right'):
+                        return (cx, cy)
+                    if scan_direction == 'left-to-right':
+                        return cx
+                    if scan_direction == 'right-to-left':
+                        return -cx
+                    if scan_direction == 'top-to-bottom':
+                        return cy
+                    if scan_direction == 'bottom-to-top':
+                        return -cy
+                    return (cy, cx)
+
+                try:
+                    sorted_detections = sorted(detections, key=_sort_key)
+                except Exception:
+                    sorted_detections = detections
+
+            for idx, (text, box) in enumerate(sorted_detections, start=1):
                 name, value = AdvancedScanner.parse_barcode(text)
-                
-                # Check cooldown, if the same code has been seen in the last N frames, then skip
-                if name in last_seen and (frame_count - last_seen[name]) < cooldown_frames:
+                key = name if name else f"raw_{idx}"
+                if key in last_seen and (frame_count - last_seen[key]) < cooldown_frames:
                     continue
-                
-                # Only track barcodes in our field list
-                if name and name in all_fields and name not in scanned_data:
-                    scanned_data[name] = value
-                    last_seen[name] = frame_count
-                    print(f"✓ Scanned: {name} = {value}")
-                    
-                    # Check if all required fields are now complete
-                    if required_fields.issubset(scanned_data.keys()):
-                        print("\nAll required fields scanned - auto-entering to Excel...")
-                        
-                        # Type to Excel in configured order
-                        if not AdvancedScanner.type_to_excel(scanned_data, field_order):
-                            print("Error: Excel not found, scan data will not be saved/reset.")
-                            continue  # Excel not found, don't save/reset
-                        
-                        # Save to JSON in configured order
-                        output_data = {
-                            "workstation_id": workstation_id,
-                            "timestamp": datetime.now().isoformat(),
-                            "barcodes": [
-                                {"name": name, "value": scanned_data[name]}
-                                for name in field_order if name in scanned_data
-                            ]
-                        }
-                        
-                        output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                        with open(output_file, 'w') as f:
-                            json.dump(output_data, f, indent=2)
-                        
-                        print(f"✓ Saved to {output_file}")
-                        scanned_data.clear()
-                        last_seen.clear()
-                        print("--- Ready for next scan ---\n")
+                if key not in scanned_data:
+                    scanned_data[key] = value
+                    last_seen[key] = frame_count
+                    print(f"✓ Scanned: {key} = {value}")
+
+                    # decide how many needed
+                    try:
+                        need = int(expected_qr_count) if expected_qr_count else 1
+                    except Exception:
+                        need = 1
+
+                    if len(scanned_data) >= need:
+                        print("\nExpected QR count reached - auto-entering...\n")
+                        # try to type to excel
+                        ok = AdvancedScanner.type_to_excel(scanned_data, field_order, append_key)
+                        if not ok:
+                            # fallback to JSON
+                            output_data = {
+                                "workstation_id": workstation_id,
+                                "timestamp": datetime.now().isoformat(),
+                                "barcodes": [
+                                    {"name": k, "value": scanned_data[k]} for k in list(scanned_data.keys())
+                                ]
+                            }
+                            output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                            with open(output_file, 'w') as f:
+                                json.dump(output_data, f, indent=2)
+                            print(f"✓ Saved to {output_file}")
+                            scanned_data.clear()
+                            last_seen.clear()
+                            print("--- Ready for next scan ---\n")
                 
                 # Draw on frame
                 if box is not None:
