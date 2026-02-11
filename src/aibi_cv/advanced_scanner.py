@@ -5,7 +5,7 @@ import cv2
 import json
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Set
+from typing import Dict, Set, List, Optional
 import keyboard
 import time
 import pygetwindow as gw
@@ -132,8 +132,12 @@ class AdvancedScanner:
         return None, data
 
 
-    def type_to_excel(scanned_data: Dict[str, str], field_order: list | None = None, append_key: str = "TAB"):
-        """Type scanned data into Excel. `field_order` optional; `append_key` is TAB|ENTER|NONE."""
+    def type_to_excel(scanned_data, field_order: list | None = None, append_key: str = "TAB"):
+        """Type scanned data into Excel.
+
+        `scanned_data` may be either a dict mapping field->value or a list of
+        scanned items [{'name':..., 'value':...}]. `field_order` optional; `append_key` is TAB|ENTER|NONE.
+        """
         # Store current scanner window
         scanner_windows = [w for w in gw.getAllWindows() if 'Advanced Scanner' in w.title]
 
@@ -156,15 +160,36 @@ class AdvancedScanner:
             print("\n⚠️ Excel not found - please open Excel")
             return False
 
-        keys = field_order if field_order is not None else list(scanned_data.keys())
+        # Normalize scanned_data to ordered keys and values
+        if isinstance(scanned_data, dict):
+            keys = field_order if field_order is not None else list(scanned_data.keys())
+            values = [scanned_data.get(k) for k in keys]
+        else:
+            # assume list of items
+            items = list(scanned_data)
+            if field_order:
+                # map by name if names are present
+                values = []
+                for name in field_order:
+                    for itm in items:
+                        if itm.get('name') == name:
+                            values.append(itm.get('value'))
+                            break
+                # fill remaining with unnamed values
+                for itm in items:
+                    if itm.get('name') is None:
+                        values.append(itm.get('value'))
+            else:
+                values = [itm.get('value') for itm in items]
         append_map = {"TAB": "tab", "ENTER": "enter", "NONE": None}
         mapped = append_map.get((append_key or "").upper(), "tab")
 
         # Type data in configuration order
         try:
-            for name in keys:
-                if name in scanned_data:
-                    keyboard.write(str(scanned_data[name]))
+            for v in values:
+                if v is None:
+                    continue
+                keyboard.write(str(v))
                 if mapped:
                     keyboard.press_and_release(mapped)
                 time.sleep(0.1)
@@ -202,7 +227,7 @@ class AdvancedScanner:
         output_dir.mkdir(exist_ok=True)
         
         # Load workstation config
-        workstation_id = "workstation_01"
+        workstation_id = "workstation_11"
         config_manager = ConfigManager(config_dir)
         config = config_manager.get_config(workstation_id)
         
@@ -215,15 +240,46 @@ class AdvancedScanner:
         scan_direction = getattr(config, 'scan_direction', 'any')
         append_key = getattr(config, 'append_key', 'TAB')
         field_order = None
+
+        # Fallback: also check top-level `configs/` directory and prefer values there
+        try:
+            fallback_cfg = project_root / "configs" / f"{workstation_id}.json"
+            if fallback_cfg.exists():
+                with open(fallback_cfg, 'r') as f:
+                    fb = json.load(f)
+                    if fb.get('expected_qr_count') is not None:
+                        expected_qr_count = fb.get('expected_qr_count')
+                        print(f"Using expected_qr_count from {fallback_cfg}")
+                    if fb.get('scan_direction') is not None:
+                        scan_direction = fb.get('scan_direction')
+                        print(f"Using scan_direction from {fallback_cfg}: {scan_direction}")
+                    if fb.get('append_key') is not None:
+                        append_key = fb.get('append_key')
+                        print(f"Using append_key from {fallback_cfg}: {append_key}")
+                    # camera_index fallback
+                    if fb.get('camera_index') is not None:
+                        camera_index = fb.get('camera_index')
+                    else:
+                        camera_index = getattr(config, 'camera_index', 0)
+            else:
+                camera_index = getattr(config, 'camera_index', 0)
+        except Exception:
+            camera_index = getattr(config, 'camera_index', 0)
+
+        # Determine how many QRs are required for a complete scan
+        try:
+            need = int(expected_qr_count) if expected_qr_count is not None else 1
+        except Exception:
+            need = 1
         
         # Tracking
-        scanned_data: Dict[str, str] = {}
-        last_seen: Dict[str, int] = {}  # Track when each code was last seen
+        scanned_items: List[Dict[str, Optional[str]]] = []  # ordered list of scanned items: {'name':..., 'value':..., 'text':...}
+        last_seen: Dict[str, int] = {}  # Track when each raw text was last seen
         cooldown_frames = 30  # Ignore same code for 30 frames (~1 second)
         frame_count = 0
         
         # Open camera
-        cap = cv2.VideoCapture(config.camera_index)
+        cap = cv2.VideoCapture(camera_index)
         if not cap.isOpened():
             print("Error: Could not open camera")
             return
@@ -288,38 +344,38 @@ class AdvancedScanner:
 
             for idx, (text, box) in enumerate(sorted_detections, start=1):
                 name, value = AdvancedScanner.parse_barcode(text)
-                key = name if name else f"raw_{idx}"
-                if key in last_seen and (frame_count - last_seen[key]) < cooldown_frames:
+                raw_text = text if isinstance(text, str) else str(text)
+
+                # cooldown based on raw_text
+                if raw_text in last_seen and (frame_count - last_seen[raw_text]) < cooldown_frames:
                     continue
-                if key not in scanned_data:
-                    scanned_data[key] = value
-                    last_seen[key] = frame_count
-                    print(f"✓ Scanned: {key} = {value}")
 
-                    # decide how many needed
-                    try:
-                        need = int(expected_qr_count) if expected_qr_count else 1
-                    except Exception:
-                        need = 1
+                # avoid adding duplicates (same raw_text)
+                if not any(item.get('text') == raw_text for item in scanned_items):
+                    scanned_items.append({'name': name, 'value': value, 'text': raw_text})
+                    last_seen[raw_text] = frame_count
+                    display_key = name if name else value
+                    print(f"✓ Scanned: {display_key} = {value}")
 
-                    if len(scanned_data) >= need:
+                    # auto-enter when we have enough items
+                    if len(scanned_items) >= need:
                         print("\nExpected QR count reached - auto-entering...\n")
                         # try to type to excel
-                        ok = AdvancedScanner.type_to_excel(scanned_data, field_order, append_key)
+                        ok = AdvancedScanner.type_to_excel(scanned_items, field_order, append_key)
                         if not ok:
                             # fallback to JSON
                             output_data = {
                                 "workstation_id": workstation_id,
                                 "timestamp": datetime.now().isoformat(),
                                 "barcodes": [
-                                    {"name": k, "value": scanned_data[k]} for k in list(scanned_data.keys())
+                                    {"name": itm.get('name'), "value": itm.get('value')} for itm in list(scanned_items)
                                 ]
                             }
                             output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
                             with open(output_file, 'w') as f:
                                 json.dump(output_data, f, indent=2)
                             print(f"✓ Saved to {output_file}")
-                            scanned_data.clear()
+                            scanned_items.clear()
                             last_seen.clear()
                             print("--- Ready for next scan ---\n")
                 
@@ -328,41 +384,68 @@ class AdvancedScanner:
                     pts = box.astype(int)
                     cv2.polylines(frame, [pts], True, (0, 255, 0), 2)
             
-            # Check completion
-            scanned_required = required_fields & scanned_data.keys()
-            missing_required = required_fields - scanned_data.keys()
+            # Check completion: require `need` number of scanned items
+            missing_required = len(scanned_items) < need
             
             # Display status
             y_pos = 30
             cv2.putText(frame, f"Workstation: {workstation_id}", (10, y_pos),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
             y_pos += 30
-            
-            for field in required_fields:
-                if field in scanned_data:
-                    display_text = f"✓ {field}: {scanned_data[field]}"
-                    color = (0, 255, 0)
+
+            # Display scanned vs needed count
+            scanned_count = len(scanned_items)
+            cv2.putText(frame, f"Scanned: {scanned_count} / Needed: {need}", (10, y_pos),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 0), 2)
+            y_pos += 30
+            # Display scanned items (show up to `need` entries)
+            for i in range(need):
+                if i < len(scanned_items):
+                    itm = scanned_items[i]
+                    if itm.get('name'):
+                        display_text = f"✓ {itm.get('name')}: {itm.get('value')}"
+                        color = (0, 255, 0)
+                    else:
+                        display_text = f"✓ {itm.get('value')}"
+                        color = (0, 255, 0)
                 else:
-                    display_text = f"✗ {field}"
+                    display_text = f"✗ slot {i+1}"
                     color = (0, 0, 255)
                 cv2.putText(frame, display_text, (10, y_pos),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
                 y_pos += 25
-            
+
             if not missing_required:
                 cv2.putText(frame, "AUTO-ENTERING TO EXCEL...", (10, y_pos),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             
             cv2.imshow('Advanced Scanner', frame)
             
-            # Handle keys
+            # Handle keys and window close. Use both OpenCV key and keyboard fallback
+            # so 'q' works even if the OpenCV window isn't focused.
             key = cv2.waitKey(1) & 0xFF
+            # If OpenCV reports window closed, exit loop
+            try:
+                if cv2.getWindowProperty('Advanced Scanner', cv2.WND_PROP_VISIBLE) < 1:
+                    break
+            except Exception:
+                pass
+
+            # Primary quit via OpenCV key
             if key == ord('q'):
                 break
             elif key == ord('r'):
-                scanned_data.clear()
+                scanned_items.clear()
                 last_seen.clear()
                 print("\n--- Reset ---\n")
+
+            # Fallback: check global keyboard state (non-blocking)
+            try:
+                if keyboard.is_pressed('q'):
+                    break
+            except Exception:
+                # keyboard may require elevated permissions, ignore if unavailable
+                pass
 
         
         cap.release()

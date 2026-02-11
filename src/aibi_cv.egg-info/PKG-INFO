@@ -56,6 +56,11 @@ Press 's' to save (when complete), 'r' to reset, 'q' to quit.
 uv run python -m aibi_cv.simulation_scanner
 ```
 
+**Camera File** - Tracks required barcodes per workstation:
+```bash
+uv run python -m aibi_cv.Camera
+```
+
 ## Barcode Format
 
 Format barcodes as: `field_name:value`
