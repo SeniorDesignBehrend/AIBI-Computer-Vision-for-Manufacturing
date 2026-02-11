@@ -12,6 +12,7 @@ Requires-Dist: pygetwindow>=0.0.9
 Requires-Dist: pytest>=9.0.1
 Requires-Dist: transformers>=5.0.0
 Requires-Dist: torch>=2.10.0
+Requires-Dist: torchvision>=0.15.0
 Requires-Dist: pillow>=12.1.0
 Requires-Dist: streamlit>=1.53.1
 Provides-Extra: dev

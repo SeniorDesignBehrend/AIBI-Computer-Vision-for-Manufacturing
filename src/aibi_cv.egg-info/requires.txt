@@ -6,6 +6,7 @@ pygetwindow>=0.0.9
 pytest>=9.0.1
 transformers>=5.0.0
 torch>=2.10.0
+torchvision>=0.15.0
 pillow>=12.1.0
 streamlit>=1.53.1
 
