@@ -346,42 +346,47 @@ class AdvancedScanner:
                 # keep original detection order until enough codes are visible
                 sorted_detections = detections
 
-            for idx, (text, box) in enumerate(sorted_detections, start=1):
-                name, value = AdvancedScanner.parse_barcode(text)
-                raw_text = text if isinstance(text, str) else str(text)
+            # Only register scans when enough codes are visible in the same frame
+            if len(detections) >= need:
+                for idx, (text, box) in enumerate(sorted_detections, start=1):
+                    name, value = AdvancedScanner.parse_barcode(text)
+                    raw_text = text if isinstance(text, str) else str(text)
 
-                # cooldown based on raw_text
-                if raw_text in last_seen and (frame_count - last_seen[raw_text]) < cooldown_frames:
-                    continue
+                    # cooldown based on raw_text
+                    if raw_text in last_seen and (frame_count - last_seen[raw_text]) < cooldown_frames:
+                        continue
 
-                # avoid adding duplicates (same raw_text)
-                if not any(item.get('text') == raw_text for item in scanned_items):
-                    scanned_items.append({'name': name, 'value': value, 'text': raw_text})
-                    last_seen[raw_text] = frame_count
-                    display_key = name if name else value
-                    print(f"✓ Scanned: {display_key} = {value}")
+                    # avoid adding duplicates (same raw_text)
+                    if not any(item.get('text') == raw_text for item in scanned_items):
+                        scanned_items.append({'name': name, 'value': value, 'text': raw_text})
+                        last_seen[raw_text] = frame_count
+                        display_key = name if name else value
+                        print(f"✓ Scanned: {display_key} = {value}")
 
-                    # auto-enter when we have enough items
-                    if len(scanned_items) >= need:
-                        print("\nExpected QR count reached - auto-entering...\n")
-                        # try to type to excel
-                        ok = AdvancedScanner.type_to_excel(scanned_items, field_order, append_key)
-                        if not ok:
-                            # fallback to JSON
-                            output_data = {
-                                "workstation_id": workstation_id,
-                                "timestamp": datetime.now().isoformat(),
-                                "barcodes": [
-                                    {"name": itm.get('name'), "value": itm.get('value')} for itm in list(scanned_items)
-                                ]
-                            }
-                            output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                            with open(output_file, 'w') as f:
-                                json.dump(output_data, f, indent=2)
-                            print(f"✓ Saved to {output_file}")
-                            scanned_items.clear()
-                            last_seen.clear()
-                            print("--- Ready for next scan ---\n")
+                        # auto-enter when we have enough items
+                        if len(scanned_items) >= need:
+                            print("\nExpected QR count reached - auto-entering...\n")
+                            # try to type to excel
+                            ok = AdvancedScanner.type_to_excel(scanned_items, field_order, append_key)
+                            if not ok:
+                                # fallback to JSON
+                                output_data = {
+                                    "workstation_id": workstation_id,
+                                    "timestamp": datetime.now().isoformat(),
+                                    "barcodes": [
+                                        {"name": itm.get('name'), "value": itm.get('value')} for itm in list(scanned_items)
+                                    ]
+                                }
+                                output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                                with open(output_file, 'w') as f:
+                                    json.dump(output_data, f, indent=2)
+                                print(f"✓ Saved to {output_file}")
+                                scanned_items.clear()
+                                last_seen.clear()
+                                print("--- Ready for next scan ---\n")
+            else:
+                # Not enough codes in-frame to register scans yet
+                pass
                 
                 # Draw on frame
                 if box is not None:
