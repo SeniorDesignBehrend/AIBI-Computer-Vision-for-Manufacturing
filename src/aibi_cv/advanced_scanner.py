@@ -450,6 +450,36 @@ class AdvancedScanner:
                     except Exception:
                         pass
             
+            # Visualize directional mapping overlay
+            if len(sorted_detections) > 1:
+                try:
+                    import numpy as np
+                    # Draw arrows showing scan direction
+                    centroids = []
+                    for _, box in sorted_detections:
+                        if box is not None:
+                            cx = int(box[:, 0].mean())
+                            cy = int(box[:, 1].mean())
+                            centroids.append((cx, cy))
+                    
+                    # Draw arrows between consecutive centroids
+                    for i in range(len(centroids) - 1):
+                        pt1 = centroids[i]
+                        pt2 = centroids[i + 1]
+                        cv2.arrowedLine(frame, pt1, pt2, (255, 0, 255), 3, tipLength=0.3)
+                        # Draw order number
+                        cv2.circle(frame, pt1, 20, (255, 0, 255), 2)
+                        cv2.putText(frame, str(i+1), (pt1[0]-8, pt1[1]+8),
+                                  cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
+                    # Draw last number
+                    if centroids:
+                        last_pt = centroids[-1]
+                        cv2.circle(frame, last_pt, 20, (255, 0, 255), 2)
+                        cv2.putText(frame, str(len(centroids)), (last_pt[0]-8, last_pt[1]+8),
+                                  cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
+                except Exception:
+                    pass
+            
             # Check completion: require `need` number of scanned items
             missing_required = len(scanned_items) < need
             
