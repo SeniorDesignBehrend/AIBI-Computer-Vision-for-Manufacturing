@@ -145,9 +145,14 @@ class AdvancedScanner:
         excel_windows = [w for w in gw.getAllWindows() if 'excel' in w.title.lower()]
 
         if excel_windows:
-            excel_windows[0].activate()
-            print("\n✓ Switched to Excel")
-            time.sleep(0.5)
+            try:
+                excel_windows[0].activate()
+                print("\n✓ Switched to Excel")
+                time.sleep(0.5)
+            except Exception as e:
+                # pygetwindow can throw errors even on success, continue anyway
+                print("\n✓ Switching to Excel...")
+                time.sleep(0.5)
         else:
             # Show popup window
             try:
@@ -289,7 +294,7 @@ class AdvancedScanner:
         print(f"Scan direction: {scan_direction}")
         print(f"Append key: {append_key}")
         print("\nFormat barcodes as: field_name:value")
-        print("Camera will freeze when all codes detected - press ENTER to continue")
+        print("Data will auto-enter to Excel, then freeze for confirmation")
         print("Press 'r' to reset, 'q' to quit\n")
         
         while True:
@@ -495,25 +500,9 @@ class AdvancedScanner:
             
             cv2.imshow('Advanced Scanner', frame)
             
-            # Freeze and wait when we have enough items (after all drawing is done)
+            # Auto-enter and freeze when we have enough items (after all drawing is done)
             if len(scanned_items) >= need:
-                print("\n✓ All codes detected - FREEZING frame")
-                frozen_frame = frame.copy()
-                cv2.putText(frozen_frame, "ALL CODES DETECTED - Press ENTER to continue", (10, frame.shape[0] - 20),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-                cv2.imshow('Advanced Scanner', frozen_frame)
-                print("Press ENTER to auto-enter data...\n")
-                
-                while True:
-                    freeze_key = cv2.waitKey(100) & 0xFF
-                    if freeze_key == 13:  # Enter key
-                        break
-                    elif freeze_key == ord('q'):
-                        cap.release()
-                        cv2.destroyAllWindows()
-                        return
-                
-                print("Auto-entering data...\n")
+                print("\n✓ All codes detected - Auto-entering to Excel...")
                 ok = AdvancedScanner.type_to_excel(scanned_items, field_order, append_key)
                 if not ok:
                     output_data = {
@@ -527,6 +516,23 @@ class AdvancedScanner:
                     with open(output_file, 'w') as f:
                         json.dump(output_data, f, indent=2)
                     print(f"✓ Saved to {output_file}")
+                
+                # Show freeze frame after data entry
+                frozen_frame = frame.copy()
+                cv2.putText(frozen_frame, "DATA ENTERED - Press ENTER for next scan", (10, frame.shape[0] - 20),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+                cv2.imshow('Advanced Scanner', frozen_frame)
+                print("\nPress ENTER to scan next set of codes...\n")
+                
+                while True:
+                    freeze_key = cv2.waitKey(100) & 0xFF
+                    if freeze_key == 13:  # Enter key
+                        break
+                    elif freeze_key == ord('q'):
+                        cap.release()
+                        cv2.destroyAllWindows()
+                        return
+                
                 scanned_items.clear()
                 last_seen.clear()
                 print("--- Ready for next scan ---\n")
