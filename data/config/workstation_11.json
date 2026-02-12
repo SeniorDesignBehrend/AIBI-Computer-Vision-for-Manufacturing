@@ -1,7 +1,7 @@
 {
   "workstation_id": "workstation_11",
-  "expected_qr_count": null,
-  "scan_direction": "any",
-  "append_key": "TAB",
+  "expected_qr_count": 6,
+  "scan_direction": "right-to-left-down",
+  "append_key": "None",
   "camera_index": 0
 }
