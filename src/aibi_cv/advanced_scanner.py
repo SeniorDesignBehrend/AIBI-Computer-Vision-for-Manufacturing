@@ -289,7 +289,7 @@ class AdvancedScanner:
         print(f"Scan direction: {scan_direction}")
         print(f"Append key: {append_key}")
         print("\nFormat barcodes as: field_name:value")
-        print("Data will auto-enter to Excel when all required fields are scanned")
+        print("Camera will freeze when all codes detected - press ENTER to continue")
         print("Press 'r' to reset, 'q' to quit\n")
         
         while True:
@@ -415,28 +415,6 @@ class AdvancedScanner:
                         last_seen[raw_text] = frame_count
                         display_key = name if name else value
                         print(f"✓ Scanned: {display_key} = {value}")
-
-                        # auto-enter when we have enough items
-                        if len(scanned_items) >= need:
-                            print("\nExpected QR count reached - auto-entering...\n")
-                            # try to type to excel
-                            ok = AdvancedScanner.type_to_excel(scanned_items, field_order, append_key)
-                            if not ok:
-                                # fallback to JSON
-                                output_data = {
-                                    "workstation_id": workstation_id,
-                                    "timestamp": datetime.now().isoformat(),
-                                    "barcodes": [
-                                        {"name": itm.get('name'), "value": itm.get('value')} for itm in list(scanned_items)
-                                    ]
-                                }
-                                output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                                with open(output_file, 'w') as f:
-                                    json.dump(output_data, f, indent=2)
-                                print(f"✓ Saved to {output_file}")
-                                scanned_items.clear()
-                                last_seen.clear()
-                                print("--- Ready for next scan ---\n")
             else:
                 # Not enough codes in-frame to register scans yet
                 pass
@@ -517,8 +495,43 @@ class AdvancedScanner:
             
             cv2.imshow('Advanced Scanner', frame)
             
-            # Handle keys and window close. Use both OpenCV key and keyboard fallback
-            # so 'q' works even if the OpenCV window isn't focused.
+            # Freeze and wait when we have enough items (after all drawing is done)
+            if len(scanned_items) >= need:
+                print("\n✓ All codes detected - FREEZING frame")
+                frozen_frame = frame.copy()
+                cv2.putText(frozen_frame, "ALL CODES DETECTED - Press ENTER to continue", (10, frame.shape[0] - 20),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+                cv2.imshow('Advanced Scanner', frozen_frame)
+                print("Press ENTER to auto-enter data...\n")
+                
+                while True:
+                    freeze_key = cv2.waitKey(100) & 0xFF
+                    if freeze_key == 13:  # Enter key
+                        break
+                    elif freeze_key == ord('q'):
+                        cap.release()
+                        cv2.destroyAllWindows()
+                        return
+                
+                print("Auto-entering data...\n")
+                ok = AdvancedScanner.type_to_excel(scanned_items, field_order, append_key)
+                if not ok:
+                    output_data = {
+                        "workstation_id": workstation_id,
+                        "timestamp": datetime.now().isoformat(),
+                        "barcodes": [
+                            {"name": itm.get('name'), "value": itm.get('value')} for itm in list(scanned_items)
+                        ]
+                    }
+                    output_file = output_dir / f"scan_{workstation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                    with open(output_file, 'w') as f:
+                        json.dump(output_data, f, indent=2)
+                    print(f"✓ Saved to {output_file}")
+                scanned_items.clear()
+                last_seen.clear()
+                print("--- Ready for next scan ---\n")
+            
+            # Handle keys and window close
             key = cv2.waitKey(1) & 0xFF
             # If OpenCV reports window closed, exit loop
             try:
