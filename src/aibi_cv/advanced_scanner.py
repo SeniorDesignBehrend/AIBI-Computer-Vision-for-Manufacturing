@@ -315,7 +315,8 @@ class AdvancedScanner:
                 except Exception:
                     return None, None
 
-            if scan_direction and scan_direction != 'any':
+            # Only apply directional ordering once we have enough detections in-frame
+            if scan_direction and scan_direction != 'any' and len(detections) >= need:
                 def _sort_key(item):
                     _, box = item
                     cx, cy = _centroid(box)
@@ -341,6 +342,9 @@ class AdvancedScanner:
                     sorted_detections = sorted(detections, key=_sort_key)
                 except Exception:
                     sorted_detections = detections
+            else:
+                # keep original detection order until enough codes are visible
+                sorted_detections = detections
 
             for idx, (text, box) in enumerate(sorted_detections, start=1):
                 name, value = AdvancedScanner.parse_barcode(text)
