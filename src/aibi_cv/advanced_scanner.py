@@ -317,29 +317,82 @@ class AdvancedScanner:
 
             # Only apply directional ordering once we have enough detections in-frame
             if scan_direction and scan_direction != 'any' and len(detections) >= need:
-                def _sort_key(item):
-                    _, box = item
-                    cx, cy = _centroid(box)
-                    if cx is None:
-                        return (float('inf'), float('inf'))
-                    if scan_direction in ('row-major', 'left-to-right-down'):
-                        return (cy, cx)
-                    if scan_direction == 'right-to-left-down':
-                        return (cy, -cx)
-                    if scan_direction in ('column-major', 'top-to-bottom-left-to-right'):
-                        return (cx, cy)
-                    if scan_direction == 'left-to-right':
-                        return cx
-                    if scan_direction == 'right-to-left':
-                        return -cx
-                    if scan_direction == 'top-to-bottom':
-                        return cy
-                    if scan_direction == 'bottom-to-top':
-                        return -cy
-                    return (cy, cx)
-
                 try:
-                    sorted_detections = sorted(detections, key=_sort_key)
+                    import numpy as _np
+
+                    # compute centroids for all detections
+                    centroids = []
+                    for item in detections:
+                        _, box = item
+                        cx, cy = _centroid(box)
+                        centroids.append((cx, cy))
+
+                    # collect valid cy values
+                    valid_cys = [c[1] for c in centroids if c[1] is not None]
+                    if len(valid_cys) >= 2:
+                        sorted_cys = sorted(valid_cys)
+                        diffs = [_np.diff(_np.array(sorted_cys))]
+                        # estimate typical vertical gap between rows
+                        try:
+                            # median of adjacent differences
+                            gaps = _np.diff(_np.array(sorted_cys))
+                            median_gap = float(_np.median(gaps)) if gaps.size else 0.0
+                        except Exception:
+                            median_gap = float(sorted_cys[-1] - sorted_cys[0]) / max(1, len(sorted_cys)-1)
+                        row_thresh = max(10.0, median_gap * 0.75)
+                    else:
+                        row_thresh = 10.0
+
+                    # assign row indices by scanning sorted by cy
+                    items_with_pos = []
+                    for (item, (cx, cy)) in zip(detections, centroids):
+                        items_with_pos.append({'item': item, 'cx': cx, 'cy': cy, 'row': None})
+
+                    # sort by cy to assign rows
+                    items_with_pos.sort(key=lambda x: (float('inf') if x['cy'] is None else x['cy']))
+                    current_row = 0
+                    prev_cy = None
+                    for entry in items_with_pos:
+                        cy = entry['cy']
+                        if cy is None:
+                            entry['row'] = 9999
+                            continue
+                        if prev_cy is None:
+                            entry['row'] = current_row
+                            prev_cy = cy
+                            continue
+                        if abs(cy - prev_cy) > row_thresh:
+                            current_row += 1
+                        entry['row'] = current_row
+                        prev_cy = cy
+
+                    # now sort within rows according to direction
+                    def _row_sort_key(e):
+                        cx = e['cx']
+                        row = e['row']
+                        if cx is None:
+                            cx_val = float('inf')
+                        else:
+                            cx_val = cx
+                        if scan_direction in ('row-major', 'left-to-right-down'):
+                            return (row, cx_val)
+                        if scan_direction == 'right-to-left-down':
+                            return (row, -cx_val)
+                        if scan_direction in ('column-major', 'top-to-bottom-left-to-right'):
+                            return (cx_val, row)
+                        if scan_direction == 'left-to-right':
+                            return (0, cx_val)
+                        if scan_direction == 'right-to-left':
+                            return (0, -cx_val)
+                        if scan_direction == 'top-to-bottom':
+                            return (row, 0)
+                        if scan_direction == 'bottom-to-top':
+                            return (-row, 0)
+                        return (row, cx_val)
+
+                    items_with_pos.sort(key=_row_sort_key)
+                    # extract sorted detections
+                    sorted_detections = [e['item'] for e in items_with_pos]
                 except Exception:
                     sorted_detections = detections
             else:
