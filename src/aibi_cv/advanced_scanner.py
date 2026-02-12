@@ -387,11 +387,15 @@ class AdvancedScanner:
             else:
                 # Not enough codes in-frame to register scans yet
                 pass
-                
-                # Draw on frame
+
+            # Draw all detected boxes (safe: do this regardless of registration)
+            for _, box in sorted_detections:
                 if box is not None:
-                    pts = box.astype(int)
-                    cv2.polylines(frame, [pts], True, (0, 255, 0), 2)
+                    try:
+                        pts = box.astype(int)
+                        cv2.polylines(frame, [pts], True, (0, 255, 0), 2)
+                    except Exception:
+                        pass
             
             # Check completion: require `need` number of scanned items
             missing_required = len(scanned_items) < need
