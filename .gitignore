@@ -9,3 +9,5 @@ data/*.db
 # uv files
 uv.lock
 .python-version
+
+.claude/
