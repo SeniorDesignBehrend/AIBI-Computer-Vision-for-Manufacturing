@@ -77,7 +77,7 @@ Run history persists for the duration of the browser session and is cleared if s
 ## Running the App
 
 ```bash
-uv run streamlit run src/aibi_cv/step_validation/app.py
+uv run streamlit run src/step_validation/app.py
 ```
 
 Requires a webcam on device index `0`.
