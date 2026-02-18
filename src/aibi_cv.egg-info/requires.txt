@@ -4,6 +4,11 @@ numpy>=1.24.0
 keyboard>=0.13.5
 pygetwindow>=0.0.9
 pytest>=9.0.1
+transformers>=5.0.0
+torch>=2.10.0
+torchvision>=0.15.0
+pillow>=12.1.0
+streamlit>=1.53.1
 
 [dev]
 pytest>=7.0.0
