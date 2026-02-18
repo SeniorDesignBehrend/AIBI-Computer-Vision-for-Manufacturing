@@ -17,22 +17,27 @@ class BarcodeField:
 class WorkstationConfig:
     """Configuration for a specific workstation."""
     workstation_id: str
-    barcode_fields: List[BarcodeField]
+    expected_qr_count: Optional[int] = None
+    scan_direction: str = "any"   # "any", "left-to-right", "right-to-left", "top-to-bottom", "bottom-to-top"
+    append_key: str = "TAB"
     camera_index: int = 0
     
     def to_dict(self) -> dict:
         return {
             "workstation_id": self.workstation_id,
-            "barcode_fields": [asdict(bf) for bf in self.barcode_fields],
+            "expected_qr_count": self.expected_qr_count,
+            "scan_direction": self.scan_direction,
+            "append_key": self.append_key,
             "camera_index": self.camera_index
         }
     
     @classmethod
     def from_dict(cls, data: dict) -> 'WorkstationConfig':
-        fields = [BarcodeField(**f) for f in data.get("barcode_fields", [])]
         return cls(
             workstation_id=data["workstation_id"],
-            barcode_fields=fields,
+            expected_qr_count=data.get("expected_qr_count"),
+            scan_direction=data.get("scan_direction", "any"),
+            append_key=data.get("append_key", "TAB"),
             camera_index=data.get("camera_index", 0)
         )
 
@@ -72,11 +77,9 @@ class ConfigManager:
         """Create a default configuration for a workstation."""
         config = WorkstationConfig(
             workstation_id=workstation_id,
-            barcode_fields=[
-                BarcodeField("part_number", True),
-                BarcodeField("serial_number", True),
-                BarcodeField("batch_id", False),
-            ],
+            expected_qr_count=None,
+            scan_direction="any",
+            append_key="TAB",
             camera_index=0
         )
         self.save_config(config)
