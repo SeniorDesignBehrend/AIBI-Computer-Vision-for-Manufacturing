@@ -1,5 +1,3 @@
-
-
 import cv2
 from datetime import datetime
 import time
@@ -56,10 +54,9 @@ class Camera:
         if not config:
             config = self.__config_manager.create_default_config(self.__workstation_id)
 
-        required_fields = {f.name for f in config.barcode_fields if f.required}
-        optional_fields = {f.name for f in config.barcode_fields if not f.required}
-        all_fields = required_fields | optional_fields
-        field_order = [f.name for f in config.barcode_fields]
+        expected_qr_count = getattr(config, "expected_qr_count", None)
+        scan_direction = getattr(config, "scan_direction", "any")
+        append_key = getattr(config, "append_key", "TAB")
 
         scanned_data = {}
         last_seen = {}
@@ -67,14 +64,25 @@ class Camera:
         cooldown_frames = 30
         frame_count = 0
 
+        # helper to compute centroid of detection polygon
+        def _centroid(box):
+            try:
+                pts = box.astype(float)
+                cx = pts[:, 0].mean()
+                cy = pts[:, 1].mean()
+                return cx, cy
+            except Exception:
+                return None, None
+
         cap = cv2.VideoCapture(config.camera_index)
         if not cap.isOpened():
             print("Error: Could not open camera")
             return
 
         print(f"=== Advanced Scanner - {self.__workstation_id} ===")
-        print(f"Required fields: {', '.join(required_fields)}")
-        print(f"Optional fields: {', '.join(optional_fields)}")
+        print(f"Expected QR count: {expected_qr_count}")
+        print(f"Scan direction: {scan_direction}")
+        print(f"Append key: {append_key}")
         print("\nFormat barcodes as: field_name:value")
         print("Data will auto-enter to Excel when all required fields are scanned")
         print("Press 'r' to reset, 'q' to quit\n")
@@ -105,36 +113,81 @@ class Camera:
                 except Exception:
                     detections = []
             if detections:
-                for text, box in detections:
+                sorted_detections = detections
+                if scan_direction and scan_direction != 'any':
+                    def _sort_key(item):
+                        _, box = item
+                        cx, cy = _centroid(box)
+                        if cx is None:
+                            return (float('inf'), float('inf'))
+                        # Row-major (left-to-right then down): sort by y then x
+                        if scan_direction in ('row-major', 'left-to-right-down'):
+                            return (cy, cx)
+                        if scan_direction == 'right-to-left-down':
+                            return (cy, -cx)
+                        # Column-major (top-to-bottom then left-to-right): sort by x then y
+                        if scan_direction in ('column-major', 'top-to-bottom-left-to-right'):
+                            return (cx, cy)
+                        if scan_direction == 'left-to-right':
+                            return cx
+                        if scan_direction == 'right-to-left':
+                            return -cx
+                        if scan_direction == 'top-to-bottom':
+                            return cy
+                        if scan_direction == 'bottom-to-top':
+                            return -cy
+                        return (cy, cx)
+                    try:
+                        sorted_detections = sorted(detections, key=_sort_key)
+                    except Exception:
+                        sorted_detections = detections
+
+                for idx, (text, box) in enumerate(sorted_detections, start=1):
                     try:
                         name, value = self.__parse.parse(text)
                     except Exception:
                         name, value = None, text
 
-                    if name in last_seen and (frame_count - last_seen[name]) < cooldown_frames:
+                    # choose a stable key for this detection
+                    key = name if name else f"raw_{idx}"
+
+                    if key in last_seen and (frame_count - last_seen[key]) < cooldown_frames:
                         continue
 
-                    if name and name in all_fields and name not in scanned_data:
-                        scanned_data[name] = value
-                        last_seen[name] = frame_count
-                        print(f"✓ Scanned: {name} = {value}")
+                    if key not in scanned_data:
+                        scanned_data[key] = value
+                        last_seen[key] = frame_count
+                        print(f"✓ Scanned: {key} = {value}")
 
-                        if required_fields.issubset(scanned_data.keys()):
-                            print("\nAll required fields scanned - attempting output...\n")
+                        # finalize when we have enough unique scans
+                        try:
+                            need = int(expected_qr_count) if expected_qr_count else 1
+                        except Exception:
+                            need = 1
+
+                        if len(scanned_data) >= need:
+                            print("\nExpected QR count reached - attempting output...\n")
+                            # map append_key to keyboard lib names
+                            ak = (append_key or "TAB").upper()
+                            mapped = 'tab' if ak == 'TAB' else ('enter' if ak == 'ENTER' else None)
 
                             # Try automated Excel entry (OutputData). If not available, save JSON.
-                            if not self.__output.to_exel(scanned_data, field_order):
-                                print("Error: Excel not found, scan data will be saved in a file")
-                                if self.__output.to_json(scanned_data, field_order):
-                                    print(f"Saved to {self.output_file}")
+                            try:
+                                ok = self.__output.to_exel(scanned_data, None, mapped)
+                            except TypeError:
+                                # fallback if OutputData expects different append_key form
+                                ok = self.__output.to_exel(scanned_data, None, append_key)
+
+                            if not ok:
+                                print("Error: Excel not used, saving scan data to JSON")
+                                if self.__output.to_json(scanned_data, None):
+                                    print("✓ Saved scan to outputs (JSON)")
+                                    scanned_data.clear()
+                                    last_seen.clear()
+                                    print("--- Ready for next scan ---\n")
                                 else:
                                     print("Error: Failed to save scan data")
-                            
-                            # Clear scanned state so UI returns to waiting (red) state
-                            scanned_data.clear()
-                            last_seen.clear()
-                            print("--- Ready for next scan ---\n")
-                               
+
                     # Draw detection polygon
                     if box is not None:
                         try:
@@ -149,16 +202,22 @@ class Camera:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
             y_pos += 30
 
-            for field in required_fields:
-                # Field is marked complete only while present in scanned_data
-                completed = (field in scanned_data)
-                status = "Scanned" if completed else "Missing"
-                color = (0, 255, 0) if completed else (0, 0, 255)
-                cv2.putText(frame, f"{status} {field}", (10, y_pos),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-                y_pos += 25
+            try:
+                need = int(expected_qr_count) if expected_qr_count else 1
+            except Exception:
+                need = 1
 
-            if required_fields and required_fields.issubset(scanned_data.keys()):
+            cv2.putText(frame, f"Scanned: {len(scanned_data)}/{need}", (10, y_pos),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 2)
+            y_pos += 25
+
+            # show recent scanned items
+            for k, v in list(scanned_data.items())[:6]:
+                display = f"{k}: {v}"
+                cv2.putText(frame, display, (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1)
+                y_pos += 20
+
+            if len(scanned_data) >= need:
                 cv2.putText(frame, "READY TO SAVE", (10, y_pos),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
