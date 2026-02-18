@@ -71,11 +71,26 @@ class ProcessManager:
 
 
 def serialize_process(steps) -> bytes:
-    return pickle.dumps(steps)
+    """Convert steps to a pickle-safe format."""
+    data = []
+    for step in steps:
+        data.append({
+            'name': step.name,
+            'order': step.order,
+            'centroid': step.centroid
+        })
+    return pickle.dumps(data)
 
 
 def deserialize_process(data: bytes) -> list:
-    return pickle.loads(data)
+    """Reconstruct ActionStep objects from serialized data."""
+    loaded_data = pickle.loads(data)
+    steps = []
+    for item in loaded_data:
+        step = ActionStep(name=item['name'], order=item['order'])
+        step.centroid = item['centroid']
+        steps.append(step)
+    return steps
 
 
 # --- 3. Embedding Extraction ---
@@ -164,7 +179,24 @@ def get_verification_state(detected_idx, current_idx, num_steps, window, require
 # --- 5. UI ---
 
 st.set_page_config(layout="wide", page_title="Action Sequence Trainer")
+
+# Disable fade-out animation on element removal
+st.markdown("""
+<style>
+    .element-container {
+        transition: none !important;
+    }
+    [data-testid="stMarkdownContainer"] {
+        transition: none !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 manager = ProcessManager()
+
+# Pre-load the model so the camera feed doesn't stall
+with st.spinner("Loading DINOv2 model..."):
+    load_dinov2_model()
 
 st.sidebar.title("System Mode")
 mode = st.sidebar.radio("Select Phase:", ["Training (Teach)", "Operation (Monitor)"])
@@ -176,13 +208,44 @@ mode = st.sidebar.radio("Select Phase:", ["Training (Teach)", "Operation (Monito
 if mode == "Training (Teach)":
     st.title("Phase 1: Teach the Process")
 
+    # Load a previously saved process
+    with st.expander("Load Saved Process", expanded=not bool(manager.get_steps())):
+        uploaded = st.file_uploader("📂 Load Saved Process (.pkl)", type=["pkl"],
+                                    key="train_uploader")
+        if uploaded is not None:
+            file_id = f"{uploaded.name}_{uploaded.size}"
+            if st.session_state.get('_last_uploaded_id') != file_id:
+                loaded_steps = deserialize_process(uploaded.read())
+                st.session_state.steps = loaded_steps
+                st.session_state.training_finalized = True
+                st.session_state.current_op_step = 0
+                st.session_state._last_uploaded_id = file_id
+                st.rerun()
+
     with st.expander("1. Define Process Steps", expanded=True):
-        col1, col2 = st.columns([3, 1])
-        new_step_name = col1.text_input("New Step Name (e.g., 'Jack up Car')")
-        if col2.button("Add Step"):
-            if new_step_name:
+        with st.form("add_step_form", clear_on_submit=True):
+            col1, col2 = st.columns([3, 1])
+            new_step_name = col1.text_input("New Step Name (e.g., 'Jack up Car')")
+            submitted = col2.form_submit_button("Add Step")
+            if submitted and new_step_name:
                 manager.add_step(new_step_name)
                 st.success(f"Added: {new_step_name}")
+                st.rerun()
+        
+        # Display steps with delete buttons
+        steps = manager.get_steps()
+        if steps:
+            st.write("**Current Steps:**")
+            for i, step in enumerate(steps):
+                col_name, col_del = st.columns([4, 1])
+                col_name.write(f"{i+1}. {step.name}")
+                if col_del.button("🗑️", key=f"del_{i}", type="secondary"):
+                    del st.session_state.steps[i]
+                    # Reorder remaining steps
+                    for j, s in enumerate(st.session_state.steps):
+                        s.order = j
+                    st.session_state.training_finalized = False
+                    st.rerun()
 
     steps = manager.get_steps()
     if steps:
@@ -227,25 +290,12 @@ if mode == "Training (Teach)":
         else:
             st.info("Record at least one frame per step before finalizing.")
 
-        # Save / Load process
-        st.markdown("---")
-        col_save, col_load = st.columns(2)
-        with col_save:
-            if st.session_state.get('training_finalized'):
-                process_bytes = serialize_process(steps)
-                st.download_button("💾 Save Process", data=process_bytes,
-                                   file_name="process.pkl", mime="application/octet-stream")
-            else:
-                st.caption("Finalize training to enable save.")
-        with col_load:
-            uploaded = st.file_uploader("📂 Load Saved Process", type=["pkl"],
-                                        label_visibility="collapsed")
-            if uploaded is not None:
-                loaded_steps = deserialize_process(uploaded.read())
-                st.session_state.steps = loaded_steps
-                st.session_state.training_finalized = True
-                st.session_state.current_op_step = 0
-                st.rerun()
+        # Save process
+        if st.session_state.get('training_finalized'):
+            st.markdown("---")
+            process_bytes = serialize_process(steps)
+            st.download_button("💾 Save Process", data=process_bytes,
+                               file_name="process.pkl", mime="application/octet-stream")
 
         # Camera feed
         cap = cv2.VideoCapture(0)
@@ -313,21 +363,26 @@ elif mode == "Operation (Monitor)":
 
         current_idx = st.session_state.current_op_step
 
-        # Progress bar
-        progress = current_idx / len(steps)
-        st.progress(progress)
+        # Use placeholders so these update live during monitoring
+        progress_loc = st.empty()
+        heading_loc = st.empty()
+        checklist_loc = st.empty()
 
-        expected_label = steps[current_idx].name if current_idx < len(steps) else "COMPLETE"
-        st.subheader(f"Expecting: Step {current_idx + 1} — {expected_label}")
+        def render_step_ui(idx):
+            progress_loc.progress(idx / len(steps))
+            expected_label = steps[idx].name if idx < len(steps) else "COMPLETE"
+            heading_loc.subheader(f"Expecting: Step {idx + 1} — {expected_label}")
+            checklist_md = ""
+            for i, s in enumerate(steps):
+                if i < idx:
+                    checklist_md += f"✅ ~~Step {i+1}: {s.name}~~\n\n"
+                elif i == idx:
+                    checklist_md += f"**▶ Step {i+1}: {s.name}** ← current\n\n"
+                else:
+                    checklist_md += f"⬜ Step {i+1}: {s.name}\n\n"
+            checklist_loc.markdown(checklist_md)
 
-        # Step checklist
-        for i, s in enumerate(steps):
-            if i < current_idx:
-                st.markdown(f"✅ ~~Step {i+1}: {s.name}~~")
-            elif i == current_idx:
-                st.markdown(f"**▶ Step {i+1}: {s.name}** ← current")
-            else:
-                st.markdown(f"⬜ Step {i+1}: {s.name}")
+        render_step_ui(current_idx)
 
         video_loc = st.empty()
         status_loc = st.empty()
@@ -343,7 +398,8 @@ elif mode == "Operation (Monitor)":
         }
 
         if st.button("Start Monitoring"):
-            cap = cv2.VideoCapture(0)
+            with st.spinner("Opening camera..."):
+                cap = cv2.VideoCapture(0)
             window = deque(maxlen=WINDOW_SIZE)
             run_record = {
                 'run': len(st.session_state.run_log) + 1,
@@ -389,6 +445,7 @@ elif mode == "Operation (Monitor)":
                     st.session_state.current_op_step += 1
                     current_idx += 1
                     window.clear()
+                    render_step_ui(current_idx)
 
                 elif state == VerificationState.WRONG_ORDER:
                     past_name = steps[detected_idx].name if detected_idx >= 0 else "unknown"
@@ -408,6 +465,7 @@ elif mode == "Operation (Monitor)":
 
                 elif state == VerificationState.COMPLETE:
                     status_text = "Process Complete!"
+                    render_step_ui(current_idx)
 
                 # Overlay on frame
                 color = STATE_COLORS[state]
