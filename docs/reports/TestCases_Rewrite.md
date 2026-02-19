@@ -817,51 +817,44 @@
 | 6 | TC-SFR12-MAN-01 | QR Scanner Manual | JSON output structure validation | Medium | PASS |
 | 7 | TC-SFR15-MAN-01 | QR Scanner Manual | Multi-code factory lighting detection | High | PASS |
 | 8 | TC-SFR16-MAN-01 | QR Scanner Manual | Complete output for all visible QRs | High | PASS |
-| 9 | TC-SFR17-MAN-01 | QR Scanner Manual | Simulation with synthetic QR codes | Medium | PASS |
-| 10 | TC-SFR6-MAN-01 | Step Verification Manual | Step sequence validation | High | PASS |
-| 11 | TC-SFR7-MAN-01 | Step Verification Manual | Live video UI overlay | High | PASS |
-| 12 | TC-SFR8-MAN-01 | Step Verification Manual | Process training interface | High | PASS |
-| 13 | TC-SFR9-MAN-01 | Step Verification Manual | Configurable sensitivity thresholds | Medium | PASS |
-| 14 | TC-SFR10-MAN-01 | Step Verification Manual | Process deviation logging | High | PASS |
-| 15 | TC-SFR14-MAN-01 | Step Verification Manual | Training dataset save/load | High | PASS |
-| 16 | TC-SFR19-MAN-01 | Step Verification Manual | Error messages display | High | PASS |
-| 17 | TC-SFR20-MAN-01 | Step Verification Manual | Step list display | High | PASS |
-| 18 | TC-SFR21-MAN-01 | Step Verification Manual | Completed step visual marker | High | PASS |
-| 19 | TC-SFR22-MAN-01 | Step Verification Manual | Missed step visual marker | High | PASS |
-| 20 | TC-SFR26-MAN-01 | Step Verification Manual | Step progress indicators | Medium | PASS |
-| 21 | TC-SFR28-MAN-01 | Step Verification Manual | Reset/restart run | High | PASS |
-| 22 | TC-PUSR1-MAN-01 | Usability | New operator onboarding (≤30 min) | High | PASS |
-| 23 | TC-PUSR2-MAN-01 | Usability | Streamlit help text and UI guidance | Medium | PASS |
-| 24 | TC-PUSR3-MAN-01 | Usability | Workflow step reduction vs. legacy | Medium | PASS |
-| 25 | TC-PUSR4-MAN-01 | Usability | Touch-free operation during scanning | High | PASS |
-| 26 | TC-PUSR10-MAN-01 | Usability | Emoji and color state indicators | Medium | PASS |
-| 27 | TC-PPSR2-MAN-01 | Non-Functional | Real-time feedback perception | High | PASS |
-| 28 | TC-PPSR5-MAN-01 | Non-Functional | 720p camera reliability | High | PASS |
-| 29 | TC-PDSR1-MAN-01 | Non-Functional | No outbound network traffic | Critical | PASS |
-| 30 | TC-PDSR2-MAN-01 | Non-Functional | Fully offline operation | Critical | PASS |
-| 31 | TC-PDSR4-MAN-01 | Non-Functional | Factory environment stability | High | PASS |
-| 32 | TC-ODSR2-MAN-01 | Non-Functional | OSS documentation completeness | Medium | PASS |
-| 33 | TC-EISR6-MAN-01 | Non-Functional | Config-driven workflow customization | Medium | PASS |
-| 34 | TC-SFR1-AUTO-01 | Auto Functional | QR detection on static image | High | PASS |
-| 35 | TC-SFR2-AUTO-01 | Auto Functional | Field mapping logic | High | PASS |
-| 36 | TC-SFR4-AUTO-01 | Auto Functional | JSON builder output | High | PASS |
-| 37 | TC-SFR5-AUTO-01 | Auto Functional | Keystroke sequence builder | High | PASS |
-| 38 | TC-SFR11-AUTO-01 | Auto Functional | JSON file write/read integrity | High | PASS |
-| 39 | TC-SFR14-AUTO-01 | Auto Functional | Process pickle save/load integrity | High | PASS |
-| 40 | TC-SFR15-AUTO-01 | Auto Functional | Multi-code detection accuracy | High | PASS |
-| 41 | TC-SFR16-AUTO-01 | Auto Functional | Output deduplication | High | PASS |
-| 42 | TC-SFR17-AUTO-01 | Auto Functional | Simulation synthetic QR generation | Medium | PASS |
-| 43 | TC-PPSR2-AUTO-01 | Auto Non-Functional | Detection latency under load | High | PASS |
-| 44 | TC-PPSR5-AUTO-01 | Auto Non-Functional | 720p detection accuracy | High | PASS |
-| 45 | TC-PDSR1-AUTO-01 | Auto Non-Functional | Local-only endpoint verification | Critical | PASS |
-| 46 | TC-PDSR2-AUTO-01 | Auto Non-Functional | No cloud dependencies | Critical | PASS |
-| 47 | TC-PDSR4-AUTO-01 | Auto Non-Functional | Long-duration stability | High | PASS |
-| 48 | TC-ODSR1-AUTO-01 | Auto Non-Functional | Approved dependencies only | Medium | PASS |
-| 49 | TC-EISR3-AUTO-01 | Auto Non-Functional | JSON output structure compliance | High | PASS |
-| 50 | TC-EISR6-AUTO-01 | Auto Non-Functional | Config-driven workflow behavior | Medium | PASS |
+| 9 | TC-SFR6-MAN-01 | Step Verification Manual | Step sequence validation | High | PASS |
+| 10 | TC-SFR7-MAN-01 | Step Verification Manual | Live video UI overlay | High | PASS |
+| 11 | TC-SFR8-MAN-01 | Step Verification Manual | Process training interface | High | PASS |
+| 12 | TC-SFR9-MAN-01 | Step Verification Manual | Configurable sensitivity thresholds | Medium | PASS |
+| 13 | TC-SFR10-MAN-01 | Step Verification Manual | Process deviation logging | High | PASS |
+| 14 | TC-SFR14-MAN-01 | Step Verification Manual | Training dataset save/load | High | PASS |
+| 15 | TC-SFR19-MAN-01 | Step Verification Manual | Error messages display | High | PASS |
+| 16 | TC-SFR20-MAN-01 | Step Verification Manual | Step list display | High | PASS |
+| 17 | TC-SFR21-MAN-01 | Step Verification Manual | Completed step visual marker | High | PASS |
+| 18 | TC-SFR22-MAN-01 | Step Verification Manual | Missed step visual marker | High | PASS |
+| 19 | TC-SFR26-MAN-01 | Step Verification Manual | Step progress indicators | Medium | PASS |
+| 20 | TC-SFR28-MAN-01 | Step Verification Manual | Reset/restart run | High | PASS |
+| 21 | TC-PUSR1-MAN-01 | Usability | New operator onboarding (≤30 min) | High | PASS |
+| 22 | TC-PUSR2-MAN-01 | Usability | Streamlit help text and UI guidance | Medium | PASS |
+| 23 | TC-PUSR3-MAN-01 | Usability | Workflow step reduction vs. legacy | Medium | PASS |
+| 24 | TC-PUSR4-MAN-01 | Usability | Touch-free operation during scanning | High | PASS |
+| 25 | TC-PUSR10-MAN-01 | Usability | Emoji and color state indicators | Medium | PASS |
+| 26 | TC-PPSR2-MAN-01 | Non-Functional | Real-time feedback perception | High | PASS |
+| 27 | TC-PPSR5-MAN-01 | Non-Functional | 720p camera reliability | High | PASS |
+| 28 | TC-PDSR1-MAN-01 | Non-Functional | No outbound network traffic | Critical | PASS |
+| 29 | TC-PDSR2-MAN-01 | Non-Functional | Fully offline operation | Critical | PASS |
+| 30 | TC-PDSR4-MAN-01 | Non-Functional | Factory environment stability | High | PASS |
+| 31 | TC-ODSR2-MAN-01 | Non-Functional | OSS documentation completeness | Medium | PASS |
+| 32 | TC-EISR6-MAN-01 | Non-Functional | Config-driven workflow customization | Medium | PASS |
+| 33 | TC-SFR1-AUTO-01 | Auto Functional | QR detection on static image | High | PASS |
+| 34 | TC-SFR5-AUTO-01 | Auto Functional | Keystroke sequence builder | High | PASS |
+| 35 | TC-SFR11-AUTO-01 | Auto Functional | JSON file write/read integrity | High | PASS |
+| 36 | TC-SFR14-AUTO-01 | Auto Functional | Process pickle save/load integrity | High | PASS |
+| 37 | TC-SFR15-AUTO-01 | Auto Functional | Multi-code detection accuracy | High | PASS |
+| 38 | TC-SFR16-AUTO-01 | Auto Functional | Output deduplication | High | PASS |
+| 39 | TC-SFR17-AUTO-01 | Auto Functional | Simulation synthetic QR generation | Medium | PASS |
+| 40 | TC-PPSR2-AUTO-01 | Auto Non-Functional | Detection latency under load | High | PASS |
+| 41 | TC-PPSR5-AUTO-01 | Auto Non-Functional | 720p detection accuracy | High | PASS |
+| 42 | TC-EISR3-AUTO-01 | Auto Non-Functional | JSON output structure compliance | High | PASS |
+| 43 | TC-EISR6-AUTO-01 | Auto Non-Functional | Config-driven workflow behavior | Medium | PASS |
 
 ---
 
-**Total: 50 test cases** (33 manual, 17 automated)
+**Total: 43 test cases** (32 manual, 11 automated)
 
 **Overall Pass Rate: 100%**
