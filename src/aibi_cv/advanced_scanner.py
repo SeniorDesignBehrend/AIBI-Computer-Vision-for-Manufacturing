@@ -12,7 +12,7 @@ import pygetwindow as gw
 import tkinter as tk
 from tkinter import messagebox
 
-from .config_manager import ConfigManager
+from aibi_cv.config_manager import ConfigManager
 
 class AdvancedScanner:
 
