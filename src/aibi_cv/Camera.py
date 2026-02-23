@@ -57,7 +57,7 @@ class Camera:
 
         if not detections:
             try:
-                detections = self.__decode.single_opencv(frame)
+                detections = self.__decode.single_opencv(frame) or []
             except Exception:
                 detections = []
 
