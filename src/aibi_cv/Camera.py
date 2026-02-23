@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 
 try:
     from .DecodeQr import DecodeQr
-    from .parse import Parse
+    from .Parse import Parse
     from .OutputData import OutputData
     from .ScanSorter import ScanSorter
     from .config_manager import ConfigManager
