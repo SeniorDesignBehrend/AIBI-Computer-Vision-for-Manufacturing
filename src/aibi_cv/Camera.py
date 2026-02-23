@@ -264,7 +264,7 @@ class Camera:
         cv2.destroyAllWindows()
 
 def main():
-    camera = Camera("workstation_1")
+    camera = Camera("workstation_11")
     camera.start()
 
 if __name__ == "__main__":
