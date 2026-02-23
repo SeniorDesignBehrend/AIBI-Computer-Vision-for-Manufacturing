@@ -18,7 +18,7 @@ except Exception:
     if str(repo_src) not in sys.path:
         sys.path.insert(0, str(repo_src))
     from aibi_cv.DecodeQr import DecodeQr
-    from aibi_cv.parse import Parse
+    from aibi_cv.Parse import Parse
     from aibi_cv.OutputData import OutputData
     from aibi_cv.ScanSorter import ScanSorter
     from aibi_cv.config_manager import ConfigManager
