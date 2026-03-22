@@ -79,6 +79,7 @@ class Camera(QMainWindow):
         self.__camera_thread = None
         self.__current_frame = None
         self.__frozen = False
+        self.__last_sorted_detections = []
         
         self._init_ui()
         self._start_camera()
@@ -191,9 +192,35 @@ class Camera(QMainWindow):
         if not ok:
             self.__output.to_json(scanned_data, None)
         
-        # Show frozen frame
+        # Show frozen frame with scan order visualization
         if self.__current_frame is not None:
             frozen_frame = self.__current_frame.copy()
+            
+            # Draw the scan order lines and arrows on freeze frame
+            if len(self.__last_sorted_detections) > 1:
+                try:
+                    centroids = []
+                    for _, box in self.__last_sorted_detections:
+                        if box is not None:
+                            cx, cy = ScanSorter.centroid(box)
+                            if cx is not None:
+                                centroids.append((int(cx), int(cy)))
+
+                    for i in range(len(centroids) - 1):
+                        pt1 = centroids[i]
+                        pt2 = centroids[i + 1]
+                        cv2.arrowedLine(frozen_frame, pt1, pt2, (255, 0, 255), 3, tipLength=0.3)
+                        cv2.circle(frozen_frame, pt1, 20, (255, 0, 255), 2)
+                        cv2.putText(frozen_frame, str(i + 1), (pt1[0] - 8, pt1[1] + 8),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
+                    if centroids:
+                        last_pt = centroids[-1]
+                        cv2.circle(frozen_frame, last_pt, 20, (255, 0, 255), 2)
+                        cv2.putText(frozen_frame, str(len(centroids)), (last_pt[0] - 8, last_pt[1] + 8),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
+                except Exception:
+                    pass
+            
             cv2.putText(frozen_frame, "DATA ENTERED - Press Continue",
                         (10, frozen_frame.shape[0] - 20),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
@@ -290,6 +317,12 @@ class Camera(QMainWindow):
             except Exception:
                 pass
 
+        # Show completion message when all codes scanned
+        scanned_count = len(scanned_items)
+        if scanned_count >= need:
+            cv2.putText(frame, "AUTO-ENTERING TO EXCEL...", (10, frame.shape[0] - 50),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+
         return frame
 
     def _process_frame(self, frame):
@@ -309,6 +342,9 @@ class Camera(QMainWindow):
             sorted_detections = ScanSorter.sort(detections, scan_direction)
         else:
             sorted_detections = detections
+        
+        # Store sorted detections for freeze frame
+        self.__last_sorted_detections = sorted_detections
         
         # Register scans
         if len(detections) >= need:
