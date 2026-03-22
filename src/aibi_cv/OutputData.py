@@ -63,7 +63,6 @@ class OutputData:
             return self.to_json(scanned_data, keys)
 
         try:
-            scanner_windows = [w for w in gw.getAllWindows() if self.__workstation_id in w.title]
             excel_windows = [w for w in gw.getAllWindows() if 'excel' in w.title.lower()]
 
             if not excel_windows:
@@ -77,13 +76,27 @@ class OutputData:
                     pass
                 return self.to_json(scanned_data, keys)
 
+            # Try to bring Excel to foreground
             try:
-                excel_windows[0].activate()
-                print("[OutputData] Switched to Excel window")
+                import win32gui
+                import win32con
+                hwnd = excel_windows[0]._hWnd
+                win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+                win32gui.SetForegroundWindow(hwnd)
+                print("[OutputData] Switched to Excel window using win32gui")
                 time.sleep(0.5)
+            except ImportError:
+                # Fallback to pygetwindow if win32gui not available
+                try:
+                    excel_windows[0].activate()
+                    print("[OutputData] Switched to Excel window")
+                    time.sleep(0.5)
+                except Exception as e:
+                    print(f"[OutputData] Could not activate Excel, but will try typing anyway: {e}")
+                    time.sleep(0.5)
             except Exception as e:
-                print(f"[OutputData] Failed to activate Excel window: {e}; falling back to JSON")
-                return self.to_json(scanned_data, keys)
+                print(f"[OutputData] Could not activate Excel, but will try typing anyway: {e}")
+                time.sleep(0.5)
 
             # Map append_key to keyboard key names (keyboard library expects names like 'tab'/'enter')
             append_key_map = {"TAB": "tab", "ENTER": "enter", "NONE": None}
@@ -108,20 +121,23 @@ class OutputData:
             except Exception as e:
                 print(f"[OutputData] Error while typing to Excel: {e}")
 
-            # Switch back to scanner window if found
+            # Switch back to scanner window
             time.sleep(0.5)
-            if scanner_windows:
-                try:
-                    scanner_windows[0].activate()
-                    print("[OutputData] Successfully switched back to scanner")
-                except Exception:
-                    pass
-            else:
-                try:
-                    cv2.setWindowProperty(self.__workstation_id, cv2.WND_PROP_TOPMOST, 1)
-                    cv2.setWindowProperty(self.__workstation_id, cv2.WND_PROP_TOPMOST, 0)
-                except Exception:
-                    pass
+            try:
+                scanner_windows = [w for w in gw.getAllWindows() if 'Barcode Scanner' in w.title]
+                if scanner_windows:
+                    try:
+                        import win32gui
+                        import win32con
+                        hwnd = scanner_windows[0]._hWnd
+                        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+                        win32gui.SetForegroundWindow(hwnd)
+                        print("[OutputData] Successfully switched back to scanner")
+                    except ImportError:
+                        scanner_windows[0].activate()
+                        print("[OutputData] Successfully switched back to scanner")
+            except Exception:
+                pass
 
             return True
         except Exception as e:

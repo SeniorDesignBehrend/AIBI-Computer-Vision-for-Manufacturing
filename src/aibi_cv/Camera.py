@@ -80,6 +80,8 @@ class Camera(QMainWindow):
         self.__current_frame = None
         self.__frozen = False
         self.__last_sorted_detections = []
+        self.__dark_mode = True
+        self.__last_excel_data = None
         
         self._init_ui()
         self._start_camera()
@@ -102,13 +104,22 @@ class Camera(QMainWindow):
         
         # Control buttons
         button_layout = QHBoxLayout()
-        self.__reset_btn = QPushButton("Reset (R)")
-        self.__reset_btn.clicked.connect(self._reset_scan)
+        self.__quit_btn = QPushButton("Quit (Q)")
+        self.__quit_btn.clicked.connect(self.close)
         self.__continue_btn = QPushButton("Continue (Enter)")
         self.__continue_btn.clicked.connect(self._continue_scan)
         self.__continue_btn.setEnabled(False)
-        button_layout.addWidget(self.__reset_btn)
+        self.__undo_btn = QPushButton("Undo Excel (U)")
+        self.__undo_btn.clicked.connect(self._undo_excel)
+        self.__undo_btn.setEnabled(False)
+        self.__theme_btn = QPushButton("🌙")
+        self.__theme_btn.setMaximumWidth(50)
+        self.__theme_btn.setToolTip("Toggle Theme (T)")
+        self.__theme_btn.clicked.connect(self._toggle_theme)
+        button_layout.addWidget(self.__quit_btn)
         button_layout.addWidget(self.__continue_btn)
+        button_layout.addWidget(self.__undo_btn)
+        button_layout.addWidget(self.__theme_btn)
         left_panel.addLayout(button_layout)
         
         main_layout.addLayout(left_panel, 3)
@@ -146,6 +157,113 @@ class Camera(QMainWindow):
         right_panel.addWidget(scan_group)
         
         main_layout.addLayout(right_panel, 1)
+        
+        self._apply_theme()
+    
+    def _apply_theme(self):
+        if self.__dark_mode:
+            self.setStyleSheet("""
+                QMainWindow, QWidget {
+                    background-color: #2b2b2b;
+                    color: #ffffff;
+                }
+                QGroupBox {
+                    border: 2px solid #555;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                    padding-top: 10px;
+                    font-weight: bold;
+                    color: #ffffff;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 10px;
+                    padding: 0 5px;
+                }
+                QLabel {
+                    color: #ffffff;
+                }
+                QPushButton {
+                    background-color: #3a3a3a;
+                    color: #ffffff;
+                    border: 1px solid #555;
+                    border-radius: 4px;
+                    padding: 8px;
+                    font-size: 11pt;
+                }
+                QPushButton:hover {
+                    background-color: #4a4a4a;
+                }
+                QPushButton:pressed {
+                    background-color: #2a2a2a;
+                }
+                QPushButton:disabled {
+                    background-color: #2a2a2a;
+                    color: #666;
+                }
+                QListWidget {
+                    background-color: #1e1e1e;
+                    color: #ffffff;
+                    border: 1px solid #555;
+                    border-radius: 4px;
+                    font-size: 11pt;
+                }
+            """)
+        else:
+            self.setStyleSheet("""
+                QMainWindow, QWidget {
+                    background-color: #f5f5f5;
+                    color: #000000;
+                }
+                QGroupBox {
+                    border: 2px solid #ccc;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                    padding-top: 10px;
+                    font-weight: bold;
+                    color: #000000;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 10px;
+                    padding: 0 5px;
+                }
+                QLabel {
+                    color: #000000;
+                }
+                QPushButton {
+                    background-color: #ffffff;
+                    color: #000000;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    padding: 8px;
+                    font-size: 11pt;
+                }
+                QPushButton:hover {
+                    background-color: #e8e8e8;
+                }
+                QPushButton:pressed {
+                    background-color: #d0d0d0;
+                }
+                QPushButton:disabled {
+                    background-color: #e0e0e0;
+                    color: #999;
+                }
+                QListWidget {
+                    background-color: #ffffff;
+                    color: #000000;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    font-size: 11pt;
+                }
+            """)
+        need = int(self.__config.expected_qr_count) if self.__config.expected_qr_count else 1
+        self._update_status(len(self.__scanned_items), need)
+    
+    def _toggle_theme(self):
+        self.__dark_mode = not self.__dark_mode
+        self.__theme_btn.setText("☀️" if self.__dark_mode else "🌙")
+        self._apply_theme()
     
     def _start_camera(self):
         self.__camera_thread = CameraThread(self.__config.camera_index)
@@ -164,9 +282,10 @@ class Camera(QMainWindow):
     def _update_status(self, scanned, needed):
         self.__status_label.setText(f"Scanned: {scanned} / Needed: {needed}")
         if scanned >= needed:
-            self.__status_label.setStyleSheet("color: green;")
+            self.__status_label.setStyleSheet("color: green; font-weight: bold;")
         else:
-            self.__status_label.setStyleSheet("color: black;")
+            color = "#ffffff" if self.__dark_mode else "#000000"
+            self.__status_label.setStyleSheet(f"color: {color}; font-weight: bold;")
     
     def _update_scan_list(self):
         self.__scan_list.clear()
@@ -186,11 +305,20 @@ class Camera(QMainWindow):
             key = itm['name'] if itm['name'] else itm['value']
             scanned_data[key] = itm['value']
         
+        print(f"[Camera] Attempting to enter data to Excel: {scanned_data}")
+        
+        # Store for undo
+        self.__last_excel_data = scanned_data.copy()
+        
         # Save data
         append_key = self.__config.append_key
         ok = self.__output.to_exel(scanned_data, None, append_key)
+        print(f"[Camera] Excel entry result: {ok}")
         if not ok:
+            print("[Camera] Excel failed, saving to JSON instead")
             self.__output.to_json(scanned_data, None)
+        else:
+            self.__undo_btn.setEnabled(True)
         
         # Show frozen frame with scan order visualization
         if self.__current_frame is not None:
@@ -226,6 +354,48 @@ class Camera(QMainWindow):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             self._display_frame(frozen_frame)
     
+    def _undo_excel(self):
+        if self.__last_excel_data is None:
+            return
+        
+        try:
+            import pygetwindow as gw
+            import keyboard
+            import time
+            
+            excel_windows = [w for w in gw.getAllWindows() if 'excel' in w.title.lower()]
+            if not excel_windows:
+                print("[Undo] Excel window not found")
+                return
+            
+            excel_windows[0].activate()
+            time.sleep(0.3)
+            
+            # Move up one row
+            keyboard.press_and_release('up')
+            time.sleep(0.1)
+            
+            # Select the entire row and delete
+            keyboard.press_and_release('shift+space')
+            time.sleep(0.1)
+            keyboard.press_and_release('ctrl+minus')
+            time.sleep(0.1)
+            keyboard.press_and_release('enter')  # Confirm delete
+            
+            print("[Undo] Deleted last Excel entry")
+            
+            # Switch back to scanner
+            time.sleep(0.3)
+            scanner_windows = [w for w in gw.getAllWindows() if 'Barcode Scanner' in w.title]
+            if scanner_windows:
+                scanner_windows[0].activate()
+            
+            self.__undo_btn.setEnabled(False)
+            self.__last_excel_data = None
+            
+        except Exception as e:
+            print(f"[Undo] Error: {e}")
+    
     def _continue_scan(self):
         self.__frozen = False
         self.__continue_btn.setEnabled(False)
@@ -245,13 +415,16 @@ class Camera(QMainWindow):
         self._update_status(0, need)
     
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_R:
-            self._reset_scan()
+        if event.key() == Qt.Key_Q:
+            self.close()
         elif event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             if self.__continue_btn.isEnabled():
                 self._continue_scan()
-        elif event.key() == Qt.Key_Q:
-            self.close()
+        elif event.key() == Qt.Key_U:
+            if self.__undo_btn.isEnabled():
+                self._undo_excel()
+        elif event.key() == Qt.Key_T:
+            self._toggle_theme()
     
     def closeEvent(self, event):
         if self.__camera_thread:
