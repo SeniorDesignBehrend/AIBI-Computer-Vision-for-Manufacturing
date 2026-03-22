@@ -193,74 +193,44 @@ class _UploadTab(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._frames: list[np.ndarray] = []
-
         layout = QVBoxLayout(self)
 
-        btn_open = QPushButton("Open Video File...")
-        btn_open.clicked.connect(self._open_file)
+        btn_open = QPushButton("Upload Video Files...")
+        btn_open.clicked.connect(self._open_files)
         layout.addWidget(btn_open)
 
-        self._preview = QLabel("No video loaded.")
-        self._preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._preview.setMinimumHeight(200)
-        self._preview.setStyleSheet("background: #1a1a1a; color: #888;")
-        layout.addWidget(self._preview)
-
-        self._info_label = QLabel()
+        self._info_label = QLabel("No videos uploaded.")
+        self._info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._info_label.setStyleSheet("color: #888;")
         layout.addWidget(self._info_label)
-
-        self._save_group = QGroupBox("Save segment")
-        self._save_group.setVisible(False)
-        save_layout = QVBoxLayout(self._save_group)
-        self._name_input = QLineEdit()
-        self._name_input.setPlaceholderText("Step name")
-        save_layout.addWidget(self._name_input)
-        btn_save = QPushButton("Save Uploaded Segment")
-        btn_save.clicked.connect(self._save_segment)
-        save_layout.addWidget(btn_save)
-        layout.addWidget(self._save_group)
         layout.addStretch()
 
-    def _open_file(self):
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open Video", "", "Video Files (*.mp4 *.avi *.mov *.mkv)"
+    def _open_files(self):
+        paths, _ = QFileDialog.getOpenFileNames(
+            self, "Upload Videos", "", "Video Files (*.mp4 *.avi *.mov *.mkv)"
         )
-        if not path:
+        if not paths:
             return
 
-        cap = cv2.VideoCapture(path)
-        all_frames: list[np.ndarray] = []
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
-            all_frames.append(frame.copy())
-        cap.release()
+        for path in paths:
+            cap = cv2.VideoCapture(path)
+            all_frames: list[np.ndarray] = []
+            while cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                all_frames.append(frame.copy())
+            cap.release()
 
-        if not all_frames:
-            QMessageBox.critical(self, "Error", "Could not read frames from this video file.")
-            return
+            if not all_frames:
+                QMessageBox.warning(self, "Error", f"Could not read frames from {Path(path).name}")
+                continue
 
-        self._frames = [f for idx, f in enumerate(all_frames) if idx % SAMPLE_EVERY_N == 0]
-        mid = self._frames[len(self._frames) // 2]
-        self._preview.setPixmap(_frame_to_pixmap(mid, 480, 270))
-        self._info_label.setText(
-            f"{len(self._frames)} frames sampled from {len(all_frames)} total"
-        )
-        self._name_input.clear()
-        self._save_group.setVisible(True)
+            frames = [f for idx, f in enumerate(all_frames) if idx % SAMPLE_EVERY_N == 0]
+            name = Path(path).stem
+            self.segment_saved.emit({"label": name, "frames": frames, "source": "upload"})
 
-    def _save_segment(self):
-        name = self._name_input.text().strip()
-        if not name:
-            QMessageBox.warning(self, "Name required", "Please enter a step name.")
-            return
-        self.segment_saved.emit({"label": name, "frames": self._frames, "source": "upload"})
-        self._frames = []
-        self._save_group.setVisible(False)
-        self._preview.setText("No video loaded.")
-        self._info_label.clear()
+        self._info_label.setText(f"Uploaded {len(paths)} video(s) as segments.")
 
 
 # ---------------------------------------------------------------------------
