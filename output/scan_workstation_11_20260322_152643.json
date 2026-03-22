@@ -1,0 +1,30 @@
+{
+  "workstation_id": "workstation_11",
+  "timestamp": "2026-03-22T15:26:43.044044",
+  "barcodes": [
+    {
+      "name": "This",
+      "value": "This"
+    },
+    {
+      "name": "is",
+      "value": "is"
+    },
+    {
+      "name": "a",
+      "value": "a"
+    },
+    {
+      "name": "test",
+      "value": "test"
+    },
+    {
+      "name": "for",
+      "value": "for"
+    },
+    {
+      "name": "QR",
+      "value": "QR"
+    }
+  ]
+}
