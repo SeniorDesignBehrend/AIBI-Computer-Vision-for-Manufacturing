@@ -130,50 +130,73 @@ def _render_camera_recording() -> None:
 
 
 def _render_upload_recording() -> None:
-    uploaded_file = st.file_uploader(
-        "Upload a video file (.mp4, .avi, .mov, .mkv)",
+    uploaded_files = st.file_uploader(
+        "Upload video files (.mp4, .avi, .mov, .mkv)",
         type=["mp4", "avi", "mov", "mkv"],
         key="video_uploader",
+        accept_multiple_files=True,
     )
-    if uploaded_file is None:
+    if not uploaded_files:
         return
 
-    suffix = Path(uploaded_file.name).suffix
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        tmp.write(uploaded_file.read())
-        tmp_path = tmp.name
+    if "pending_uploads" not in st.session_state:
+        st.session_state.pending_uploads = []
 
-    cap = cv2.VideoCapture(tmp_path)
-    all_frames: list = []
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-        all_frames.append(frame.copy())
-    cap.release()
-    os.unlink(tmp_path)
+    # Process new uploads
+    for uploaded_file in uploaded_files:
+        file_id = f"{uploaded_file.name}_{uploaded_file.size}"
+        if file_id not in [p["id"] for p in st.session_state.pending_uploads]:
+            suffix = Path(uploaded_file.name).suffix
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                tmp.write(uploaded_file.read())
+                tmp_path = tmp.name
 
-    if not all_frames:
-        st.error("Could not read frames from this video file.")
-        return
+            cap = cv2.VideoCapture(tmp_path)
+            all_frames: list = []
+            while cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                all_frames.append(frame.copy())
+            cap.release()
+            os.unlink(tmp_path)
 
-    frames = [f for idx, f in enumerate(all_frames) if idx % SAMPLE_EVERY_N == 0]
-    preview = cv2.cvtColor(frames[len(frames) // 2], cv2.COLOR_BGR2RGB)
-    st.image(preview, caption=f"Preview (mid-frame) — {len(frames)} frames sampled from {len(all_frames)} total",
-             use_container_width=True)
+            if all_frames:
+                frames = [f for idx, f in enumerate(all_frames) if idx % SAMPLE_EVERY_N == 0]
+                st.session_state.pending_uploads.append({
+                    "id": file_id,
+                    "name": uploaded_file.name,
+                    "frames": frames,
+                    "total_frames": len(all_frames),
+                    "label": "",
+                })
 
-    label = st.text_input("Step name:", key="upload_label_input")
-    if st.button("Save Uploaded Segment", key="upload_save", type="primary"):
-        if not label.strip():
-            st.error("Please enter a step name.")
-        else:
-            st.session_state.recorded_segments.append({
-                "label": label.strip(),
-                "frames": frames,
-                "source": "upload",
-            })
-            st.success(f"Saved '{label.strip()}' ({len(frames)} frames from upload).")
-            st.rerun()
+    # Display all pending uploads
+    for i, upload in enumerate(st.session_state.pending_uploads):
+        with st.container(border=True):
+            col_preview, col_input = st.columns([1, 2])
+            with col_preview:
+                preview = cv2.cvtColor(upload["frames"][len(upload["frames"]) // 2], cv2.COLOR_BGR2RGB)
+                st.image(preview, caption=upload["name"], use_container_width=True)
+            with col_input:
+                st.caption(f"{len(upload['frames'])} frames sampled from {upload['total_frames']} total")
+                upload["label"] = st.text_input("Step name:", value=upload["label"], key=f"upload_label_{i}")
+
+    if st.session_state.pending_uploads:
+        if st.button("Save All Uploaded Segments", key="upload_save_all", type="primary"):
+            missing_labels = [u["name"] for u in st.session_state.pending_uploads if not u["label"].strip()]
+            if missing_labels:
+                st.error(f"Please enter step names for: {', '.join(missing_labels)}")
+            else:
+                for upload in st.session_state.pending_uploads:
+                    st.session_state.recorded_segments.append({
+                        "label": upload["label"].strip(),
+                        "frames": upload["frames"],
+                        "source": "upload",
+                    })
+                st.session_state.pending_uploads = []
+                st.success(f"Saved {len(uploaded_files)} segment(s).")
+                st.rerun()
 
 
 def _render_review_phase(manager: ProcessManager) -> None:
