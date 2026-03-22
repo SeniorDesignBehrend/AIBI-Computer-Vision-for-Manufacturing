@@ -417,8 +417,8 @@ class TestQDSR1DependencyAudit:
                 assert indicator not in module_name.lower()
 
 
-class TestETSR3InteroperabilitySchema:
-    """TC-ETSR3-AUTO-01: Sample outputs validate against interoperability JSON schema."""
+class TestEISR3InteroperabilitySchema:
+    """TC-EISR3-AUTO-01: Sample outputs validate against interoperability JSON schema."""
     
     def test_interoperability_schema_validation(self):
         """Test that outputs conform to interoperability schema."""
@@ -444,8 +444,8 @@ class TestETSR3InteroperabilitySchema:
             pytest.fail("Timestamp not in valid ISO 8601 format")
 
 
-class TestETSR5MESIntegration:
-    """TC-ETSR5-AUTO-01: Integration test posts sample payloads to mock MES/ERP endpoint."""
+class TestEISR5MESIntegration:
+    """TC-EISR5-AUTO-01: Integration test posts sample payloads to mock MES/ERP endpoint."""
     
     def test_mes_payload_structure(self):
         """Test MES/ERP payload structure and key fields."""
@@ -476,8 +476,8 @@ class TestETSR5MESIntegration:
             assert isinstance(part["part_number"], str)
 
 
-class TestETSR6ConfigurableWorkflows:
-    """TC-ETSR6-AUTO-01: Different config files result in different, correct workflows."""
+class TestEISR6ConfigurableWorkflows:
+    """TC-EISR6-AUTO-01: Different config files result in different, correct workflows."""
     
     def test_different_config_workflows(self):
         """Test that different configurations produce different workflows."""

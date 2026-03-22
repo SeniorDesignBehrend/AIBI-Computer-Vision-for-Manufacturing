@@ -436,11 +436,11 @@ class TestTCQDSR1AUTO01:
                 assert prohibited not in module_name.lower(), f"Unauthorized library '{prohibited}' detected"
 
 
-class TestTCETSR3AUTO01:
-    """TC-ETSR3-AUTO-01: Interoperability schema validation."""
+class TestTCEISR3AUTO01:
+    """TC-EISR3-AUTO-01: Interoperability schema validation."""
     
-    def test_all_outputs_validate_against_etsr_schema(self):
-        """JSON outputs from all workflows validate against ETSR schema."""
+    def test_all_outputs_validate_against_eisr_schema(self):
+        """JSON outputs from all workflows validate against EISR schema."""
         # Test data: outputs from different workflows
         workflow_outputs = [
             {
@@ -457,9 +457,9 @@ class TestTCETSR3AUTO01:
             }
         ]
         
-        # Validate ETSR schema compliance
+        # Validate EISR schema compliance
         for output in workflow_outputs:
-            # Required ETSR fields
+            # Required EISR fields
             assert "workstation_id" in output
             assert "timestamp" in output
             assert "barcodes" in output
@@ -475,8 +475,8 @@ class TestTCETSR3AUTO01:
                 assert "value" in barcode
 
 
-class TestTCETSR5AUTO01:
-    """TC-ETSR5-AUTO-01: Automated export to MES/ERP."""
+class TestTCEISR5AUTO01:
+    """TC-EISR5-AUTO-01: Automated export to MES/ERP."""
     
     def test_mes_payload_accepted_fields_correct(self):
         """Mock MES/ERP endpoint + sample payload - payload accepted; fields correct."""
@@ -508,8 +508,8 @@ class TestTCETSR5AUTO01:
         assert payload_accepted
 
 
-class TestTCETSR6AUTO01:
-    """TC-ETSR6-AUTO-01: Config-driven workflow control."""
+class TestTCEISR6AUTO01:
+    """TC-EISR6-AUTO-01: Config-driven workflow control."""
     
     def test_workflow_behavior_changes_based_on_config(self):
         """Two distinct config files + same scan sequence - workflow behavior changes correctly based on config."""
