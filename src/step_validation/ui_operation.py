@@ -1,7 +1,8 @@
-from collections import deque
+import time
 from datetime import datetime
 
 import cv2
+import numpy as np
 import streamlit as st
 
 from .embeddings import get_embedding
@@ -10,23 +11,61 @@ from .state import VerificationState
 from .verification import calculate_similarity, get_verification_state
 
 
+def _draw_checklist_overlay(
+    frame_rgb: np.ndarray,
+    steps: list,
+    current_idx: int,
+    state: VerificationState,
+    state_colors: dict,
+) -> np.ndarray:
+    frame = frame_rgb.copy()
+    h, w = frame.shape[:2]
+
+    panel_x, panel_y, panel_w, line_h = 10, 10, 320, 28
+    panel_h = min(len(steps) * line_h + 20, h - 20)
+
+    overlay = frame.copy()
+    cv2.rectangle(overlay, (panel_x, panel_y),
+                  (panel_x + panel_w, panel_y + panel_h), (20, 20, 20), -1)
+    cv2.addWeighted(overlay, 0.55, frame, 0.45, 0, dst=frame)
+
+    for i, step in enumerate(steps):
+        y = panel_y + 18 + i * line_h
+        if y > panel_y + panel_h - 8:
+            break
+        if i < current_idx:
+            symbol, color = "OK", (80, 220, 80)
+        elif i == current_idx:
+            symbol = ">>"
+            color = state_colors.get(state, (255, 220, 50))
+        else:
+            symbol, color = "  ", (160, 160, 160)
+
+        cv2.putText(frame, symbol, (panel_x + 5, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.52, color, 1, cv2.LINE_AA)
+        cv2.putText(frame, f"  {i + 1}. {step.name}", (panel_x + 40, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.52, color, 1, cv2.LINE_AA)
+
+    return frame
+
+
 def render_operation_ui(manager: ProcessManager) -> None:
     st.title("Phase 2: Sequence Verification")
 
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("Verification Parameters")
-    similarity_threshold = st.sidebar.slider(
-        "Similarity Threshold", 0.50, 1.0, 0.75, 0.01,
-        help="Minimum cosine similarity to count a frame as a match. Below this = IDLE."
-    )
-    window_size = st.sidebar.slider(
-        "Window Size (frames)", 5, 30, 10, 1,
-        help="Number of recent frames kept for sliding-window voting."
-    )
-    required_votes = st.sidebar.slider(
-        "Required Votes", 1, window_size, max(1, int(window_size * 0.7)), 1,
-        help="Votes needed within the window to confirm a step."
-    )
+    with st.expander("Verification Parameters", expanded=False):
+        similarity_threshold = st.slider(
+            "Similarity Threshold", 0.50, 1.0, 0.75, 0.01,
+            help="Minimum cosine similarity to count a frame as a match.",
+        )
+        window_duration = st.slider(
+            "Detection Window (seconds)", 0.5, 5.0, 2.0, 0.5,
+            help="How many seconds of frames to consider when confirming a step.",
+        )
+        required_fraction = st.slider(
+            "Required Confidence", 0.3, 1.0, 0.7, 0.05,
+            format="%.0f%%",
+            help="Fraction of frames in the window that must match to confirm a step.",
+        )
 
     steps = manager.get_steps()
 
@@ -34,52 +73,39 @@ def render_operation_ui(manager: ProcessManager) -> None:
         st.warning("No process defined. Please go to Training mode first.")
         return
     if not st.session_state.get("training_finalized"):
-        st.warning("Training not finalized. Go to Training mode and click **Finalize Training**.")
+        st.warning("Training not finalized. Go to Training mode and finalize.")
         return
 
-    col_restart, _ = st.columns([1, 4])
-    if col_restart.button("↺ Restart Observation"):
+    col_restart, col_start, _ = st.columns([1, 1, 3])
+    if col_restart.button("↺ Restart"):
         st.session_state.current_op_step = 0
         st.rerun()
 
     current_idx = st.session_state.current_op_step
 
-    progress_loc = st.empty()
-    heading_loc = st.empty()
-    checklist_loc = st.empty()
-
-    def render_step_ui(idx: int) -> None:
-        progress_loc.progress(idx / len(steps))
-        expected_label = steps[idx].name if idx < len(steps) else "COMPLETE"
-        heading_loc.subheader(f"Expecting: Step {idx + 1} — {expected_label}")
-        checklist_md = ""
-        for i, s in enumerate(steps):
-            if i < idx:
-                checklist_md += f"✅ ~~Step {i+1}: {s.name}~~\n\n"
-            elif i == idx:
-                checklist_md += f"**▶ Step {i+1}: {s.name}** ← current\n\n"
-            else:
-                checklist_md += f"⬜ Step {i+1}: {s.name}\n\n"
-        checklist_loc.markdown(checklist_md)
-
-    render_step_ui(current_idx)
+    # Colors in RGB order (frame is already converted to RGB before drawing)
+    state_colors = {
+        VerificationState.IDLE:          (180, 180, 180),
+        VerificationState.CORRECT_STEP:  (0,   200, 100),
+        VerificationState.CONFIRMED:     (0,   255,   0),
+        VerificationState.WRONG_ORDER:   (255, 165,   0),
+        VerificationState.SKIPPED:       (255,   0,   0),
+        VerificationState.COMPLETE:      (0,   255,   0),
+    }
 
     video_loc = st.empty()
     status_loc = st.empty()
 
-    state_colors = {
-        VerificationState.IDLE: (180, 180, 180),
-        VerificationState.CORRECT_STEP: (100, 200, 0),
-        VerificationState.CONFIRMED: (0, 255, 0),
-        VerificationState.WRONG_ORDER: (0, 165, 255),
-        VerificationState.SKIPPED: (0, 0, 255),
-        VerificationState.COMPLETE: (0, 255, 0),
-    }
-
-    if st.button("Start Monitoring"):
+    if col_start.button("Start Monitoring"):
         with st.spinner("Opening camera..."):
             cap = cv2.VideoCapture(0)
-        window = deque(maxlen=window_size)
+
+        if not cap.isOpened():
+            st.error("Camera not available.")
+            return
+
+        timed_window: list[tuple[float, int]] = []
+        TARGET_FPS = 10
         run_record = {
             "run": len(st.session_state.run_log) + 1,
             "started": datetime.now().strftime("%H:%M:%S"),
@@ -92,44 +118,46 @@ def render_operation_ui(manager: ProcessManager) -> None:
             ret, frame = cap.read()
             if not ret:
                 break
+            frame_start = time.monotonic()
 
             emb = get_embedding(frame)
             detected_idx, conf = calculate_similarity(emb, steps, similarity_threshold)
-            window.append(detected_idx)
+            timed_window.append((time.monotonic(), detected_idx))
+            cutoff = time.monotonic() - window_duration
+            timed_window = [(ts, idx) for ts, idx in timed_window if ts >= cutoff]
 
             state = get_verification_state(
-                detected_idx, current_idx, len(steps), window, required_votes
+                detected_idx, current_idx, len(steps),
+                timed_window, window_duration, required_fraction
             )
 
             if state == VerificationState.IDLE:
                 status_text = "Waiting for action..."
 
             elif state == VerificationState.CORRECT_STEP:
-                votes = sum(1 for v in window if v == current_idx)
+                cutoff = time.monotonic() - window_duration
+                recent = [idx for ts, idx in timed_window if ts >= cutoff]
+                frac = sum(1 for idx in recent if idx == current_idx) / max(len(recent), 1)
                 status_text = (
                     f"Detecting '{steps[current_idx].name}'... "
-                    f"({votes}/{required_votes})"
+                    f"({int(frac * 100)}% / {int(required_fraction * 100)}%)"
                 )
 
             elif state == VerificationState.CONFIRMED:
-                status_text = f"Step {current_idx + 1} confirmed! Advancing..."
+                status_text = f"Step {current_idx + 1} confirmed!"
                 run_record["steps"].append({
                     "step": steps[current_idx].name,
-                    "result": "✅",
-                    "warnings": "; ".join(current_step_warnings) or "—",
+                    "result": "OK",
+                    "warnings": "; ".join(current_step_warnings) or "-",
                 })
                 current_step_warnings = []
                 st.session_state.current_op_step += 1
                 current_idx += 1
-                window.clear()
-                render_step_ui(current_idx)
+                timed_window.clear()
 
             elif state == VerificationState.WRONG_ORDER:
                 past_name = steps[detected_idx].name if detected_idx >= 0 else "unknown"
-                status_text = (
-                    f"Warning: '{past_name}' re-detected "
-                    f"(expected step {current_idx + 1})"
-                )
+                status_text = f"Warning: '{past_name}' re-detected (expected step {current_idx + 1})"
                 current_step_warnings.append(f"Re-detected '{past_name}'")
 
             elif state == VerificationState.SKIPPED:
@@ -142,21 +170,26 @@ def render_operation_ui(manager: ProcessManager) -> None:
 
             elif state == VerificationState.COMPLETE:
                 status_text = "Process Complete!"
-                render_step_ui(current_idx)
 
-            color = state_colors[state]
-            conf_pct = int(conf * 100)
-            cv2.putText(frame, status_text, (30, 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.75, color, 2)
-            cv2.putText(frame,
-                        f"Conf: {conf_pct}%  Threshold: {int(similarity_threshold * 100)}%",
-                        (30, 85), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (200, 200, 200), 1)
-
+            # Draw on RGB frame
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            video_loc.image(frame_rgb, use_container_width=True)
-            status_loc.markdown(
-                f"**State:** `{state.name}` &nbsp;|&nbsp; **Confidence:** {conf_pct}%"
+            conf_pct = int(conf * 100)
+            cv2.putText(
+                frame_rgb,
+                f"{state.name}  |  {conf_pct}%",
+                (20, frame_rgb.shape[0] - 20),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, state_colors[state], 2, cv2.LINE_AA,
             )
+            frame_annotated = _draw_checklist_overlay(
+                frame_rgb, steps, current_idx, state, state_colors
+            )
+            video_loc.image(frame_annotated, use_container_width=True)
+            status_loc.caption(status_text)
+
+            elapsed = time.monotonic() - frame_start
+            sleep_time = (1.0 / TARGET_FPS) - elapsed
+            if sleep_time > 0:
+                time.sleep(sleep_time)
 
             if state == VerificationState.COMPLETE:
                 st.success("Process Completed Successfully!")
