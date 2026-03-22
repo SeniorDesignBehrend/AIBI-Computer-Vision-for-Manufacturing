@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 from PySide6.QtCore import QThread, Signal, Slot
@@ -43,6 +44,7 @@ class MainWindow(QMainWindow):
         self.resize(1280, 800)
 
         self._mode = mode
+        self._process_path = process_path  # deferred — loaded after UI is shown
         self._op_params = dict(
             threshold=threshold,
             window_duration=window_duration,
@@ -50,18 +52,6 @@ class MainWindow(QMainWindow):
             log_dir=log_dir,
         )
         self._manager = ProcessManager()
-
-        # Load a process file if provided (e.g. via --process CLI arg)
-        if process_path:
-            try:
-                steps = deserialize_process(Path(process_path).read_bytes())
-                self._manager.steps = steps
-                self._manager.training_finalized = True
-            except Exception as exc:
-                QMessageBox.warning(
-                    self, "Load Warning",
-                    f"Could not load process file:\n{exc}\n\nStarting with empty process."
-                )
 
         # Show a modal progress dialog while the model loads
         self._progress = QProgressDialog("Loading DINOv2 model...", None, 0, 0, self)
@@ -75,11 +65,30 @@ class MainWindow(QMainWindow):
         self._loader.error.connect(self._on_model_error)
         self._loader.start()
 
+    def _load_process(self):
+        """Load the process file now that the event loop is running and window is visible."""
+        if not self._process_path:
+            return
+        path = Path(self._process_path)
+        print(f"[step_validation] Loading process: {path}", flush=True)
+        try:
+            steps = deserialize_process(path.read_bytes())
+            self._manager.steps = steps
+            self._manager.training_finalized = True
+            print(f"[step_validation] Loaded {len(steps)} step(s) from {path.name}", flush=True)
+        except Exception as exc:
+            print(f"[step_validation] ERROR loading process: {exc}", file=sys.stderr, flush=True)
+            QMessageBox.warning(
+                self, "Load Warning",
+                f"Could not load process file:\n{path}\n\n{exc}\n\nStarting with empty process."
+            )
+
     @Slot()
     def _on_model_loaded(self):
         self._loader.wait()  # Ensure run() has fully returned before we continue
         self._progress.close()
         self._build_ui()
+        self._load_process()  # Load after window is visible so errors show correctly
 
     @Slot(str)
     def _on_model_error(self, msg: str):
@@ -87,7 +96,8 @@ class MainWindow(QMainWindow):
         self._progress.close()
         QMessageBox.critical(self, "Model Load Error",
                              f"Failed to load DINOv2 model:\n{msg}")
-        self._build_ui()  # Still open the app — user may want to inspect state
+        self._build_ui()
+        self._load_process()
 
     def _build_ui(self):
         if self._mode == "training":
