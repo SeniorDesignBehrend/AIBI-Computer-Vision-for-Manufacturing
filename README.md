@@ -23,23 +23,6 @@ uv sync --extra dev
 
 ### 3. Run Scanner
 
-**Simple Scanner** - Saves all QR codes to JSON:
-```bash
-uv run python examples/qr/simple_qr_scanner.py
-```
-Press 's' to save, 'q' to quit. Output: `outputs/qr_scans.json`
-
-**Advanced Scanner** - Tracks required barcodes per workstation:
-```bash
-uv run python -m aibi_cv.advanced_scanner
-```
-Press 's' to save (when complete), 'r' to reset, 'q' to quit.
-
-**Simulation Test** - Test without camera (generates synthetic QR codes):
-```bash
-uv run python -m aibi_cv.simulation_scanner
-```
-
 **Camera File** - Tracks required barcodes per workstation:
 ```bash
 uv run python -m aibi_cv.Camera
@@ -81,18 +64,6 @@ Each workstation defines required barcode fields in `data/config/{workstation_id
     "type": "QR_CODE"
   }
 ]
-```
-
-**Advanced Scanner** (`outputs/scan_{workstation_id}_{timestamp}.json`):
-```json
-{
-  "workstation_id": "workstation_01",
-  "timestamp": "2024-01-15T10:30:45.123456",
-  "barcodes": [
-    {"name": "part_number", "value": "PN-12345"},
-    {"name": "serial_number", "value": "SN-67890"}
-  ]
-}
 ```
 
 ## Project Structure
