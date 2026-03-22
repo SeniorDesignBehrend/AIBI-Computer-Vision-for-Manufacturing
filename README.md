@@ -1,6 +1,11 @@
 # AIBI Computer Vision for Manufacturing
 
-QR code scanning system for manufacturing that outputs scan data to JSON files.
+Two-part system for manufacturing quality control:
+
+1. **QR/Barcode Scanner** (`aibi_cv`) — scans barcodes and outputs data to JSON or Excel
+2. **Action Sequence Trainer** (`step_validation`) — teaches and verifies manufacturing process steps using computer vision (DINOv2)
+
+---
 
 ## Quick Start
 
@@ -21,65 +26,135 @@ uv sync
 uv sync --extra dev
 ```
 
-### 3. Run Scanner
+---
 
-**Simple Scanner** - Saves all QR codes to JSON:
+## Action Sequence Trainer
+
+A native desktop app (PySide6) for training and verifying that manufacturing workers perform process steps in the correct order. Launched directly or from a host application (e.g. VB.NET) via command-line arguments.
+
+### Running
+
+**Training mode** — record video segments for each step, then finalize to produce a `.pkl` process file:
+```bash
+uv run python -m step_validation.main --mode training
+```
+
+**Operation mode** — monitor a worker against a saved process in real time:
+```bash
+uv run python -m step_validation.main --mode operation --process path/to/process.pkl
+```
+
+### CLI Arguments
+
+| Argument | Default | Description |
+|---|---|---|
+| `--mode` | *(required)* | `training` or `operation` |
+| `--process PATH` | — | `.pkl` process file to load on startup |
+| `--camera INDEX` | `0` | Camera device index |
+| `--threshold FLOAT` | `0.75` | Min cosine similarity to count a frame as a match (0.5–1.0) |
+| `--window SECONDS` | `2.0` | Detection window length in seconds |
+| `--confidence FLOAT` | `0.70` | Fraction of frames in window required to confirm a step |
+| `--log-dir PATH` | `logs/` | Directory to write run log JSON files |
+
+### Launching from VB.NET
+
+```vbnet
+Dim proc As New Process()
+proc.StartInfo.FileName = "python"
+proc.StartInfo.Arguments = "-m step_validation.main --mode operation " &
+    "--process C:\path\process.pkl --log-dir C:\logs"
+proc.StartInfo.WorkingDirectory = "C:\path\to\AIBI-Computer-Vision-for-Manufacturing\src"
+proc.Start()
+```
+
+### Training Workflow
+
+1. Launch in `--mode training`
+2. **Record** — use the Live Camera tab to record a video segment of each step, or upload a video file. Give each segment a name.
+3. **Review** — reorder segments by dragging or using ↑/↓ buttons. Delete or rename as needed.
+4. **Finalize** — click "Finalize Training" to compute DINOv2 embeddings. This may take a minute.
+5. **Save** — click "Save Process (.pkl)" and share the file with operation machines.
+
+### Operation Mode
+
+The app shows a fullscreen camera feed with an overlay checklist of steps. It automatically advances through steps as each one is detected with sufficient confidence. State indicators:
+
+| State | Meaning |
+|---|---|
+| `IDLE` | No action detected |
+| `CORRECT_STEP` | Expected step detected, building confidence |
+| `CONFIRMED` | Step confirmed, advancing |
+| `WRONG_ORDER` | A past step was re-detected |
+| `SKIPPED` | A future step detected before the expected one |
+| `COMPLETE` | All steps verified |
+
+Run logs are saved as JSON to `--log-dir` after each monitoring session.
+
+### Run Log Format
+
+`logs/run_1_20240115_143022.json`:
+```json
+{
+  "run": 1,
+  "started": "14:30:22",
+  "completed": true,
+  "steps": [
+    { "step": "Attach Left Bracket", "result": "OK", "warnings": "-" },
+    { "step": "Torque Bolts",        "result": "OK", "warnings": "Re-detected 'Attach Left Bracket'" }
+  ]
+}
+```
+
+---
+
+## QR / Barcode Scanner
+
+### Running
+
+**Simple Scanner** — saves all QR codes to JSON:
 ```bash
 uv run python examples/qr/simple_qr_scanner.py
 ```
-Press 's' to save, 'q' to quit. Output: `outputs/qr_scans.json`
+Press `s` to save, `q` to quit. Output: `outputs/qr_scans.json`
 
-**Advanced Scanner** - Tracks required barcodes per workstation:
+**Advanced Scanner** — tracks required barcodes per workstation:
 ```bash
 uv run python -m aibi_cv.advanced_scanner
 ```
-Press 's' to save (when complete), 'r' to reset, 'q' to quit.
+Press `s` to save (when complete), `r` to reset, `q` to quit.
 
-**Simulation Test** - Test without camera (generates synthetic QR codes):
+**Simulation Test** — test without a camera (generates synthetic QR codes):
 ```bash
 uv run python -m aibi_cv.simulation_scanner
 ```
 
-**Camera File** - Tracks required barcodes per workstation:
-```bash
-uv run python -m aibi_cv.Camera
-```
+### Barcode Format
 
-## Barcode Format
-
-Format barcodes as: `field_name:value`
-
-Examples:
+Format barcodes as `field_name:value`:
 - `part_number:PN-12345`
 - `serial_number:SN-67890`
 - `batch_id:BATCH-2024-01`
 
-## Workstation Configuration
+### Workstation Configuration
 
-Each workstation defines required barcode fields in `data/config/{workstation_id}.json`:
+Each workstation is configured in `configs/{workstation_id}.json`:
 
 ```json
 {
   "workstation_id": "workstation_01",
-  "barcode_fields": [
-    {"name": "part_number", "required": true},
-    {"name": "serial_number", "required": true},
-    {"name": "batch_id", "required": false}
-  ],
+  "expected_qr_count": 6,
+  "scan_direction": "row-major",
+  "append_key": "NONE",
   "camera_index": 0
 }
 ```
 
-## Output Format
+### Output Format
 
 **Simple Scanner** (`outputs/qr_scans.json`):
 ```json
 [
-  {
-    "timestamp": "2024-01-15T10:30:45.123456",
-    "data": "part_number:PN-12345",
-    "type": "QR_CODE"
-  }
+  { "timestamp": "2024-01-15T10:30:45.123456", "data": "part_number:PN-12345", "type": "QR_CODE" }
 ]
 ```
 
@@ -89,64 +164,65 @@ Each workstation defines required barcode fields in `data/config/{workstation_id
   "workstation_id": "workstation_01",
   "timestamp": "2024-01-15T10:30:45.123456",
   "barcodes": [
-    {"name": "part_number", "value": "PN-12345"},
-    {"name": "serial_number", "value": "SN-67890"}
+    { "name": "part_number", "value": "PN-12345" },
+    { "name": "serial_number", "value": "SN-67890" }
   ]
 }
 ```
 
+---
+
 ## Project Structure
 
 ```
-├── src/aibi_cv/          # Main package
-├── examples/qr/          # Scanner examples
-├── data/config/          # Workstation configs
-├── outputs/              # Scan results (JSON)
-├── tests/                # Test files
-└── docs/                 # Documentation
+src/
+├── aibi_cv/                  # QR/barcode scanning package
+│   ├── Camera.py             # Main camera/scanner class
+│   ├── advanced_scanner.py
+│   ├── simulation_scanner.py
+│   └── ...
+└── step_validation/          # Action sequence trainer (PySide6 desktop app)
+    ├── main.py               # Entry point (argparse + QApplication)
+    ├── main_window.py        # QMainWindow with DINOv2 loading
+    ├── process_manager.py    # State management
+    ├── embeddings.py         # DINOv2 vision embeddings
+    ├── verification.py       # State machine logic
+    ├── models.py             # ActionStep dataclass
+    ├── serialization.py      # .pkl save/load
+    ├── state.py              # VerificationState enum
+    ├── widgets/
+    │   ├── training_widget.py   # Training UI
+    │   └── operation_widget.py  # Operation UI
+    └── workers/
+        ├── camera_worker.py     # QThread: camera preview
+        └── operation_worker.py  # QThread: monitoring loop
+configs/                      # Workstation config files (JSON)
+examples/                     # Example scanner scripts
+tests/                        # Test suite
 ```
 
-## Creating New Workstations
-
-1. Create config: `data/config/workstation_02.json`
-2. Define required barcode fields
-3. Update `workstation_id` in `advanced_scanner.py`
-4. Run scanner
+---
 
 ## Testing
 
-**Run SFR compliance tests:**
 ```bash
-uv run python run_sfr_tests.py --sfr-only
+# Run all tests
+uv run pytest
+
+# With coverage
+uv run pytest --cov
 ```
 
-**Run all tests:**
-```bash
-uv run python run_sfr_tests.py
-```
-
-**Run with coverage:**
-```bash
-uv run python run_sfr_tests.py --coverage
-```
-
-**Legacy test runner:**
-```bash
-uv run python run_tests.py
-```
-
-### Test Categories
-
-- **SFR Compliance Tests** (`test_comprehensive.py`) - Full Software Functional Requirements validation
-- **Basic Tests** (`test_*.py`) - Core functionality verification
-- **Integration Tests** - End-to-end workflow validation
+---
 
 ## Troubleshooting
 
-**Camera not opening:**
+**Camera not detected:**
 ```bash
 uv run python -c "import cv2; print(cv2.VideoCapture(0).isOpened())"
 ```
+
+**xFormers warnings on startup** (DINOv2) — harmless, no action needed. Install `xformers` for a small speed improvement if desired.
 
 **Lock file corrupted:**
 ```bash
