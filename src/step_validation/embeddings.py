@@ -1,16 +1,18 @@
 import cv2
 import numpy as np
-import streamlit as st
 import torch
 import torchvision.transforms as T
 from PIL import Image
 
+_model = None
 
-@st.cache_resource
+
 def load_dinov2_model():
-    model = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14")
-    model.eval()
-    return model
+    global _model
+    if _model is None:
+        _model = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14")
+        _model.eval()
+    return _model
 
 
 def _build_transform():
