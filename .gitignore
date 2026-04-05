@@ -5,6 +5,7 @@ __pycache__/
 .DS_Store
 outputs/*.json
 data/*.db
+output/*.json
 
 # uv files
 uv.lock

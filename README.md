@@ -158,20 +158,6 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 ]
 ```
 
-**Advanced Scanner** (`outputs/scan_{workstation_id}_{timestamp}.json`):
-```json
-{
-  "workstation_id": "workstation_01",
-  "timestamp": "2024-01-15T10:30:45.123456",
-  "barcodes": [
-    { "name": "part_number", "value": "PN-12345" },
-    { "name": "serial_number", "value": "SN-67890" }
-  ]
-}
-```
-
----
-
 ## Project Structure
 
 ```
