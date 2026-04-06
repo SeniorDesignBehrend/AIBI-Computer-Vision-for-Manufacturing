@@ -111,21 +111,9 @@ Run logs are saved as JSON to `--log-dir` after each monitoring session.
 
 ### Running
 
-**Simple Scanner** — saves all QR codes to JSON:
+**Camera File** - Tracks required barcodes per workstation:
 ```bash
-uv run python examples/qr/simple_qr_scanner.py
-```
-Press `s` to save, `q` to quit. Output: `outputs/qr_scans.json`
-
-**Advanced Scanner** — tracks required barcodes per workstation:
-```bash
-uv run python -m aibi_cv.advanced_scanner
-```
-Press `s` to save (when complete), `r` to reset, `q` to quit.
-
-**Simulation Test** — test without a camera (generates synthetic QR codes):
-```bash
-uv run python -m aibi_cv.simulation_scanner
+uv run python -m aibi_cv.Camera
 ```
 
 ### Barcode Format
@@ -151,12 +139,19 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 
 ### Output Format
 
-**Simple Scanner** (`outputs/qr_scans.json`):
+(`outputs/scan_{workstation_id}_{timestamp}.json`):
 ```json
-[
-  { "timestamp": "2024-01-15T10:30:45.123456", "data": "part_number:PN-12345", "type": "QR_CODE" }
-]
+{
+  "workstation_id": "workstation_01",
+  "timestamp": "2024-01-15T10:30:45.123456",
+  "barcodes": [
+    { "name": "part_number", "value": "PN-12345" },
+    { "name": "serial_number", "value": "SN-67890" }
+  ]
+}
 ```
+
+---
 
 ## Project Structure
 
@@ -164,9 +159,6 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 src/
 ├── aibi_cv/                  # QR/barcode scanning package
 │   ├── Camera.py             # Main camera/scanner class
-│   ├── advanced_scanner.py
-│   ├── simulation_scanner.py
-│   └── ...
 └── step_validation/          # Action sequence trainer (PySide6 desktop app)
     ├── main.py               # Entry point (argparse + QApplication)
     ├── main_window.py        # QMainWindow with DINOv2 loading
@@ -202,11 +194,6 @@ uv run pytest --cov
 ---
 
 ## Troubleshooting
-
-**Camera not detected:**
-```bash
-uv run python -c "import cv2; print(cv2.VideoCapture(0).isOpened())"
-```
 
 **xFormers warnings on startup** (DINOv2) — harmless, no action needed. Install `xformers` for a small speed improvement if desired.
 
