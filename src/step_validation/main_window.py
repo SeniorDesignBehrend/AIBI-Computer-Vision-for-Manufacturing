@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         window_duration: float = 2.0,
         required_fraction: float = 0.70,
         log_dir: str = "logs",
+        auto_start: bool = False,
     ):
         super().__init__()
         self.setWindowTitle("Action Sequence Trainer")
@@ -45,6 +46,7 @@ class MainWindow(QMainWindow):
 
         self._mode = mode
         self._process_path = process_path  # deferred — loaded after UI is shown
+        self._auto_start = auto_start
         self._op_params = dict(
             threshold=threshold,
             window_duration=window_duration,
@@ -89,6 +91,8 @@ class MainWindow(QMainWindow):
         self._progress.close()
         self._build_ui()
         self._load_process()  # Load after window is visible so errors show correctly
+        if self._auto_start and self._mode == "operation":
+            self._central.auto_start()
 
     @Slot(str)
     def _on_model_error(self, msg: str):

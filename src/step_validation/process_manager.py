@@ -65,3 +65,36 @@ class ProcessManager:
         self.training_finalized = True
         self.recorded_segments = []
         self.training_phase = "record"
+
+    def augment_steps_from_segments(self, segments: list) -> int:
+        """Add new video segments to existing steps and re-compute centroids.
+
+        Segments whose label matches an existing step name are merged in.
+        Returns the number of steps that were augmented.
+        """
+        from .embeddings import get_embedding
+
+        step_by_name: dict[str, ActionStep] = {s.name: s for s in self.steps}
+
+        augmented = 0
+        for seg in segments:
+            label = seg.get("label", "").strip()
+            frames = seg.get("frames", [])
+            if not label or not frames or label not in step_by_name:
+                continue
+
+            step = step_by_name[label]
+            new_embeddings = [get_embedding(f) for f in frames]
+
+            # Combine existing centroid with new embeddings
+            all_embeddings = list(new_embeddings)
+            if step.centroid is not None:
+                all_embeddings.append(step.centroid)
+
+            mean_emb = np.mean(all_embeddings, axis=0)
+            norm = np.linalg.norm(mean_emb)
+            step.centroid = mean_emb / norm if norm > 0 else mean_emb
+            augmented += 1
+
+        self.recorded_segments = []
+        return augmented

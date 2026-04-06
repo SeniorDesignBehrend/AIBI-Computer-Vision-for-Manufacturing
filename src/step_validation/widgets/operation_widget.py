@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMessageBox,
+    QProgressBar,
     QPushButton,
     QSizePolicy,
     QVBoxLayout,
@@ -64,8 +65,9 @@ class OperationWidget(QWidget):
         outer.setContentsMargins(4, 4, 4, 4)
         outer.setSpacing(4)
 
-        # ---- Toolbar ----
+        # ---- Toolbar (centered) ----
         toolbar = QHBoxLayout()
+        toolbar.addStretch()
         self._btn_start = QPushButton("▶  Start")
         self._btn_start.clicked.connect(self._start)
         self._btn_stop = QPushButton("■  Stop")
@@ -78,6 +80,16 @@ class OperationWidget(QWidget):
         toolbar.addWidget(self._btn_restart)
         toolbar.addStretch()
         outer.addLayout(toolbar)
+
+        # ---- Progress bar ----
+        self._progress_bar = QProgressBar()
+        self._progress_bar.setTextVisible(True)
+        self._progress_bar.setFormat("Step %v / %m")
+        self._progress_bar.setValue(0)
+        self._progress_bar.setMinimum(0)
+        self._progress_bar.setMaximum(1)  # updated when operation starts
+        self._progress_bar.setFixedHeight(22)
+        outer.addWidget(self._progress_bar)
 
         # ---- Video (fills remaining space) ----
         self._video_label = QLabel("Press ▶ Start to begin.")
@@ -106,6 +118,7 @@ class OperationWidget(QWidget):
         self._status_label.setText(status)
         color = _STATE_COLORS.get(state, "#aaaaaa")
         self._status_label.setStyleSheet(f"font-size: 13px; color: {color};")
+        self._progress_bar.setValue(current_idx)
 
     @Slot(dict)
     def _on_run_finished(self, record: dict):
@@ -116,8 +129,13 @@ class OperationWidget(QWidget):
         self._worker = None
         self._save_log(record)
         if record["completed"]:
+            self._progress_bar.setValue(self._progress_bar.maximum())
             self._status_label.setText("Process Completed Successfully!")
             self._status_label.setStyleSheet("font-size: 13px; color: #00ff00;")
+
+    @Slot()
+    def _on_camera_ready(self):
+        self._btn_stop.setEnabled(True)
 
     @Slot()
     def _on_camera_error(self):
@@ -143,9 +161,12 @@ class OperationWidget(QWidget):
             return
 
         self._btn_start.setEnabled(False)
-        self._btn_stop.setEnabled(True)
+        self._btn_stop.setEnabled(False)
         self._btn_restart.setEnabled(False)
-        self._video_label.setText("")
+        self._video_label.setText("Connecting to camera...")
+        self._video_label.setStyleSheet("background: #111; color: #888;")
+        self._progress_bar.setMaximum(len(steps))
+        self._progress_bar.setValue(0)
 
         self._worker = OperationWorker(
             steps=steps,
@@ -157,6 +178,7 @@ class OperationWidget(QWidget):
         self._worker.frame_processed.connect(self._on_frame)
         self._worker.run_finished.connect(self._on_run_finished)
         self._worker.camera_error.connect(self._on_camera_error)
+        self._worker.camera_opened.connect(self._on_camera_ready)
         self._worker.start()
 
     def _stop(self):
@@ -170,6 +192,7 @@ class OperationWidget(QWidget):
     def _restart(self):
         self._stop()
         self._manager.current_op_step = 0
+        self._progress_bar.setValue(0)
         self._status_label.setText("")
         self._video_label.setText("Press ▶ Start to begin.")
         self._video_label.setStyleSheet("background: #111; color: #666;")
@@ -186,6 +209,10 @@ class OperationWidget(QWidget):
             path.write_text(json.dumps(record, indent=2))
         except Exception:
             pass  # Never crash the app over a log write failure
+
+    def auto_start(self):
+        """Programmatically trigger the Start button (used by --auto-start)."""
+        self._start()
 
     def cleanup(self):
         if self._worker:

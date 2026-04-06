@@ -76,6 +76,12 @@ def main():
         metavar="PATH",
         help="Directory to write run log JSON files (default: logs/).",
     )
+    parser.add_argument(
+        "--auto-start",
+        action="store_true",
+        default=False,
+        help="Automatically start operation monitoring once the window opens.",
+    )
     args = parser.parse_args()
 
     cv2.setLogLevel(0)  # Suppress MSMF/backend grab warnings on Windows
@@ -90,6 +96,7 @@ def main():
         window_duration=args.window,
         required_fraction=args.confidence,
         log_dir=args.log_dir,
+        auto_start=args.auto_start,
     )
     window.show()
 

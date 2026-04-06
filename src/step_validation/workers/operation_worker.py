@@ -75,6 +75,7 @@ class OperationWorker(QThread):
     step_confirmed = Signal(int)
     run_finished = Signal(dict)
     camera_error = Signal()
+    camera_opened = Signal()
 
     def __init__(
         self,
@@ -102,6 +103,15 @@ class OperationWorker(QThread):
         if not cap.isOpened():
             self.camera_error.emit()
             return
+
+        # Confirm camera delivers frames before entering the loop
+        ret, first_frame = cap.read()
+        if not ret:
+            cap.release()
+            self.camera_error.emit()
+            return
+
+        self.camera_opened.emit()
 
         self._running = True
         current_idx = 0

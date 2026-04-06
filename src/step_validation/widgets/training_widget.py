@@ -5,6 +5,7 @@ import numpy as np
 from PySide6.QtCore import Qt, QSize, QThread, Signal, Slot
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import (
+    QComboBox,
     QFileDialog,
     QGroupBox,
     QHBoxLayout,
@@ -61,6 +62,24 @@ class _FinalizeWorker(QThread):
             self.error.emit(str(exc))
 
 
+class _AugmentWorker(QThread):
+    """Runs augment_steps_from_segments in a background thread."""
+    done = Signal(int)   # emits number of steps augmented
+    error = Signal(str)
+
+    def __init__(self, manager: ProcessManager, segments: list, parent=None):
+        super().__init__(parent)
+        self.manager = manager
+        self.segments = segments
+
+    def run(self):
+        try:
+            count = self.manager.augment_steps_from_segments(self.segments)
+            self.done.emit(count)
+        except Exception as exc:
+            self.error.emit(str(exc))
+
+
 # ---------------------------------------------------------------------------
 # Record phase — camera tab
 # ---------------------------------------------------------------------------
@@ -73,10 +92,11 @@ class _CameraTab(QWidget):
         self._buffer: list[np.ndarray] = []
         self._camera_worker: CameraWorker | None = None
         self._recording = False
+        self._camera_ready = False
 
         layout = QVBoxLayout(self)
 
-        self._preview = QLabel("Camera preview will appear here.")
+        self._preview = QLabel("Connecting to camera...")
         self._preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._preview.setMinimumHeight(300)
         self._preview.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -85,6 +105,7 @@ class _CameraTab(QWidget):
 
         btn_row = QHBoxLayout()
         self._btn_start = QPushButton("Start Recording")
+        self._btn_start.setEnabled(False)
         self._btn_start.clicked.connect(self._start_recording)
         self._btn_stop = QPushButton("Stop Recording")
         self._btn_stop.setEnabled(False)
@@ -122,10 +143,17 @@ class _CameraTab(QWidget):
         self._camera_worker = CameraWorker(fps=30)
         self._camera_worker.frame_ready.connect(self._on_preview_frame)
         self._camera_worker.camera_error.connect(self._on_camera_error)
+        self._camera_worker.camera_opened.connect(self._on_camera_opened)
         self._camera_worker.start()
 
     @Slot()
+    def _on_camera_opened(self):
+        self._camera_ready = True
+        self._btn_start.setEnabled(True)
+
+    @Slot()
     def _on_camera_error(self):
+        self._camera_ready = False
         self._preview.setText("Camera not available.\nCheck that no other application is using it.")
         self._btn_start.setEnabled(False)
 
@@ -147,6 +175,8 @@ class _CameraTab(QWidget):
 
     @Slot(object)
     def _on_preview_frame(self, frame: np.ndarray):
+        if not self._camera_ready:
+            return
         lw = self._preview.width() or 640
         lh = self._preview.height() or 480
         if self._recording:
@@ -513,6 +543,138 @@ class _ReviewPhase(QWidget):
 # Top-level TrainingWidget
 # ---------------------------------------------------------------------------
 
+class _AugmentPhase(QWidget):
+    """Allows adding more video segments to an already-loaded process."""
+    augment_done = Signal()
+
+    def __init__(self, manager: ProcessManager, parent=None):
+        super().__init__(parent)
+        self._manager = manager
+        self._segments: list[dict] = []
+        self._augment_worker: _AugmentWorker | None = None
+
+        layout = QVBoxLayout(self)
+
+        header = QLabel("Add More Videos to Existing Steps")
+        header.setStyleSheet("font-size: 16px; font-weight: bold;")
+        layout.addWidget(header)
+
+        self._step_list_label = QLabel()
+        self._step_list_label.setStyleSheet("color: #aaa;")
+        layout.addWidget(self._step_list_label)
+
+        layout.addWidget(QLabel(
+            "Record or upload new video for an existing step. "
+            "The new data will be merged with the current centroid."
+        ))
+
+        tabs = QTabWidget()
+        self._camera_tab = _CameraTab()
+        self._camera_tab.segment_saved.connect(self._on_segment_saved)
+        self._upload_tab = _UploadTab()
+        self._upload_tab.segment_saved.connect(self._on_segment_saved)
+        tabs.addTab(self._camera_tab, "Live Camera")
+        tabs.addTab(self._upload_tab, "Upload Video File")
+        layout.addWidget(tabs)
+
+        # Pending segments list
+        self._pending_label = QLabel("No segments queued yet.")
+        self._pending_label.setStyleSheet("color: #888;")
+        layout.addWidget(self._pending_label)
+
+        btn_row = QHBoxLayout()
+        self._btn_augment = QPushButton("Merge Into Process")
+        self._btn_augment.setEnabled(False)
+        self._btn_augment.clicked.connect(self._augment)
+        btn_row.addStretch()
+        btn_row.addWidget(self._btn_augment)
+        layout.addLayout(btn_row)
+
+        self._status_label = QLabel()
+        layout.addWidget(self._status_label)
+
+        self._btn_save = QPushButton("Save Updated Process (.pkl)")
+        self._btn_save.setVisible(False)
+        self._btn_save.clicked.connect(self._save_process)
+        layout.addWidget(self._btn_save)
+
+    def refresh(self):
+        step_names = [s.name for s in self._manager.steps]
+        self._step_list_label.setText(
+            f"Current steps: {', '.join(step_names)}"
+        )
+        self._segments.clear()
+        self._update_pending_label()
+        self._btn_save.setVisible(False)
+        self._status_label.clear()
+
+    @Slot(dict)
+    def _on_segment_saved(self, seg: dict):
+        # Check that the segment label matches an existing step
+        label = seg.get("label", "").strip()
+        existing_names = {s.name for s in self._manager.steps}
+        if label not in existing_names:
+            QMessageBox.warning(
+                self, "Unknown Step",
+                f"'{label}' does not match any existing step.\n"
+                f"Existing steps: {', '.join(existing_names)}\n\n"
+                "Please use the exact step name."
+            )
+            return
+        self._segments.append(seg)
+        self._update_pending_label()
+
+    def _update_pending_label(self):
+        if not self._segments:
+            self._pending_label.setText("No segments queued yet.")
+            self._btn_augment.setEnabled(False)
+        else:
+            names = [s["label"] for s in self._segments]
+            self._pending_label.setText(
+                f"{len(self._segments)} segment(s) queued: {', '.join(names)}"
+            )
+            self._btn_augment.setEnabled(True)
+
+    def _augment(self):
+        self._btn_augment.setEnabled(False)
+        self._status_label.setText("Computing embeddings and merging...")
+
+        self._augment_worker = _AugmentWorker(
+            self._manager, list(self._segments)
+        )
+        self._augment_worker.done.connect(self._on_augmented)
+        self._augment_worker.error.connect(self._on_augment_error)
+        self._augment_worker.start()
+
+    @Slot(int)
+    def _on_augmented(self, count: int):
+        if self._augment_worker:
+            self._augment_worker.wait()
+        self._segments.clear()
+        self._update_pending_label()
+        self._status_label.setText(f"Augmented {count} step(s). Centroids updated.")
+        self._btn_save.setVisible(True)
+        self.augment_done.emit()
+
+    @Slot(str)
+    def _on_augment_error(self, msg: str):
+        self._status_label.setText(f"Error: {msg}")
+        self._btn_augment.setEnabled(True)
+
+    def _save_process(self):
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save Process", "process.pkl", "Process Files (*.pkl)"
+        )
+        if not path:
+            return
+        data = serialize_process(self._manager.get_steps())
+        Path(path).write_bytes(data)
+        self._status_label.setText(f"Saved to {path}")
+
+    def cleanup(self):
+        self._camera_tab.cleanup()
+
+
 class TrainingWidget(QWidget):
     def __init__(self, manager: ProcessManager, parent=None):
         super().__init__(parent)
@@ -531,8 +693,10 @@ class TrainingWidget(QWidget):
         self._stack = QStackedWidget()
         self._record_phase = _RecordPhase(manager)
         self._review_phase = _ReviewPhase(manager)
+        self._augment_phase = _AugmentPhase(manager)
         self._stack.addWidget(self._record_phase)   # index 0
         self._stack.addWidget(self._review_phase)   # index 1
+        self._stack.addWidget(self._augment_phase)   # index 2
         outer.addWidget(self._stack)
 
         self._record_phase.go_to_review.connect(self._show_review)
@@ -545,6 +709,10 @@ class TrainingWidget(QWidget):
 
     def _show_record(self):
         self._stack.setCurrentIndex(0)
+
+    def _show_augment(self):
+        self._augment_phase.refresh()
+        self._stack.setCurrentIndex(2)
 
     @Slot()
     def _on_training_finalized(self):
@@ -561,12 +729,17 @@ class TrainingWidget(QWidget):
             self._manager.steps = steps
             self._manager.training_finalized = True
             self._manager.current_op_step = 0
-            QMessageBox.information(
+            reply = QMessageBox.question(
                 self, "Loaded",
-                f"Loaded {len(steps)} step(s) from {Path(path).name}"
+                f"Loaded {len(steps)} step(s) from {Path(path).name}.\n\n"
+                "Would you like to add more videos to these steps?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             )
+            if reply == QMessageBox.StandardButton.Yes:
+                self._show_augment()
         except Exception as exc:
             QMessageBox.critical(self, "Load Error", str(exc))
 
     def cleanup(self):
         self._record_phase.cleanup()
+        self._augment_phase.cleanup()
