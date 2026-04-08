@@ -1,27 +1,26 @@
-"""Basic barcode parsing tests - see test_comprehensive.py for SFR compliance tests."""
+"""Basic parsing tests for the current parser implementation."""
 
-import pytest
-from aibi_cv.advanced_scanner import AdvancedScanner
+from aibi_cv.parse import Parse
 
 
 class TestBasicBarcodeParser:
     """Basic barcode parsing functionality tests."""
-    
+
     def test_parse_colon_format(self):
         """Test parsing standard colon-separated format."""
-        name, value = AdvancedScanner.parse_barcode("part_number:PN-12345")
+        name, value = Parse.parse("part_number:PN-12345")
         assert name == "part_number"
         assert value == "PN-12345"
 
     def test_parse_json_format(self):
         """Test parsing JSON format barcodes."""
         json_data = '{"part_number": "PN-99999"}'
-        name, value = AdvancedScanner.parse_barcode(json_data)
+        name, value = Parse.parse(json_data)
         assert name == "part_number"
         assert value == "PN-99999"
 
     def test_parse_no_colon_returns_none_name(self):
         """Test parsing data without colon separator."""
-        name, value = AdvancedScanner.parse_barcode("PLAIN_TEXT_CODE")
+        name, value = Parse.parse("PLAIN_TEXT_CODE")
         assert name is None
         assert value == "PLAIN_TEXT_CODE"

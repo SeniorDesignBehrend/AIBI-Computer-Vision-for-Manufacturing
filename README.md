@@ -81,7 +81,7 @@ Each workstation defines required barcode fields in `data/config/{workstation_id
 
 1. Create config: `data/config/workstation_02.json`
 2. Define required barcode fields
-3. Update `workstation_id` in `advanced_scanner.py`
+3. Launch scanner with the target workstation ID in the Camera entrypoint
 4. Run scanner
 
 ## Testing
