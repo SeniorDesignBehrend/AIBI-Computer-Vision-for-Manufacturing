@@ -1,0 +1,17 @@
+{
+  "completed": true,
+  "run": 1,
+  "started": "16:00:34",
+  "steps": [
+    {
+      "result": "OK",
+      "step": "Ceiling",
+      "warnings": "Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'; Skipped to 'Person'"
+    },
+    {
+      "result": "OK",
+      "step": "Person",
+      "warnings": "Re-detected 'Ceiling'; Re-detected 'Ceiling'; Re-detected 'Ceiling'; Re-detected 'Ceiling'; Re-detected 'Ceiling'; Re-detected 'Ceiling'; Re-detected 'Ceiling'"
+    }
+  ]
+}

@@ -13,15 +13,31 @@ src/aibi_cv.egg-info/dependency_links.txt
 src/aibi_cv.egg-info/requires.txt
 src/aibi_cv.egg-info/top_level.txt
 src/step_validation/__init__.py
+<<<<<<< HEAD
+src/step_validation/embeddings.py
+src/step_validation/main.py
+src/step_validation/main_window.py
+=======
 src/step_validation/app.py
 src/step_validation/embeddings.py
+>>>>>>> bfe744f335095baecf86a574fdec0be7c403857a
 src/step_validation/models.py
 src/step_validation/process_manager.py
 src/step_validation/serialization.py
 src/step_validation/state.py
+<<<<<<< HEAD
+src/step_validation/verification.py
+src/step_validation/widgets/__init__.py
+src/step_validation/widgets/operation_widget.py
+src/step_validation/widgets/training_widget.py
+src/step_validation/workers/__init__.py
+src/step_validation/workers/camera_worker.py
+src/step_validation/workers/operation_worker.py
+=======
 src/step_validation/ui_operation.py
 src/step_validation/ui_training.py
 src/step_validation/verification.py
+>>>>>>> bfe744f335095baecf86a574fdec0be7c403857a
 tests/test_barcode_parsing.py
 tests/test_comprehensive.py
 tests/test_config_manager.py
