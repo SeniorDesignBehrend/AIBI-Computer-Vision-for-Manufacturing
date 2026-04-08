@@ -66,7 +66,7 @@ Saved to `outputs/scan_{workstation_id}_{timestamp}.json`:
 
 1. Create a new config file: `data/config/workstation_03.json`
 2. Define the barcode fields needed for that workstation
-3. Update the `workstation_id` variable in `advanced_scanner.py`
+3. Launch the scanner for the intended workstation via the Camera entrypoint
 4. Run the scanner
 
 ## Example Workstations
