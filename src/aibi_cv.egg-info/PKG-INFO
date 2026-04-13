@@ -49,7 +49,6 @@ uv sync --extra dev
 
 ---
 
-<<<<<<< HEAD
 ## Action Sequence Trainer
 
 A native desktop app (PySide6) for training and verifying that manufacturing workers perform process steps in the correct order. Launched directly or from a host application (e.g. VB.NET) via command-line arguments.
@@ -133,30 +132,12 @@ Run logs are saved as JSON to `--log-dir` after each monitoring session.
 
 ### Running
 
-**Simple Scanner** — saves all QR codes to JSON:
-```bash
-uv run python examples/qr/simple_qr_scanner.py
-```
-Press `s` to save, `q` to quit. Output: `outputs/qr_scans.json`
-
-**Advanced Scanner** — tracks required barcodes per workstation:
-```bash
-uv run python -m aibi_cv.advanced_scanner
-```
-Press `s` to save (when complete), `r` to reset, `q` to quit.
-
-**Simulation Test** — test without a camera (generates synthetic QR codes):
-```bash
-uv run python -m aibi_cv.simulation_scanner
-```
-
-### Barcode Format
-=======
 **Camera File** - Tracks required barcodes per workstation:
 ```bash
 uv run python -m aibi_cv.Camera
 ```
->>>>>>> bfe744f335095baecf86a574fdec0be7c403857a
+
+### Barcode Format
 
 Format barcodes as `field_name:value`:
 - `part_number:PN-12345`
@@ -179,15 +160,7 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 
 ### Output Format
 
-**Simple Scanner** (`outputs/qr_scans.json`):
-```json
-[
-  { "timestamp": "2024-01-15T10:30:45.123456", "data": "part_number:PN-12345", "type": "QR_CODE" }
-]
-```
-
-<<<<<<< HEAD
-**Advanced Scanner** (`outputs/scan_{workstation_id}_{timestamp}.json`):
+(`outputs/scan_{workstation_id}_{timestamp}.json`):
 ```json
 {
   "workstation_id": "workstation_01",
@@ -201,17 +174,12 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 
 ---
 
-=======
->>>>>>> bfe744f335095baecf86a574fdec0be7c403857a
 ## Project Structure
 
 ```
 src/
 ├── aibi_cv/                  # QR/barcode scanning package
 │   ├── Camera.py             # Main camera/scanner class
-│   ├── advanced_scanner.py
-│   ├── simulation_scanner.py
-│   └── ...
 └── step_validation/          # Action sequence trainer (PySide6 desktop app)
     ├── main.py               # Entry point (argparse + QApplication)
     ├── main_window.py        # QMainWindow with DINOv2 loading
@@ -247,11 +215,6 @@ uv run pytest --cov
 ---
 
 ## Troubleshooting
-
-**Camera not detected:**
-```bash
-uv run python -c "import cv2; print(cv2.VideoCapture(0).isOpened())"
-```
 
 **xFormers warnings on startup** (DINOv2) — harmless, no action needed. Install `xformers` for a small speed improvement if desired.
 

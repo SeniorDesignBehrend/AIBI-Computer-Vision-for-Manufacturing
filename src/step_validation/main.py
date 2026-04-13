@@ -84,7 +84,9 @@ def main():
     )
     args = parser.parse_args()
 
-    cv2.setLogLevel(0)  # Suppress MSMF/backend grab warnings on Windows
+    # Suppress MSMF/backend grab warnings on Windows (not available in all builds)
+    if hasattr(cv2, "setLogLevel"):
+        cv2.setLogLevel(0)
 
     app = QApplication(sys.argv)
     app.setApplicationName("Action Sequence Trainer")
