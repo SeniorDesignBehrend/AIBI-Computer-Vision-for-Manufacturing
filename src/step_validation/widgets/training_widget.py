@@ -120,9 +120,18 @@ class _CameraTab(QWidget):
         save_layout = QVBoxLayout(self._save_group)
         self._label_info = QLabel()
         save_layout.addWidget(self._label_info)
+        # Step name with dropdown for existing names
+        name_row = QHBoxLayout()
         self._name_input = QLineEdit()
         self._name_input.setPlaceholderText("Step name (e.g. 'Attach Left Bracket')")
-        save_layout.addWidget(self._name_input)
+        self._name_combo = QComboBox()
+        self._name_combo.setEditable(False)
+        self._name_combo.addItem("-- New Step --")
+        self._name_combo.currentTextChanged.connect(self._on_combo_changed)
+        name_row.addWidget(self._name_input, stretch=3)
+        name_row.addWidget(QLabel("or select:"))
+        name_row.addWidget(self._name_combo, stretch=2)
+        save_layout.addLayout(name_row)
         save_btns = QHBoxLayout()
         btn_save = QPushButton("Save Segment")
         btn_save.clicked.connect(self._save_segment)
@@ -171,7 +180,24 @@ class _CameraTab(QWidget):
         if self._buffer:
             self._label_info.setText(f"Captured {len(self._buffer)} frames. Name this step to save it.")
             self._name_input.clear()
+            self._name_combo.setCurrentIndex(0)
             self._save_group.setVisible(True)
+
+    def _on_combo_changed(self, text: str):
+        if text and text != "-- New Step --":
+            self._name_input.setText(text)
+
+    def update_existing_names(self, names: list[str]):
+        """Update the combo box with existing step names."""
+        current = self._name_combo.currentText()
+        self._name_combo.clear()
+        self._name_combo.addItem("-- New Step --")
+        for name in names:
+            self._name_combo.addItem(name)
+        # Restore selection if it still exists
+        idx = self._name_combo.findText(current)
+        if idx >= 0:
+            self._name_combo.setCurrentIndex(idx)
 
     @Slot(object)
     def _on_preview_frame(self, frame: np.ndarray):
@@ -225,19 +251,41 @@ class _UploadTab(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout(self)
 
-        btn_open = QPushButton("Upload Video Files...")
+        # Step name input first
+        name_group = QGroupBox("Step Name")
+        name_layout = QVBoxLayout(name_group)
+        name_row = QHBoxLayout()
+        self._name_input = QLineEdit()
+        self._name_input.setPlaceholderText("Step name (e.g. 'Attach Left Bracket')")
+        self._name_combo = QComboBox()
+        self._name_combo.setEditable(False)
+        self._name_combo.addItem("-- New Step --")
+        self._name_combo.currentTextChanged.connect(self._on_combo_changed)
+        name_row.addWidget(self._name_input, stretch=3)
+        name_row.addWidget(QLabel("or select:"))
+        name_row.addWidget(self._name_combo, stretch=2)
+        name_layout.addLayout(name_row)
+        layout.addWidget(name_group)
+
+        # Upload button
+        btn_open = QPushButton("Upload Video(s) for This Step...")
         btn_open.clicked.connect(self._open_files)
         layout.addWidget(btn_open)
 
-        self._info_label = QLabel("No videos uploaded.")
+        self._info_label = QLabel("Enter a step name, then upload one or more videos.")
         self._info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._info_label.setStyleSheet("color: #888;")
         layout.addWidget(self._info_label)
         layout.addStretch()
 
     def _open_files(self):
+        name = self._name_input.text().strip()
+        if not name:
+            QMessageBox.warning(self, "Name Required", "Please enter a step name before uploading videos.")
+            return
+
         paths, _ = QFileDialog.getOpenFileNames(
-            self, "Upload Videos", "", "Video Files (*.mp4 *.avi *.mov *.mkv)"
+            self, f"Upload Videos for '{name}'", "", "Video Files (*.mp4 *.avi *.mov *.mkv)"
         )
         if not paths:
             return
@@ -257,10 +305,24 @@ class _UploadTab(QWidget):
                 continue
 
             frames = [f for idx, f in enumerate(all_frames) if idx % SAMPLE_EVERY_N == 0]
-            name = Path(path).stem
             self.segment_saved.emit({"label": name, "frames": frames, "source": "upload"})
 
-        self._info_label.setText(f"Uploaded {len(paths)} video(s) as segments.")
+        self._info_label.setText(f"Uploaded {len(paths)} video(s) for step '{name}'.")
+
+    def _on_combo_changed(self, text: str):
+        if text and text != "-- New Step --":
+            self._name_input.setText(text)
+
+    def update_existing_names(self, names: list[str]):
+        """Update the combo box with existing step names."""
+        current = self._name_combo.currentText()
+        self._name_combo.clear()
+        self._name_combo.addItem("-- New Step --")
+        for name in names:
+            self._name_combo.addItem(name)
+        idx = self._name_combo.findText(current)
+        if idx >= 0:
+            self._name_combo.setCurrentIndex(idx)
 
 
 # ---------------------------------------------------------------------------
@@ -276,12 +338,12 @@ class _RecordPhase(QWidget):
 
         layout = QVBoxLayout(self)
 
-        header = QLabel("Step 1: Record a Segment")
+        header = QLabel("Step 1: Record Segments")
         header.setStyleSheet("font-size: 16px; font-weight: bold;")
         layout.addWidget(header)
         layout.addWidget(QLabel(
-            "Record video of yourself performing one step, then give it a name. "
-            "Repeat for each step."
+            "Record or upload videos for each step. Use the same name for multiple videos "
+            "of the same step to train on all of them."
         ))
 
         tabs = QTabWidget()
@@ -304,11 +366,21 @@ class _RecordPhase(QWidget):
     def _on_segment_saved(self, seg: dict):
         self._manager.recorded_segments.append(seg)
         self._refresh_review_button()
+        self._update_existing_names()
 
     def _refresh_review_button(self):
         n = len(self._manager.recorded_segments)
         self._review_btn.setEnabled(n > 0)
         self._review_btn.setText(f"Review {n} segment(s) and finalize →")
+
+    def _update_existing_names(self):
+        """Update both tabs with existing step names."""
+        unique_names = sorted(set(
+            seg["label"] for seg in self._manager.recorded_segments
+            if seg.get("label", "").strip()
+        ))
+        self._camera_tab.update_existing_names(unique_names)
+        self._upload_tab.update_existing_names(unique_names)
 
     def cleanup(self):
         self._camera_tab.cleanup()
@@ -420,7 +492,8 @@ class _ReviewPhase(QWidget):
         header.setStyleSheet("font-size: 16px; font-weight: bold;")
         layout.addWidget(header)
         layout.addWidget(QLabel(
-            "Drag rows to reorder, or use ↑/↓ buttons. All steps must be named before finalizing."
+            "Drag rows to reorder, or use ↑/↓ buttons. Multiple videos with the same name "
+            "will be merged during finalization."
         ))
 
         self._list = _DragList()
