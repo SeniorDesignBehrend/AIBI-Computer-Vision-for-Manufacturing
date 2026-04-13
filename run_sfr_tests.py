@@ -18,9 +18,9 @@ This script runs the comprehensive test suite that validates all SFR test cases:
 - PDSR1: Config Inspection
 - PDSR2: API Analysis
 - QDSR1: Dependency Audit
-- ETSR3: Interoperability Schema
-- ETSR5: MES Integration
-- ETSR6: Configurable Workflows
+- EISR3: Interoperability Schema
+- EISR5: MES Integration
+- EISR6: Configurable Workflows
 """
 
 import subprocess

@@ -1,14 +1,12 @@
 """Integration tests for the complete scanning workflow."""
 
 import json
-import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch, MagicMock
-import numpy as np
 
-from aibi_cv.config_manager import ConfigManager, WorkstationConfig, BarcodeField
-from aibi_cv.advanced_scanner import parse_barcode
+from aibi_cv.OutputData import OutputData
+from aibi_cv.config_manager import ConfigManager, WorkstationConfig
+from aibi_cv.parse import Parse
 
 
 class TestScanningWorkflow:
@@ -27,12 +25,13 @@ class TestScanningWorkflow:
         """Test complete scanning workflow from config to output."""
         # 1. Create workstation config
         config_manager = ConfigManager(self.config_dir)
-        fields = [
-            BarcodeField("part_number", True),
-            BarcodeField("serial_number", True),
-            BarcodeField("batch_id", False)
-        ]
-        config = WorkstationConfig("test_ws", fields, 0)
+        config = WorkstationConfig(
+            workstation_id="test_ws",
+            expected_qr_count=2,
+            scan_direction="left-to-right",
+            append_key="TAB",
+            camera_index=0,
+        )
         config_manager.save_config(config)
         
         # 2. Simulate scanning process
@@ -47,7 +46,7 @@ class TestScanningWorkflow:
         
         # 3. Process each barcode
         for barcode_text in test_barcodes:
-            name, value = parse_barcode(barcode_text)
+            name, value = Parse.parse(barcode_text)
             if name and name in {"part_number", "serial_number", "batch_id"}:
                 scanned_data[name] = value
         
@@ -55,27 +54,17 @@ class TestScanningWorkflow:
         missing_required = required_fields - scanned_data.keys()
         assert len(missing_required) == 0
         
-        # 5. Generate output
-        output_data = {
-            "workstation_id": "test_ws",
-            "timestamp": "2024-01-01T10:00:00",
-            "barcodes": [
-                {"name": name, "value": value}
-                for name, value in scanned_data.items()
-            ]
-        }
-        
-        # 6. Save and verify output
-        output_file = self.output_dir / "test_scan.json"
-        with open(output_file, 'w') as f:
-            json.dump(output_data, f, indent=2)
-        
-        assert output_file.exists()
-        
-        # 7. Verify saved data
-        with open(output_file, 'r') as f:
+        # 5. Generate output via current output module
+        writer = OutputData("test_ws", str(self.output_dir))
+        assert writer.to_json(scanned_data)
+
+        output_files = list(self.output_dir.glob("scan_test_ws_*.json"))
+        assert len(output_files) == 1
+
+        # 6. Verify saved data
+        with open(output_files[0], "r", encoding="utf-8") as f:
             saved_data = json.load(f)
-        
+
         assert saved_data["workstation_id"] == "test_ws"
         assert len(saved_data["barcodes"]) == 3
 
@@ -92,7 +81,7 @@ class TestScanningWorkflow:
         required_fields = {"part_number", "serial_number"}
         
         for barcode_text in test_barcodes:
-            name, value = parse_barcode(barcode_text)
+            name, value = Parse.parse(barcode_text)
             if name and name in required_fields:
                 scanned_data[name] = value
         
@@ -119,7 +108,7 @@ class TestScanningWorkflow:
         scanned_data = {}
         
         for barcode_text in invalid_barcodes:
-            name, value = parse_barcode(barcode_text)
+            name, value = Parse.parse(barcode_text)
             if name and name in valid_fields:
                 scanned_data[name] = value
         
@@ -128,14 +117,9 @@ class TestScanningWorkflow:
 
     def test_field_order_preservation(self):
         """Test that field order is preserved in output."""
-        # Create config with specific field order
-        fields = [
-            BarcodeField("serial_number", True),  # Note: serial_number first
-            BarcodeField("part_number", True),    # part_number second
-            BarcodeField("batch_id", False)
-        ]
-        config = WorkstationConfig("order_ws", fields)
-        field_order = [f.name for f in config.barcode_fields]
+        # Config does not define field ordering; ordering is provided by caller.
+        config = WorkstationConfig("order_ws", expected_qr_count=3)
+        field_order = ["serial_number", "part_number", "batch_id"]
         
         # Scan in different order
         scanned_data = {
