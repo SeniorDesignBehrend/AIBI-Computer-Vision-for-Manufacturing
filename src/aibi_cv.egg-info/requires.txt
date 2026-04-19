@@ -8,7 +8,14 @@ transformers>=5.0.0
 torch>=2.10.0
 torchvision>=0.15.0
 pillow>=12.1.0
+<<<<<<< HEAD
 PySide6>=6.7.0
+=======
+streamlit>=1.53.1
+flask>=3.1.3
+pyside6>=6.10.2
+pywin32>=306
+>>>>>>> bfe744f335095baecf86a574fdec0be7c403857a
 
 [dev]
 pytest>=7.0.0

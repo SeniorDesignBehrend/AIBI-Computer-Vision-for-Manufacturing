@@ -49,6 +49,7 @@ uv sync --extra dev
 
 ---
 
+<<<<<<< HEAD
 ## Action Sequence Trainer
 
 A native desktop app (PySide6) for training and verifying that manufacturing workers perform process steps in the correct order. Launched directly or from a host application (e.g. VB.NET) via command-line arguments.
@@ -150,6 +151,12 @@ uv run python -m aibi_cv.simulation_scanner
 ```
 
 ### Barcode Format
+=======
+**Camera File** - Tracks required barcodes per workstation:
+```bash
+uv run python -m aibi_cv.Camera
+```
+>>>>>>> bfe744f335095baecf86a574fdec0be7c403857a
 
 Format barcodes as `field_name:value`:
 - `part_number:PN-12345`
@@ -179,6 +186,7 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 ]
 ```
 
+<<<<<<< HEAD
 **Advanced Scanner** (`outputs/scan_{workstation_id}_{timestamp}.json`):
 ```json
 {
@@ -193,6 +201,8 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 
 ---
 
+=======
+>>>>>>> bfe744f335095baecf86a574fdec0be7c403857a
 ## Project Structure
 
 ```
