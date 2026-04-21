@@ -145,7 +145,7 @@ class Camera(QMainWindow):
         ws_layout.addWidget(self.__workstation_combo)
         info_layout.addLayout(ws_layout)
         
-        self.__expected_label = QLabel(f"<b>Expected QR Count:</b> {self.__config.expected_qr_count}")
+        self.__expected_label = QLabel(f"<b>Expected Code Count:</b> {self.__config.expected_qr_count}")
         self.__direction_label = QLabel(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
         
         info_layout.addWidget(self.__expected_label)
@@ -298,7 +298,7 @@ class Camera(QMainWindow):
         
         self.__output = OutputData(self.__workstation_id, "./output")
         self.setWindowTitle(f"Barcode Scanner - {self.__workstation_id}")
-        self.__expected_label.setText(f"<b>Expected QR Count:</b> {self.__config.expected_qr_count}")
+        self.__expected_label.setText(f"<b>Expected code Count:</b> {self.__config.expected_qr_count}")
         self.__direction_label.setText(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
         
         if self.__camera_thread:
@@ -566,7 +566,7 @@ class Camera(QMainWindow):
 
     def start(self):
         print(f"=== Advanced Scanner - {self.__workstation_id} ===")
-        print(f"Expected QR count: {self.__config.expected_qr_count}")
+        print(f"Expected code count: {self.__config.expected_qr_count}")
         print(f"Scan direction: {self.__config.scan_direction}")
         print(f"Append key: {self.__config.append_key}")
         print("\nFormat barcodes as: field_name:value")
