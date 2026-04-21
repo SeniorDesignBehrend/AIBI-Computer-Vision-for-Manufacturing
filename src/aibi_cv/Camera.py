@@ -35,6 +35,7 @@ class CameraThread(QThread):
         self.camera_index = camera_index
         self.running = False
         self.cap = None
+        self.skip_frames = 0
         
     def run(self):
         self.cap = cv2.VideoCapture(self.camera_index)
@@ -43,7 +44,12 @@ class CameraThread(QThread):
         while self.running:
             ret, frame = self.cap.read()
             if ret:
-                self.frame_ready.emit(frame)
+                # Only emit every 5th frame to reduce processing load
+                if self.skip_frames == 0:
+                    self.frame_ready.emit(frame)
+                    self.skip_frames = 4
+                else:
+                    self.skip_frames -= 1
             self.msleep(30)
     
     def stop(self):
@@ -470,24 +476,12 @@ class Camera(QMainWindow):
         event.accept()
 
     def _detect(self, frame):
-        """Run detection using pyzbar first, then OpenCV fallbacks."""
+        """Run detection using Data Matrix decoder only."""
         detections = []
         try:
-            detections = self.__decode.multi_pyzbar(frame)
+            detections = self.__decode.multi_datamatrix(frame)
         except Exception:
             detections = []
-
-        if not detections:
-            try:
-                detections = self.__decode.multi_opencv(frame)
-            except Exception:
-                detections = []
-
-        if not detections:
-            try:
-                detections = self.__decode.single_opencv(frame) or []
-            except Exception:
-                detections = []
 
         return detections
 
@@ -503,7 +497,7 @@ class Camera(QMainWindow):
                     pass
 
         # Draw directional arrows and order numbers
-        if len(sorted_detections) > 1:
+        if len(sorted_detections) >= 1:
             try:
                 centroids = []
                 for _, box in sorted_detections:
@@ -512,17 +506,16 @@ class Camera(QMainWindow):
                         if cx is not None:
                             centroids.append((int(cx), int(cy)))
 
+                # Draw arrows between codes if multiple
                 for i in range(len(centroids) - 1):
                     pt1 = centroids[i]
                     pt2 = centroids[i + 1]
                     cv2.arrowedLine(frame, pt1, pt2, (255, 0, 255), 3, tipLength=0.3)
-                    cv2.circle(frame, pt1, 20, (255, 0, 255), 2)
-                    cv2.putText(frame, str(i + 1), (pt1[0] - 8, pt1[1] + 8),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-                if centroids:
-                    last_pt = centroids[-1]
-                    cv2.circle(frame, last_pt, 20, (255, 0, 255), 2)
-                    cv2.putText(frame, str(len(centroids)), (last_pt[0] - 8, last_pt[1] + 8),
+                
+                # Draw numbered circles for all codes
+                for i, pt in enumerate(centroids):
+                    cv2.circle(frame, pt, 20, (255, 0, 255), 2)
+                    cv2.putText(frame, str(i + 1), (pt[0] - 8, pt[1] + 8),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
             except Exception:
                 pass

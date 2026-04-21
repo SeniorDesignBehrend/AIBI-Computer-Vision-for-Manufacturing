@@ -17,9 +17,9 @@ dependencies = [
     { name = "opencv-python" },
     { name = "pillow" },
     { name = "pygetwindow" },
+    { name = "pylibdmtx" },
     { name = "pyside6" },
     { name = "pytest" },
-    { name = "pyzbar" },
     { name = "torch" },
     { name = "torchvision" },
     { name = "transformers" },
@@ -38,11 +38,11 @@ requires-dist = [
     { name = "opencv-python", specifier = ">=4.12.0.88" },
     { name = "pillow", specifier = ">=12.1.0" },
     { name = "pygetwindow", specifier = ">=0.0.9" },
+    { name = "pylibdmtx", specifier = ">=0.1.10" },
     { name = "pyside6", specifier = ">=6.7.0" },
     { name = "pytest", specifier = ">=9.0.1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
-    { name = "pyzbar", specifier = ">=0.1.9" },
     { name = "torch", specifier = ">=2.10.0" },
     { name = "torchvision", specifier = ">=0.15.0" },
     { name = "transformers", specifier = ">=5.0.0" },
@@ -1040,6 +1040,16 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/c3/b2/bc9c9196916376152d655522fdcebac55e66de6603a76a02bca1b6414f6c/pygments-2.20.0.tar.gz", hash = "sha256:6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f", size = 4955991, upload-time = "2026-03-29T13:29:33.898Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f4/7e/a72dd26f3b0f4f2bf1dd8923c85f7ceb43172af56d63c7383eb62b332364/pygments-2.20.0-py3-none-any.whl", hash = "sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176", size = 1231151, upload-time = "2026-03-29T13:29:30.038Z" },
+]
+
+[[package]]
+name = "pylibdmtx"
+version = "0.1.10"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b3/c7/49c464cbee2a7ee33132db45ee01cf52403ae1c49267d53e735726cee55d/pylibdmtx-0.1.10-py2.py3-none-any.whl", hash = "sha256:ab73df28b64b3f5e29f22e6937b93967eb77ae7fcd5be381e1142f5a7268eb9e", size = 23191, upload-time = "2022-03-15T14:40:40.176Z" },
+    { url = "https://files.pythonhosted.org/packages/b9/57/74d28fba3205a76cd3e4c16d693da54b21a10df6a28fb688f7100c153d15/pylibdmtx-0.1.10-py2.py3-none-win32.whl", hash = "sha256:2adb8dd71bd138159f6433dafd8eec7420eef97aaf8e51cf0f4fdd976f109962", size = 58108, upload-time = "2022-03-15T14:40:42.742Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/4b/d3fb82bd33d3b8bc0143f17c69660f99f830bd7326d0a09c3c1e1cc01771/pylibdmtx-0.1.10-py2.py3-none-win_amd64.whl", hash = "sha256:e8b0140ab5f473c67fa4335333994a99ea9f683888ae892b1af2dc045560331b", size = 65735, upload-time = "2022-03-15T14:40:44.772Z" },
 ]
 
 [[package]]
@@ -4072,16 +4082,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/da/92/1446574745d74df0c92e6aa4a7b0b3130706a4142b2d1a5869f2eaa423c6/pyyaml-6.0.3-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:16249ee61e95f858e83976573de0f5b2893b3677ba71c9dd36b9cf8be9ac6d65", size = 829923, upload-time = "2025-09-25T21:32:54.537Z" },
     { url = "https://files.pythonhosted.org/packages/f0/7a/1c7270340330e575b92f397352af856a8c06f230aa3e76f86b39d01b416a/pyyaml-6.0.3-cp314-cp314t-win_amd64.whl", hash = "sha256:4ad1906908f2f5ae4e5a8ddfce73c320c2a1429ec52eafd27138b7f1cbe341c9", size = 174062, upload-time = "2025-09-25T21:32:55.767Z" },
     { url = "https://files.pythonhosted.org/packages/f1/12/de94a39c2ef588c7e6455cfbe7343d3b2dc9d6b6b2f40c4c6565744c873d/pyyaml-6.0.3-cp314-cp314t-win_arm64.whl", hash = "sha256:ebc55a14a21cb14062aa4162f906cd962b28e2e9ea38f9b4391244cd8de4ae0b", size = 149341, upload-time = "2025-09-25T21:32:56.828Z" },
-]
-
-[[package]]
-name = "pyzbar"
-version = "0.1.9"
-source = { registry = "https://pypi.org/simple" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6d/24/81ebe6a1c00760471a3028a23cbe0b94e5fa2926e5ba47adc895920887bc/pyzbar-0.1.9-py2.py3-none-any.whl", hash = "sha256:4559628b8192feb25766d954b36a3753baaf5c97c03135aec7e4a026036b475d", size = 32560, upload-time = "2022-03-15T14:53:40.637Z" },
-    { url = "https://files.pythonhosted.org/packages/8e/87/7b596730179ddf17857eea33ba820354dd4e1cf941e57f51ffccce26c409/pyzbar-0.1.9-py2.py3-none-win32.whl", hash = "sha256:8f4c5264c9c7c6b9f20d01efc52a4eba1ded47d9ba857a94130afe33703eb518", size = 810633, upload-time = "2022-03-15T14:53:43.446Z" },
-    { url = "https://files.pythonhosted.org/packages/0a/e2/1c6a8e94197612dbdfc51eab8dfb674168829885fac2c4f50ac8366c25ca/pyzbar-0.1.9-py2.py3-none-win_amd64.whl", hash = "sha256:13e3ee5a2f3a545204a285f41814d5c0db571967e8d4af8699a03afc55182a9c", size = 817363, upload-time = "2022-03-15T14:53:46.691Z" },
 ]
 
 [[package]]

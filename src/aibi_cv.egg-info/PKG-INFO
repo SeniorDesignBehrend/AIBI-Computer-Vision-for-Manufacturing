@@ -5,7 +5,7 @@ Summary: Barebones starter for the AIBI CV project using uv
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 Requires-Dist: opencv-python>=4.12.0.88
-Requires-Dist: pyzbar>=0.1.9
+Requires-Dist: pylibdmtx>=0.1.10
 Requires-Dist: numpy>=1.24.0
 Requires-Dist: keyboard>=0.13.5
 Requires-Dist: pygetwindow>=0.0.9
