@@ -132,7 +132,7 @@ class Camera(QMainWindow):
         info_layout = QVBoxLayout()
         
         ws_label = QLabel(f"<b>Workstation:</b> {self.__workstation_id}")
-        expected_label = QLabel(f"<b>Expected QR Count:</b> {self.__config.expected_qr_count}")
+        expected_label = QLabel(f"<b>Expected Code Count:</b> {self.__config.expected_qr_count}")
         direction_label = QLabel(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
         
         info_layout.addWidget(ws_label)
