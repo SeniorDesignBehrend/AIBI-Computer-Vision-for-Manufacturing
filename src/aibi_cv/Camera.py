@@ -5,7 +5,7 @@ import numpy as np
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                                QHBoxLayout, QLabel, QPushButton, QListWidget, 
-                               QListWidgetItem, QGroupBox)
+                               QListWidgetItem, QGroupBox, QComboBox)
 from PySide6.QtCore import QTimer, Qt, Signal, QThread
 from PySide6.QtGui import QImage, QPixmap, QFont
 import cv2
@@ -131,13 +131,19 @@ class Camera(QMainWindow):
         info_group = QGroupBox("Workstation Info")
         info_layout = QVBoxLayout()
         
-        ws_label = QLabel(f"<b>Workstation:</b> {self.__workstation_id}")
-        expected_label = QLabel(f"<b>Expected QR Count:</b> {self.__config.expected_qr_count}")
-        direction_label = QLabel(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
+        ws_layout = QHBoxLayout()
+        ws_layout.addWidget(QLabel("<b>Workstation:</b>"))
+        self.__workstation_combo = QComboBox()
+        self.__workstation_combo.currentTextChanged.connect(self._change_workstation)
+        self._populate_workstations()
+        ws_layout.addWidget(self.__workstation_combo)
+        info_layout.addLayout(ws_layout)
         
-        info_layout.addWidget(ws_label)
-        info_layout.addWidget(expected_label)
-        info_layout.addWidget(direction_label)
+        self.__expected_label = QLabel(f"<b>Expected QR Count:</b> {self.__config.expected_qr_count}")
+        self.__direction_label = QLabel(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
+        
+        info_layout.addWidget(self.__expected_label)
+        info_layout.addWidget(self.__direction_label)
         info_group.setLayout(info_layout)
         right_panel.addWidget(info_group)
         
@@ -264,6 +270,37 @@ class Camera(QMainWindow):
         self.__dark_mode = not self.__dark_mode
         self.__theme_btn.setText("☀️" if self.__dark_mode else "🌙")
         self._apply_theme()
+    
+    def _populate_workstations(self):
+        available = sorted(self.__config_manager.configs.keys())
+        self.__workstation_combo.blockSignals(True)
+        self.__workstation_combo.clear()
+        self.__workstation_combo.addItems(available)
+        idx = self.__workstation_combo.findText(self.__workstation_id)
+        if idx >= 0:
+            self.__workstation_combo.setCurrentIndex(idx)
+        self.__workstation_combo.blockSignals(False)
+    
+    def _change_workstation(self, new_id):
+        if not new_id or new_id == self.__workstation_id:
+            return
+        
+        self.__workstation_id = new_id
+        self.__config = self.__config_manager.get_config(new_id)
+        if not self.__config:
+            self.__config = self.__config_manager.create_default_config(new_id)
+        
+        self.__output = OutputData(self.__workstation_id, "./output")
+        self.setWindowTitle(f"Barcode Scanner - {self.__workstation_id}")
+        self.__expected_label.setText(f"<b>Expected QR Count:</b> {self.__config.expected_qr_count}")
+        self.__direction_label.setText(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
+        
+        if self.__camera_thread:
+            self.__camera_thread.stop()
+            self.__camera_thread.wait()
+        
+        self._reset_scan()
+        self._start_camera()
     
     def _start_camera(self):
         self.__camera_thread = CameraThread(self.__config.camera_index)
