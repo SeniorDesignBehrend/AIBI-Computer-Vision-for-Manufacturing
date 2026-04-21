@@ -377,17 +377,9 @@ class Camera(QMainWindow):
                             if cx is not None:
                                 centroids.append((int(cx), int(cy)))
 
-                    for i in range(len(centroids) - 1):
-                        pt1 = centroids[i]
-                        pt2 = centroids[i + 1]
-                        cv2.arrowedLine(frozen_frame, pt1, pt2, (255, 0, 255), 3, tipLength=0.3)
-                        cv2.circle(frozen_frame, pt1, 20, (255, 0, 255), 2)
-                        cv2.putText(frozen_frame, str(i + 1), (pt1[0] - 8, pt1[1] + 8),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-                    if centroids:
-                        last_pt = centroids[-1]
-                        cv2.circle(frozen_frame, last_pt, 20, (255, 0, 255), 2)
-                        cv2.putText(frozen_frame, str(len(centroids)), (last_pt[0] - 8, last_pt[1] + 8),
+                    for i, pt in enumerate(centroids):
+                        cv2.circle(frozen_frame, pt, 20, (255, 0, 255), 2)
+                        cv2.putText(frozen_frame, str(i + 1), (pt[0] - 8, pt[1] + 8),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
                 except Exception:
                     pass
@@ -506,12 +498,6 @@ class Camera(QMainWindow):
                         if cx is not None:
                             centroids.append((int(cx), int(cy)))
 
-                # Draw arrows between codes if multiple
-                for i in range(len(centroids) - 1):
-                    pt1 = centroids[i]
-                    pt2 = centroids[i + 1]
-                    cv2.arrowedLine(frame, pt1, pt2, (255, 0, 255), 3, tipLength=0.3)
-                
                 # Draw numbered circles for all codes
                 for i, pt in enumerate(centroids):
                     cv2.circle(frame, pt, 20, (255, 0, 255), 2)
