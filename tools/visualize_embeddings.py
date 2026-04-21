@@ -58,15 +58,15 @@ def sample_frames(video_path: Path, sample_every: int) -> list[np.ndarray]:
 
 
 def compute_embeddings_by_label(
-    videos: list[Path], sample_every: int
+    videos: list[Path], sample_every: int, labels: list[str] | None = None
 ) -> tuple[np.ndarray, list[str]]:
     """Return (N x 384 matrix, list of N label strings)."""
     all_embs: list[np.ndarray] = []
     all_labels: list[str] = []
 
-    for video in videos:
-        label = video.stem
-        print(f"[visualize] {video.name}: sampling frames...", flush=True)
+    for i, video in enumerate(videos):
+        label = labels[i] if labels else video.stem
+        print(f"[visualize] {video.name} -> {label!r}: sampling frames...", flush=True)
         frames = sample_frames(video, sample_every)
         if not frames:
             print(f"[visualize]   WARNING: no frames read from {video.name}", flush=True)
@@ -104,6 +104,11 @@ def main():
         help="One or more video files. The filename stem is used as the step label.",
     )
     parser.add_argument(
+        "--labels", nargs="+", default=None, metavar="LABEL",
+        help="Optional step labels (one per video, in the same order). "
+             "Overrides filename-based labeling. Use quotes for multi-word labels.",
+    )
+    parser.add_argument(
         "--process", type=str, default=None, metavar="PATH",
         help="Optional .pkl process file to overlay its centroids on the plot.",
     )
@@ -130,10 +135,15 @@ def main():
         print(f"ERROR: video file(s) not found: {missing}", file=sys.stderr)
         sys.exit(1)
 
+    if args.labels is not None and len(args.labels) != len(video_paths):
+        print(f"ERROR: got {len(args.labels)} --labels but {len(video_paths)} --videos "
+              f"(counts must match)", file=sys.stderr)
+        sys.exit(1)
+
     print("[visualize] Loading DINOv2 model...", flush=True)
     load_dinov2_model()
 
-    embs, labels = compute_embeddings_by_label(video_paths, args.sample_every)
+    embs, labels = compute_embeddings_by_label(video_paths, args.sample_every, args.labels)
     print(f"[visualize] Total embeddings: {len(embs)} across {len(set(labels))} step(s)", flush=True)
 
     print("[visualize] Running PCA to 2D...", flush=True)

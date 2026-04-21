@@ -22,16 +22,25 @@ class CameraWorker(QThread):
         self._interval = 1.0 / fps
         self._running = False
 
-    def run(self):
-        cap = cv2.VideoCapture(self.camera_index)
-        if not cap.isOpened():
-            self.camera_error.emit()
-            return
+    _WARMUP_ATTEMPTS = 30
 
-        # Read a first frame to confirm the camera is truly ready
-        ret, frame = cap.read()
-        if not ret:
+    def _open_camera(self) -> tuple[cv2.VideoCapture | None, np.ndarray | None]:
+        # Try MSMF (default), then DirectShow fallback
+        for backend in (cv2.CAP_ANY, cv2.CAP_DSHOW):
+            cap = cv2.VideoCapture(self.camera_index, backend)
+            if not cap.isOpened():
+                continue
+            for _ in range(self._WARMUP_ATTEMPTS):
+                ret, frame = cap.read()
+                if ret:
+                    return cap, frame
+                time.sleep(self._interval)
             cap.release()
+        return None, None
+
+    def run(self):
+        cap, frame = self._open_camera()
+        if cap is None:
             self.camera_error.emit()
             return
 

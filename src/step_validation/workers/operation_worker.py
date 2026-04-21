@@ -98,16 +98,25 @@ class OperationWorker(QThread):
         self._interval = 1.0 / target_fps
         self._running = False
 
-    def run(self):
-        cap = cv2.VideoCapture(self.camera_index)
-        if not cap.isOpened():
-            self.camera_error.emit()
-            return
+    _WARMUP_ATTEMPTS = 30
 
-        # Confirm camera delivers frames before entering the loop
-        ret, first_frame = cap.read()
-        if not ret:
+    def _open_camera(self) -> cv2.VideoCapture | None:
+        # Try MSMF (default), then DirectShow fallback
+        for backend in (cv2.CAP_ANY, cv2.CAP_DSHOW):
+            cap = cv2.VideoCapture(self.camera_index, backend)
+            if not cap.isOpened():
+                continue
+            for _ in range(self._WARMUP_ATTEMPTS):
+                ret, _ = cap.read()
+                if ret:
+                    return cap
+                time.sleep(self._interval)
             cap.release()
+        return None
+
+    def run(self):
+        cap = self._open_camera()
+        if cap is None:
             self.camera_error.emit()
             return
 
