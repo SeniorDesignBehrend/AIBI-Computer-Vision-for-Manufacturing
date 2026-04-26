@@ -367,22 +367,7 @@ class Camera(QMainWindow):
         if self.__current_frame is not None:
             frozen_frame = self.__current_frame.copy()
             
-            # Draw the scan order lines and arrows on freeze frame
-            if len(self.__last_sorted_detections) > 1:
-                try:
-                    centroids = []
-                    for _, box in self.__last_sorted_detections:
-                        if box is not None:
-                            cx, cy = ScanSorter.centroid(box)
-                            if cx is not None:
-                                centroids.append((int(cx), int(cy)))
 
-                    for i, pt in enumerate(centroids):
-                        cv2.circle(frozen_frame, pt, 20, (255, 0, 255), 2)
-                        cv2.putText(frozen_frame, str(i + 1), (pt[0] - 8, pt[1] + 8),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-                except Exception:
-                    pass
             
             cv2.putText(frozen_frame, "DATA ENTERED - Press Continue",
                         (10, frozen_frame.shape[0] - 20),
@@ -478,34 +463,7 @@ class Camera(QMainWindow):
         return detections
 
     def _draw_overlays(self, frame, sorted_detections, scanned_items, need):
-        """Draw detection boxes, directional arrows, and status text on frame."""
-        # Draw detection polygons
-        for _, box in sorted_detections:
-            if box is not None:
-                try:
-                    pts = box.astype(int)
-                    cv2.polylines(frame, [pts], True, (0, 255, 0), 2)
-                except Exception:
-                    pass
-
-        # Draw directional arrows and order numbers
-        if len(sorted_detections) >= 1:
-            try:
-                centroids = []
-                for _, box in sorted_detections:
-                    if box is not None:
-                        cx, cy = ScanSorter.centroid(box)
-                        if cx is not None:
-                            centroids.append((int(cx), int(cy)))
-
-                # Draw numbered circles for all codes
-                for i, pt in enumerate(centroids):
-                    cv2.circle(frame, pt, 20, (255, 0, 255), 2)
-                    cv2.putText(frame, str(i + 1), (pt[0] - 8, pt[1] + 8),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-            except Exception:
-                pass
-
+        """Draw status text on frame."""
         # Show completion message when all codes scanned
         scanned_count = len(scanned_items)
         if scanned_count >= need:

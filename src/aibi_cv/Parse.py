@@ -4,7 +4,7 @@ import json
 class Parse:
     @staticmethod
     def parse(data: str) -> tuple:
-        """Parse barcode text into (name, value).
+        """Parse Data Matrix code text into (name, value).
 
         Tries JSON first, then `name:value` format, otherwise returns (None, data).
         """

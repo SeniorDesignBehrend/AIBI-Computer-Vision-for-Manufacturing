@@ -2,7 +2,7 @@
 
 Two-part system for manufacturing quality control:
 
-1. **QR/Barcode Scanner** (`aibi_cv`) — scans barcodes and outputs data to JSON or Excel
+1. **Data Matrix/Barcode Scanner** (`aibi_cv`) — scans Data Matrix codes and outputs data to JSON or Excel
 2. **Action Sequence Trainer** (`step_validation`) — teaches and verifies manufacturing process steps using computer vision (DINOv2)
 
 ---
@@ -107,11 +107,11 @@ Run logs are saved as JSON to `--log-dir` after each monitoring session.
 
 ---
 
-## QR / Barcode Scanner
+## Data Matrix / Barcode Scanner
 
 ### Running
 
-**Camera File** - Tracks required barcodes per workstation:
+**Camera File** - Tracks required Data Matrix codes per workstation:
 ```bash
 uv run python -m aibi_cv.Camera
 ```
@@ -130,7 +130,7 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 ```json
 {
   "workstation_id": "workstation_01",
-  "expected_qr_count": 6,
+  "expected_datamatrix_count": 6,
   "scan_direction": "row-major",
   "append_key": "NONE",
   "camera_index": 0
@@ -157,7 +157,7 @@ Each workstation is configured in `configs/{workstation_id}.json`:
 
 ```
 src/
-├── aibi_cv/                  # QR/barcode scanning package
+├── aibi_cv/                  # Data Matrix/barcode scanning package
 │   ├── Camera.py             # Main camera/scanner class
 └── step_validation/          # Action sequence trainer (PySide6 desktop app)
     ├── main.py               # Entry point (argparse + QApplication)

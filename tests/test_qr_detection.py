@@ -1,4 +1,4 @@
-"""Basic QR detection tests for current decoder utilities."""
+"""Basic Data Matrix detection tests for current decoder utilities."""
 
 import numpy as np
 from unittest.mock import patch, MagicMock
@@ -7,7 +7,7 @@ from aibi_cv.DecodeQr import DecodeQr
 
 
 class TestBasicQRDetection:
-    """Basic QR detection functionality tests."""
+    """Basic Data Matrix detection functionality tests."""
 
     @patch("aibi_cv.DecodeQr.cv.QRCodeDetector")
     def test_multi_opencv_returns_detections(self, mock_detector_class):

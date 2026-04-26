@@ -2,11 +2,11 @@
 
 ## Overview
 
-The advanced scanner uses named barcodes to track which fields have been scanned. Each workstation has a configuration file that defines which barcode fields are required.
+The advanced scanner uses named Data Matrix codes to track which fields have been scanned. Each workstation has a configuration file that defines which Data Matrix fields are required.
 
 ## Barcode Format
 
-All barcodes must follow this format:
+All Data Matrix codes must follow this format:
 ```
 field_name:value
 ```
@@ -39,8 +39,8 @@ Each workstation defines its required and optional fields in `data/config/{works
 
 ## Scanner Behavior
 
-1. **Scanning**: The scanner continuously looks for QR codes
-2. **Filtering**: Only barcodes matching the workstation's field list are tracked
+1. **Scanning**: The scanner continuously looks for Data Matrix codes
+2. **Filtering**: Only Data Matrix codes matching the workstation's field list are tracked
 3. **Tracking**: Each field can only be scanned once per session
 4. **Validation**: All required fields must be scanned before saving
 5. **Saving**: Press 's' to save when all required fields are complete
