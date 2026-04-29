@@ -5,7 +5,7 @@ import numpy as np
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                                QHBoxLayout, QLabel, QPushButton, QListWidget, 
-                               QListWidgetItem, QGroupBox)
+                               QListWidgetItem, QGroupBox, QComboBox)
 from PySide6.QtCore import QTimer, Qt, Signal, QThread
 from PySide6.QtGui import QImage, QPixmap, QFont
 import cv2
@@ -35,6 +35,7 @@ class CameraThread(QThread):
         self.camera_index = camera_index
         self.running = False
         self.cap = None
+        self.skip_frames = 0
         
     def run(self):
         self.cap = cv2.VideoCapture(self.camera_index)
@@ -43,7 +44,12 @@ class CameraThread(QThread):
         while self.running:
             ret, frame = self.cap.read()
             if ret:
-                self.frame_ready.emit(frame)
+                # Only emit every 5th frame to reduce processing load
+                if self.skip_frames == 0:
+                    self.frame_ready.emit(frame)
+                    self.skip_frames = 4
+                else:
+                    self.skip_frames -= 1
             self.msleep(30)
     
     def stop(self):
@@ -131,13 +137,19 @@ class Camera(QMainWindow):
         info_group = QGroupBox("Workstation Info")
         info_layout = QVBoxLayout()
         
-        ws_label = QLabel(f"<b>Workstation:</b> {self.__workstation_id}")
-        expected_label = QLabel(f"<b>Expected Code Count:</b> {self.__config.expected_qr_count}")
-        direction_label = QLabel(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
+        ws_layout = QHBoxLayout()
+        ws_layout.addWidget(QLabel("<b>Workstation:</b>"))
+        self.__workstation_combo = QComboBox()
+        self.__workstation_combo.currentTextChanged.connect(self._change_workstation)
+        self._populate_workstations()
+        ws_layout.addWidget(self.__workstation_combo)
+        info_layout.addLayout(ws_layout)
         
-        info_layout.addWidget(ws_label)
-        info_layout.addWidget(expected_label)
-        info_layout.addWidget(direction_label)
+        self.__expected_label = QLabel(f"<b>Expected Code Count:</b> {self.__config.expected_qr_count}")
+        self.__direction_label = QLabel(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
+        
+        info_layout.addWidget(self.__expected_label)
+        info_layout.addWidget(self.__direction_label)
         info_group.setLayout(info_layout)
         right_panel.addWidget(info_group)
         
@@ -265,6 +277,37 @@ class Camera(QMainWindow):
         self.__theme_btn.setText("☀️" if self.__dark_mode else "🌙")
         self._apply_theme()
     
+    def _populate_workstations(self):
+        available = sorted(self.__config_manager.configs.keys())
+        self.__workstation_combo.blockSignals(True)
+        self.__workstation_combo.clear()
+        self.__workstation_combo.addItems(available)
+        idx = self.__workstation_combo.findText(self.__workstation_id)
+        if idx >= 0:
+            self.__workstation_combo.setCurrentIndex(idx)
+        self.__workstation_combo.blockSignals(False)
+    
+    def _change_workstation(self, new_id):
+        if not new_id or new_id == self.__workstation_id:
+            return
+        
+        self.__workstation_id = new_id
+        self.__config = self.__config_manager.get_config(new_id)
+        if not self.__config:
+            self.__config = self.__config_manager.create_default_config(new_id)
+        
+        self.__output = OutputData(self.__workstation_id, "./output")
+        self.setWindowTitle(f"Barcode Scanner - {self.__workstation_id}")
+        self.__expected_label.setText(f"<b>Expected code Count:</b> {self.__config.expected_qr_count}")
+        self.__direction_label.setText(f"<b>Scan Direction:</b> {self.__config.scan_direction}")
+        
+        if self.__camera_thread:
+            self.__camera_thread.stop()
+            self.__camera_thread.wait()
+        
+        self._reset_scan()
+        self._start_camera()
+    
     def _start_camera(self):
         self.__camera_thread = CameraThread(self.__config.camera_index)
         self.__camera_thread.frame_ready.connect(self._process_frame)
@@ -324,30 +367,7 @@ class Camera(QMainWindow):
         if self.__current_frame is not None:
             frozen_frame = self.__current_frame.copy()
             
-            # Draw the scan order lines and arrows on freeze frame
-            if len(self.__last_sorted_detections) > 1:
-                try:
-                    centroids = []
-                    for _, box in self.__last_sorted_detections:
-                        if box is not None:
-                            cx, cy = ScanSorter.centroid(box)
-                            if cx is not None:
-                                centroids.append((int(cx), int(cy)))
 
-                    for i in range(len(centroids) - 1):
-                        pt1 = centroids[i]
-                        pt2 = centroids[i + 1]
-                        cv2.arrowedLine(frozen_frame, pt1, pt2, (255, 0, 255), 3, tipLength=0.3)
-                        cv2.circle(frozen_frame, pt1, 20, (255, 0, 255), 2)
-                        cv2.putText(frozen_frame, str(i + 1), (pt1[0] - 8, pt1[1] + 8),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-                    if centroids:
-                        last_pt = centroids[-1]
-                        cv2.circle(frozen_frame, last_pt, 20, (255, 0, 255), 2)
-                        cv2.putText(frozen_frame, str(len(centroids)), (last_pt[0] - 8, last_pt[1] + 8),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-                except Exception:
-                    pass
             
             cv2.putText(frozen_frame, "DATA ENTERED - Press Continue",
                         (10, frozen_frame.shape[0] - 20),
@@ -433,63 +453,17 @@ class Camera(QMainWindow):
         event.accept()
 
     def _detect(self, frame):
-        """Run detection using pyzbar first, then OpenCV fallbacks."""
+        """Run detection using Data Matrix decoder only."""
         detections = []
         try:
-            detections = self.__decode.multi_pyzbar(frame)
+            detections = self.__decode.multi_datamatrix(frame)
         except Exception:
             detections = []
-
-        if not detections:
-            try:
-                detections = self.__decode.multi_opencv(frame)
-            except Exception:
-                detections = []
-
-        if not detections:
-            try:
-                detections = self.__decode.single_opencv(frame) or []
-            except Exception:
-                detections = []
 
         return detections
 
     def _draw_overlays(self, frame, sorted_detections, scanned_items, need):
-        """Draw detection boxes, directional arrows, and status text on frame."""
-        # Draw detection polygons
-        for _, box in sorted_detections:
-            if box is not None:
-                try:
-                    pts = box.astype(int)
-                    cv2.polylines(frame, [pts], True, (0, 255, 0), 2)
-                except Exception:
-                    pass
-
-        # Draw directional arrows and order numbers
-        if len(sorted_detections) > 1:
-            try:
-                centroids = []
-                for _, box in sorted_detections:
-                    if box is not None:
-                        cx, cy = ScanSorter.centroid(box)
-                        if cx is not None:
-                            centroids.append((int(cx), int(cy)))
-
-                for i in range(len(centroids) - 1):
-                    pt1 = centroids[i]
-                    pt2 = centroids[i + 1]
-                    cv2.arrowedLine(frame, pt1, pt2, (255, 0, 255), 3, tipLength=0.3)
-                    cv2.circle(frame, pt1, 20, (255, 0, 255), 2)
-                    cv2.putText(frame, str(i + 1), (pt1[0] - 8, pt1[1] + 8),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-                if centroids:
-                    last_pt = centroids[-1]
-                    cv2.circle(frame, last_pt, 20, (255, 0, 255), 2)
-                    cv2.putText(frame, str(len(centroids)), (last_pt[0] - 8, last_pt[1] + 8),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-            except Exception:
-                pass
-
+        """Draw status text on frame."""
         # Show completion message when all codes scanned
         scanned_count = len(scanned_items)
         if scanned_count >= need:
@@ -550,7 +524,7 @@ class Camera(QMainWindow):
 
     def start(self):
         print(f"=== Advanced Scanner - {self.__workstation_id} ===")
-        print(f"Expected QR count: {self.__config.expected_qr_count}")
+        print(f"Expected code count: {self.__config.expected_qr_count}")
         print(f"Scan direction: {self.__config.scan_direction}")
         print(f"Append key: {self.__config.append_key}")
         print("\nFormat barcodes as: field_name:value")

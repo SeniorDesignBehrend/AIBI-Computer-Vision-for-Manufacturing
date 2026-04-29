@@ -7,6 +7,7 @@ src/aibi_cv/Parse.py
 src/aibi_cv/ScanSorter.py
 src/aibi_cv/__init__.py
 src/aibi_cv/config_manager.py
+src/aibi_cv/datamatrix_scanner.py
 src/aibi_cv.egg-info/PKG-INFO
 src/aibi_cv.egg-info/SOURCES.txt
 src/aibi_cv.egg-info/dependency_links.txt

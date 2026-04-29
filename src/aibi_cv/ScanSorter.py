@@ -1,11 +1,11 @@
-"""Directional sorting for detected barcodes/QR codes."""
+"""Directional sorting for detected Data Matrix codes."""
 
 import numpy as np
 from typing import List, Tuple, Optional
 
 
 class ScanSorter:
-    """Sorts detected barcodes by scan direction using row-based grouping."""
+    """Sorts detected Data Matrix codes by scan direction using row-based grouping."""
 
     @staticmethod
     def centroid(box) -> Tuple[Optional[float], Optional[float]]:

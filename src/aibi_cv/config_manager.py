@@ -1,4 +1,4 @@
-"""Configuration management for workstation-specific barcode mapping."""
+"""Configuration management for workstation-specific Data Matrix code mapping."""
 
 import json
 from pathlib import Path
@@ -8,7 +8,7 @@ from dataclasses import dataclass, asdict
 
 @dataclass
 class BarcodeField:
-    """Defines a barcode field to scan."""
+    """Defines a Data Matrix code field to scan."""
     name: str
     required: bool = True
 
