@@ -12,7 +12,7 @@ import numpy as np
 from aibi_cv.DecodeQr import DecodeQr
 from aibi_cv.OutputData import OutputData
 from aibi_cv.config_manager import ConfigManager, WorkstationConfig
-from aibi_cv.parse import Parse
+from aibi_cv.Parse import Parse
 
 
 class TestTCSFR1AUTO01:

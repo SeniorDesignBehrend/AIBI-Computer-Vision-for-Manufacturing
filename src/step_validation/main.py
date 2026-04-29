@@ -16,7 +16,10 @@ VB.NET example
 """
 
 import argparse
+import os
 import sys
+
+os.environ["OPENCV_LOG_LEVEL"] = "SILENT"
 
 import cv2
 from PySide6.QtWidgets import QApplication

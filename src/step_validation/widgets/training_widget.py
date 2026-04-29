@@ -144,16 +144,27 @@ class _CameraTab(QWidget):
 
     def showEvent(self, event):
         super().showEvent(event)
-        # Start preview lazily so the label has been laid out and has real dimensions
+        # (Re-)start preview whenever the tab becomes visible
         if self._camera_worker is None:
             self._start_preview()
 
     def _start_preview(self):
+        self._camera_ready = False
+        self._btn_start.setEnabled(False)
+        self._preview.setText("Connecting to camera...")
         self._camera_worker = CameraWorker(fps=30)
         self._camera_worker.frame_ready.connect(self._on_preview_frame)
         self._camera_worker.camera_error.connect(self._on_camera_error)
         self._camera_worker.camera_opened.connect(self._on_camera_opened)
         self._camera_worker.start()
+
+    def release_camera(self):
+        """Stop the camera worker so another widget can use the device."""
+        if self._camera_worker:
+            self._camera_worker.stop()
+            self._camera_worker = None
+        self._camera_ready = False
+        self._btn_start.setEnabled(False)
 
     @Slot()
     def _on_camera_opened(self):
@@ -236,8 +247,7 @@ class _CameraTab(QWidget):
         self._save_group.setVisible(False)
 
     def cleanup(self):
-        if self._camera_worker:
-            self._camera_worker.stop()
+        self.release_camera()
 
 
 # ---------------------------------------------------------------------------
@@ -381,6 +391,9 @@ class _RecordPhase(QWidget):
         ))
         self._camera_tab.update_existing_names(unique_names)
         self._upload_tab.update_existing_names(unique_names)
+
+    def release_camera(self):
+        self._camera_tab.release_camera()
 
     def cleanup(self):
         self._camera_tab.cleanup()
@@ -676,6 +689,8 @@ class _AugmentPhase(QWidget):
         self._step_list_label.setText(
             f"Current steps: {', '.join(step_names)}"
         )
+        self._camera_tab.update_existing_names(step_names)
+        self._upload_tab.update_existing_names(step_names)
         self._segments.clear()
         self._update_pending_label()
         self._btn_save.setVisible(False)
@@ -744,6 +759,9 @@ class _AugmentPhase(QWidget):
         Path(path).write_bytes(data)
         self._status_label.setText(f"Saved to {path}")
 
+    def release_camera(self):
+        self._camera_tab.release_camera()
+
     def cleanup(self):
         self._camera_tab.cleanup()
 
@@ -776,14 +794,21 @@ class TrainingWidget(QWidget):
         self._review_phase.go_back.connect(self._show_record)
         self._review_phase.training_finalized.connect(self._on_training_finalized)
 
+    def _release_all_cameras(self):
+        self._record_phase.release_camera()
+        self._augment_phase.release_camera()
+
     def _show_review(self):
+        self._release_all_cameras()
         self._review_phase.refresh()
         self._stack.setCurrentIndex(1)
 
     def _show_record(self):
+        self._release_all_cameras()
         self._stack.setCurrentIndex(0)
 
     def _show_augment(self):
+        self._release_all_cameras()
         self._augment_phase.refresh()
         self._stack.setCurrentIndex(2)
 

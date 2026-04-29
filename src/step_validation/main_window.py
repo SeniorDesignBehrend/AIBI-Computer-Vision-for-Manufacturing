@@ -18,13 +18,13 @@ from .widgets.training_widget import TrainingWidget
 
 class _ModelLoader(QThread):
     """Loads DINOv2 in a background thread so the UI stays responsive."""
-    finished = Signal()
+    done = Signal()    # 'done' to avoid shadowing QThread's built-in 'finished'
     error = Signal(str)
 
     def run(self):
         try:
             load_dinov2_model()
-            self.finished.emit()
+            self.done.emit()
         except Exception as exc:
             self.error.emit(str(exc))
 
@@ -63,7 +63,7 @@ class MainWindow(QMainWindow):
         self._progress.show()
 
         self._loader = _ModelLoader(self)
-        self._loader.finished.connect(self._on_model_loaded)
+        self._loader.done.connect(self._on_model_loaded)
         self._loader.error.connect(self._on_model_error)
         self._loader.start()
 
